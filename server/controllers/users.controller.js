@@ -1,6 +1,7 @@
 const userService = require("../services/user.service");
 const { ErrorHandler } = require("../helpers/error");
 const { hashPassword } = require("../helpers/hashPassword");
+
 const getAllUsers = async (req, res) => {
     const results = await userService.getAllUsers();
     res.status(200).json(results);
