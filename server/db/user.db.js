@@ -5,12 +5,18 @@ const getAllUsersDb = async () => {
   return users;
 };
 
-const createUserDb = async ({ username, password, email, fullname }) => {
+const createUserDb = async ({
+  username,
+  password,
+  email,
+  fullname,
+  phone_numbers,
+}) => {
   const { rows: user } = await pool.query(
-    `INSERT INTO users(username, password, email, fullname) 
-        VALUES($1, $2, $3, $4) 
+    `INSERT INTO users(username, password, email, fullname, phone_numbers) 
+        VALUES($1, $2, $3, $4, $5) 
         returning user_id, username, email, fullname, roles, phone_numbers, address, city, country, created_at`,
-    [username, password, email, fullname]
+    [username, password, email, fullname, phone_numbers]
   );
   return user[0];
 };
