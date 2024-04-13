@@ -1,20 +1,18 @@
+import loadableComponent from "components/loadable-component";
 import React from "react";
 import { Navigate, Routes, Route } from 'react-router-dom'
-import Login from "views/pages/login";
+import GuestRoute from "./guest-route";
 
-
+const Login = loadableComponent(()=> import('views/pages/login'))
 
 function AllRoutes(){
     return(
-        // <Routes>
-        //     <Route path="/" element={<Navigate to={'/login'} />} />
-        //     <Route>
-        //         <Route path="/login" element={<Login />} />
-        //     </Route>
-        // </Routes>
-        <>
-            <Login />
-        </>
+        <Routes>
+            <Route path="/" element={<Navigate to={'/login'} />} />
+            <Route element={<GuestRoute />}>
+                <Route path="/login" element={<Login />} />
+            </Route>
+        </Routes>
     )
 }
 
