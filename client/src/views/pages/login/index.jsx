@@ -2,14 +2,14 @@ import { useState } from 'react'
 import { Form, Input, Button, Modal } from 'antd'
 import { UserOutlined, UnlockOutlined } from '@ant-design/icons'
 import messages from 'assets/lang/messages'
-// import auth from 'api/auth'
+import auth from 'api/auth'
 // import useAuth from 'hooks/useAuth'
 import background from 'assets/images/background.png'
 import avatar from 'assets/images/avatar.svg'
 import './login.scss'
-
+import { useNavigate } from 'react-router-dom'
 function Login() {
-    
+    const navigate = useNavigate()
     const [isModalVisible, setIsModalVisible] = useState(false)
     const [form] = Form.useForm()
 
@@ -22,18 +22,21 @@ function Login() {
     }
 
     // const { setToken } = useAuth()
-    // const handleSubmit = async (values) => {
-    //     try {
-    //         const response = await auth.login(values)
-    //         if (response.request.status === 200) {
-    //             setToken(response.data.token)
-    //             alert(response.data.message)
-    //         }
-    //     } catch (error) {
-    //         //TODO: hiển bị thông báo theo từng error code (error.request.status === 404)
-    //         alert(error.response.data.message)
-    //     }
-    // }
+    const handleSubmit = async (values) => {
+        try {
+            const response = await auth.login(values)
+            console.log(response.data);
+            if (response.status === 200) {
+                // setToken(response.data.token)
+                alert('Đăng nhập thành công')
+                navigate('/pet')
+               
+            }
+        } catch (error) {
+            //TODO: hiển bị thông báo theo từng error code (error.request.status === 404)
+            alert('đăng nhập thất bại')
+        }
+    }
 
     // const handleForgotPasswordSubmit = async (values) => {
     //     try {
@@ -58,7 +61,7 @@ function Login() {
                     <Form
                         name="login"
                         className="login-container__sub__content__form"
-                        // onFinish={handleSubmit}
+                        onFinish={handleSubmit}
                     >
                         <img
                             className="image-avatar"

@@ -1,0 +1,24 @@
+.header-wrapper{
+    height: '45px';
+    position: 'sticky';
+    top: 0;
+    z-index: 1;
+    width: '100%';
+    display: 'flex';
+    align-items: center;
+    
+    &__logo {
+        display: inline-flex;
+        align-items: center;
+        img {
+            width: 45px;
+        }
+    }
+
+    &__avatar {
+        display: inline-block;
+        // img {
+        //     width: 45px;
+        // }
+    }
+}
