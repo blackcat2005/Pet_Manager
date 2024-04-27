@@ -1,40 +1,44 @@
-import { useState } from 'react'
-import { Form, Input, Button, Modal } from 'antd'
-import { UserOutlined, UnlockOutlined } from '@ant-design/icons'
+import React, { useContext, useEffect, useState } from 'react'
+import { Form, Input, Button, Modal, Checkbox } from 'antd'
+import { UserOutlined, LockOutlined } from '@ant-design/icons'
 import messages from 'assets/lang/messages'
 import auth from 'api/auth'
-// import useAuth from 'hooks/useAuth'
-import background from 'assets/images/background.png'
-import avatar from 'assets/images/avatar.svg'
 import './login.scss'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify'
+import { UserContext } from 'context/UserContext'
+
 function Login() {
-    const navigate = useNavigate()
-    const [isModalVisible, setIsModalVisible] = useState(false)
-    const [form] = Form.useForm()
+    const navigate = useNavigate();
+    // const [form] = Form.useForm()
+    const { user, loginContext } = useContext(UserContext);
 
-    const showModal = () => {
-        setIsModalVisible(true)
-    }
-
-    const handleCancel = () => {
-        setIsModalVisible(false)
-    }
-
-    // const { setToken } = useAuth()
-    const handleSubmit = async (values) => {
+    const handleSubmit = async (dataUser) => {
         try {
-            const response = await auth.login(values)
-            console.log(response.data);
-            if (response.status === 200) {
-                // setToken(response.data.token)
-                alert('Đăng nhập thành công')
-                navigate('/pet')
-               
+            if (dataUser) {
+                let response = await auth.login(dataUser)
+                console.log("response", response);
+
+                if (response.status === 200) {
+                    let token = response.data.token;
+                    let user = response.data.user;
+
+                    let data = {
+                        isAuthenticated: true,
+                        token: token,
+                        user: user
+                    }
+                    localStorage.setItem('jwt', token);
+                    loginContext(data);
+
+                    toast.success('Đăng nhập thành công')
+                    navigate(`/pet`);
+                }
             }
         } catch (error) {
+            console.log("error: ", error);
             //TODO: hiển bị thông báo theo từng error code (error.request.status === 404)
-            alert('đăng nhập thất bại')
+            toast.error('Đăng nhập thất bại')
         }
     }
 
@@ -49,136 +53,102 @@ function Login() {
     //     setIsModalVisible(false)
     // }
 
+
+    const handleToRegister = () => {
+        navigate('/register');
+    }
+
+    useEffect(() => {
+        console.log(user);
+    }, [])
+
     return (
-        <div className="login-container">
+        <div className="login-container" >
             <div className="login-container__sub">
-                <img
-                    className="login-container__sub__image"
-                    src={background}
-                    alt={'backgound'}
-                />
                 <div className="login-container__sub__content">
                     <Form
+                        layout="vertical"
                         name="login"
                         className="login-container__sub__content__form"
+                        initialValues={{
+                            remember: true,
+                        }}
                         onFinish={handleSubmit}
                     >
-                        <img
-                            className="image-avatar"
-                            src={avatar}
-                            alt={'avatar'}
-                        />
-                        <h2>Welcome</h2>
-                        <div className="login-container__sub__content__form__item">
-                            <i>
-                                <UserOutlined />
-                            </i>
-                            <Form.Item
-                                className="form-item"
-                                name="email"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: messages['email_required'],
-                                    },
-                                    {
-                                        type: 'email',
-                                        message: messages['invalid_email'],
-                                    },
-                                ]}
-                            >
-                                <Input
-                                    placeholder="Email"
-                                    className="input email"
-                                />
-                            </Form.Item>
+                        <div className='login-container__sub__content__form__header'>
+                            <h3 className='login-container__sub__content__form__header__title'>
+                                Đăng nhập
+                            </h3>
+                            <hr />
+                            <div className='login-container__sub__content__form__header__sub-title'>
+                                Nếu bạn đã có tài khoản, bạn có thể đăng nhập bằng email/tên đăng nhập và mật khẩu
+                            </div>
                         </div>
 
-                        <div className="login-container__sub__content__form__item">
-                            <i>
-                                <UnlockOutlined />
-                            </i>
-                            <Form.Item
-                                className="form-item"
-                                name="password"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: messages['password_required'],
-                                    },
-                                    {
-                                        type: 'string',
-                                        min: 6,
-                                        max: 24,
-                                        message:
-                                            messages['invalid_password_length'],
-                                    },
-                                ]}
-                            >
-                                <Input.Password
-                                    placeholder="Password"
-                                    className="input password"
-                                />
-                            </Form.Item>
-                        </div>
-                        <label className="forgot-password" onClick={showModal}>
-                            Forgot Password
-                        </label>
-                        <Modal
-                            className="forgot-password-modal"
-                            title="Quên mật khẩu"
-                            visible={isModalVisible}
-                            onOk={form.submit}
-                            onCancel={handleCancel}
+                        <Form.Item
+                            label="Địa chỉ email"
+                            className="form-item"
+                            name="email"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: messages['email_required'],
+                                },
+                                {
+                                    type: 'email',
+                                    message: messages['invalid_email'],
+                                },
+                            ]}
                         >
-                            <Form
-                                form={form}
-                                // onFinish={handleForgotPasswordSubmit}
-                            >
-                                <h3>Email</h3>
-                                <div className="forgot-password-modal__email">
-                                    <i className="forgot-password-modal__email__icon">
-                                        <UserOutlined className="icon" />
-                                    </i>
-                                    <Form.Item
-                                        className="forgot-password-modal__email__item"
-                                        name="email"
-                                        rules={[
-                                            {
-                                                required: true,
-                                                message:
-                                                    messages['email_required'],
-                                            },
-                                            {
-                                                type: 'email',
-                                                message:
-                                                    messages['invalid_email'],
-                                            },
-                                        ]}
-                                    >
-                                        <Input
-                                            name="forgot-password-email"
-                                            type="email"
-                                            placeholder="Email"
-                                            size="large"
-                                            className="forgot-password-modal__email__item__input"
-                                        />
-                                    </Form.Item>
+                            <Input
+                                prefix={<UserOutlined className="site-form-item-icon" />}
+                                placeholder="Email" />
+                        </Form.Item>
+
+                        <Form.Item
+                            label="Mật khẩu"
+                            className="form-item"
+                            name="password"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Please input your Password!',
+                                },
+                            ]}
+                        >
+                            <Input.Password
+                                prefix={<LockOutlined className="site-form-item-icon" />}
+                                type="password"
+                                placeholder="Password"
+                                className='input-password'
+                            />
+                        </Form.Item>
+                        <Form.Item>
+                            <div className='remember-forgot'>
+                                <Form.Item name="remember" valuePropName="checked" noStyle>
+                                    <Checkbox>Ghi nhớ tôi</Checkbox>
+                                </Form.Item>
+
+                                <div className="login-form-forgot">
+                                    Quên mật khẩu
                                 </div>
-                            </Form>
-                        </Modal>
+                            </div>
+                        </Form.Item>
 
                         <Button
-                            className="button-submit"
                             type="primary"
                             htmlType="submit"
-                        >
-                            LOGIN
+                            className="login-form-button"
+                            onClick={() => handleSubmit()}>
+                            Đăng nhập
                         </Button>
-                        <a className="create-account" href="/register">
-                            Create new account{' '}
-                        </a>
                     </Form>
+
+
+                    <div className="register">
+                        Chưa có tài khoản?
+                        <span className='register-link' onClick={() => handleToRegister()}>Đăng ký tại đây</span>
+                    </div>
                 </div>
             </div>
         </div>

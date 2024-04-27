@@ -15,7 +15,7 @@ const createAccount = async (req, res) => {
     sameSite: process.env.NODE_ENV === "development" ? true : "none",
     secure: process.env.NODE_ENV === "development" ? false : true,
   });
-  res.status(201).json({
+  res.status(200).json({
     token,
     user,
   });
@@ -23,6 +23,7 @@ const createAccount = async (req, res) => {
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
+  console.log("email:", email, password);
   const { token, refreshToken, user } = await authService.login(
     email,
     password

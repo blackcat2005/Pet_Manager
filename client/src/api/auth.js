@@ -6,7 +6,7 @@ const auth = {
         return axiosClient.post(url, credentials)
     },
     register: (credentials) => {
-        const url = '/api/auth/register'
+        const url = '/api/auth/signup'
         return axiosClient.post(url, credentials)
     },
     getAuthenticatedUser: () => {
