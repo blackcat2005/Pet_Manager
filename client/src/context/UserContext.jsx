@@ -6,68 +6,66 @@ import auth from 'api/auth'
 const UserContext = createContext({})
 
 const UserProvider = ({ children }) => {
+  const userDefault = {
+    isAuthenticated: false,
+    token: '',
+    user: {}
+  }
+  const [user, setUser] = useState(userDefault)
+  const loginContext = (userData) => {
+    setUser(userData)
+  }
 
-    const userDefault = {
-        isAuthenticated: false,
-        token: '',
-        user: {}
-    }
-    const [user, setUser] = useState(userDefault);
-    const loginContext = (userData) => {
-        setUser(userData);
-    }
+  const logoutContext = () => {
+    setUser(userDefault)
+  }
 
-    const logoutContext = () => {
-        setUser(userDefault);
-    }
+  // const [token, setToken] = useState(localStorage.getItem('token'))
+  // const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')))
+  // const [collapsed, setCollapsed] = useState(
+  //     localStorage.getItem('collapsed') === 'true',
+  // )
 
-    // const [token, setToken] = useState(localStorage.getItem('token'))
-    // const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')))
-    // const [collapsed, setCollapsed] = useState(
-    //     localStorage.getItem('collapsed') === 'true',
-    // )
+  // const providerValue = useMemo(
+  //     () => ({ token, setToken, user, setUser, collapsed, setCollapsed }),
+  //     [token, setToken, user, setUser, collapsed, setCollapsed],
+  // )
 
-    // const providerValue = useMemo(
-    //     () => ({ token, setToken, user, setUser, collapsed, setCollapsed }),
-    //     [token, setToken, user, setUser, collapsed, setCollapsed],
-    // )
+  // useEffect(() => {
+  //     if (token !== 'null') {
+  //         // Set authenticate token to axios
+  //         axiosClient.defaults.headers.common[
+  //             'Authorization'
+  //         ] = `Bearer ${token}`
 
-    // useEffect(() => {
-    //     if (token !== 'null') {
-    //         // Set authenticate token to axios
-    //         axiosClient.defaults.headers.common[
-    //             'Authorization'
-    //         ] = `Bearer ${token}`
+  //         if (token !== localStorage.getItem('token')) {
+  //             // Get current user's data
+  //             auth.getAuthenticatedUser()
+  //                 .then((response) => {
+  //                     setUser(response.data)
+  //                     localStorage.setItem('token', token)
+  //                     localStorage.setItem(
+  //                         'user',
+  //                         JSON.stringify(response.data),
+  //                     )
+  //                 })
+  //                 .catch((error) => {
+  //                     console.log(error)
+  //                 })
+  //         }
+  //     } else {
+  //         // User logout
+  //         setUser('null')
+  //         localStorage.setItem('token', null)
+  //         localStorage.setItem('user', null)
+  //     }
+  // }, [token])
 
-    //         if (token !== localStorage.getItem('token')) {
-    //             // Get current user's data
-    //             auth.getAuthenticatedUser()
-    //                 .then((response) => {
-    //                     setUser(response.data)
-    //                     localStorage.setItem('token', token)
-    //                     localStorage.setItem(
-    //                         'user',
-    //                         JSON.stringify(response.data),
-    //                     )
-    //                 })
-    //                 .catch((error) => {
-    //                     console.log(error)
-    //                 })
-    //         }
-    //     } else {
-    //         // User logout
-    //         setUser('null')
-    //         localStorage.setItem('token', null)
-    //         localStorage.setItem('user', null)
-    //     }
-    // }, [token])
-
-    return (
-        <UserContext.Provider value={{ user, loginContext, logoutContext }}>
-            {children}
-        </UserContext.Provider>
-    )
+  return (
+    <UserContext.Provider value={{ user, loginContext, logoutContext }}>
+      {children}
+    </UserContext.Provider>
+  )
 }
 
-export { UserContext, UserProvider };
-
+export { UserContext, UserProvider }

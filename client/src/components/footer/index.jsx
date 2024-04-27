@@ -1,17 +1,17 @@
-import { Layout } from "antd";
+import { Layout } from 'antd'
 
-const { Footer }  = Layout;
-
+const { Footer } = Layout
 
 const FooterRender = () => {
-    return (
-        <Footer
-          style={{
-            textAlign: 'center',
-          }}
-        >From thang fong with lớp @{new Date().getFullYear()}
-        </Footer>
-    )
+  return (
+    <Footer
+      style={{
+        textAlign: 'center'
+      }}
+    >
+      From thang fong with lớp @{new Date().getFullYear()}
+    </Footer>
+  )
 }
 
-export default FooterRender;
+export default FooterRender
