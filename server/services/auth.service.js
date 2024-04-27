@@ -27,7 +27,7 @@ class AuthService {
     try {
       const { password, email, fullname, username } = user;
       if (!email || !password || !fullname || !username) {
-        throw new ErrorHandler(401, "all fields required");
+        throw new ErrorHandler(401, "All fields required");
       }
 
       if (validateUser(email, password)) {
@@ -38,11 +38,11 @@ class AuthService {
         const userByUsername = await getUserByUsernameDb(username);
 
         if (userByEmail) {
-          throw new ErrorHandler(401, "email taken already");
+          throw new ErrorHandler(401, "Email taken already");
         }
 
         if (userByUsername) {
-          throw new ErrorHandler(401, "username taken already");
+          throw new ErrorHandler(401, "Username taken already");
         }
 
         const newUser = await createUserDb({
@@ -84,7 +84,6 @@ class AuthService {
       }
 
       const user = await getUserByEmailDb(email);
-
       if (!user) {
         throw new ErrorHandler(403, "Email or password incorrect.");
       }
