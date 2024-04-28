@@ -1,39 +1,26 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, {useEffect, useState } from 'react'
 import { Form, Input, Button, Modal, Checkbox } from 'antd'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
 import messages from 'assets/lang/messages'
 import auth from 'api/auth'
 import './login.scss'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Navigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { UserContext } from 'context/UserContext'
+import useAuth from 'hooks/useAuth'
 
 function Login() {
+
+  const { isLoggedIn, setUserState } = useAuth();
   const navigate = useNavigate()
-  // const [form] = Form.useForm()
-  const { user, loginContext } = useContext(UserContext)
 
   const handleSubmit = async (dataUser) => {
     try {
       if (dataUser) {
-        let response = await auth.login(dataUser)
-        console.log('response', response)
-
-        if (response.status === 200) {
-          let token = response.data.token
-          let user = response.data.user
-
-          let data = {
-            isAuthenticated: true,
-            token: token,
-            user: user
-          }
-          localStorage.setItem('jwt', token)
-          loginContext(data)
-
-          toast.success('Đăng nhập thành công')
-          navigate(`/pet`)
-        }
+        const res = await auth.login(dataUser)
+        console.log('response', res)
+        setUserState(res.data);
+        toast.success('Đăng nhập thành công')
+        navigate('/pet')
       }
     } catch (error) {
       console.log('error: ', error)
@@ -57,9 +44,9 @@ function Login() {
     navigate('/register')
   }
 
-  useEffect(() => {
-    console.log(user)
-  }, [])
+  // if (isLoggedIn) {
+  //   return <Navigate to={state?.from || "/pet"} />;
+  // }
 
   return (
     <div className='login-container'>

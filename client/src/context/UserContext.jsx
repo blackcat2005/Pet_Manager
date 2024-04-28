@@ -1,71 +1,85 @@
-import axiosClient from 'api/axiosClient'
-import { createContext, useState, useEffect, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
-import auth from 'api/auth'
+// import API from "api/axiosClient";
+import WithAxios from "helpers/WithAxios";
+import { createContext, useEffect, useState } from "react";
+import user from "api/user";
 
-const UserContext = createContext({})
+const UserContext = createContext();
 
-const UserProvider = ({ children }) => {
-  const userDefault = {
-    isAuthenticated: false,
-    token: '',
-    user: {}
-  }
-  const [user, setUser] = useState(userDefault)
-  const loginContext = (userData) => {
-    setUser(userData)
-  }
+export const UserProvider = ({ children }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userData, setUserData] = useState(null)
+  const [collapsed, setCollapsed] = useState(
+      localStorage.getItem('collapsed') === 'true',
+  )
+  const [authData, setAuthData] = useState({
+    token: "",
+  });
 
-  const logoutContext = () => {
-    setUser(userDefault)
-  }
 
-  // const [token, setToken] = useState(localStorage.getItem('token'))
-  // const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')))
-  // const [collapsed, setCollapsed] = useState(
-  //     localStorage.getItem('collapsed') === 'true',
-  // )
+  useEffect(() => {
+    if (isLoggedIn) {
+      user.getProfile().then((res) => setUserData(res.data));
+    }
+  }, [isLoggedIn]);
 
-  // const providerValue = useMemo(
-  //     () => ({ token, setToken, user, setUser, collapsed, setCollapsed }),
-  //     [token, setToken, user, setUser, collapsed, setCollapsed],
-  // )
+  useEffect(() => {
+    if (localStorage.getItem("token")) {
+      setIsLoggedIn(true);
+      setAuthData(JSON.parse(localStorage.getItem("token")));
+    }
+  }, []);
 
-  // useEffect(() => {
-  //     if (token !== 'null') {
-  //         // Set authenticate token to axios
-  //         axiosClient.defaults.headers.common[
-  //             'Authorization'
-  //         ] = `Bearer ${token}`
+  const setUserInfo = (data) => {
+    const { user, token } = data;
+    setIsLoggedIn(true);
+    setUserData(user);
+    setAuthData({
+      token,
+    });
+    localStorage.setItem("token", JSON.stringify(token));
+  };
+  const updateUserData = async ({ fullname, email, username, address, city, state, country }) => {
+    const res = await user.updateUserInfo(
+      userData.user_id,
+      {
+      fullname,
+      email,
+      username,
+      address,
+      city,
+      state,
+      country,
+      }
+    );
+    setUserData(res.data);
+  };
 
-  //         if (token !== localStorage.getItem('token')) {
-  //             // Get current user's data
-  //             auth.getAuthenticatedUser()
-  //                 .then((response) => {
-  //                     setUser(response.data)
-  //                     localStorage.setItem('token', token)
-  //                     localStorage.setItem(
-  //                         'user',
-  //                         JSON.stringify(response.data),
-  //                     )
-  //                 })
-  //                 .catch((error) => {
-  //                     console.log(error)
-  //                 })
-  //         }
-  //     } else {
-  //         // User logout
-  //         setUser('null')
-  //         localStorage.setItem('token', null)
-  //         localStorage.setItem('user', null)
-  //     }
-  // }, [token])
+  const logout = () => {
+    setUserData(null);
+    setAuthData(null);
+    setIsLoggedIn(false);
+    user.logout();
+  };
 
   return (
-    <UserContext.Provider value={{ user, loginContext, logoutContext }}>
-      {children}
+    <UserContext.Provider
+      value={{
+        userData,
+        setUserData,
+        setUserState: (data) => setUserInfo(data),
+        logout,
+        isLoggedIn,
+        setIsLoggedIn,
+        authData,
+        setAuthData,
+        collapsed,
+        setCollapsed,
+        updateUserData,
+      }}
+    >
+      <WithAxios>{children}</WithAxios>
     </UserContext.Provider>
-  )
-}
+  );
+};
 
-export { UserContext, UserProvider }
+export default UserContext

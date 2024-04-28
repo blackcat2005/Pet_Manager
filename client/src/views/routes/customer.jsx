@@ -1,11 +1,10 @@
-import { useContext } from "react";
-import { Navigate, Outlet, Route, Routes } from "react-router-dom";
-import { UserContext } from "context/UserContext";
+import { Navigate, Outlet } from "react-router-dom";
+import useAuth from "hooks/useAuth";
 
 const CustomerRoutes = (props) => {
-    const { user } = useContext(UserContext);
-    console.log(user);
-    if (user && user.isAuthenticated) {
+    const {userData} = useAuth()
+
+    if (userData) {
         return (
             <Outlet />
         )

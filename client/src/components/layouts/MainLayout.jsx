@@ -3,7 +3,6 @@ import { Breadcrumb, Layout, theme } from 'antd'
 import HeaderRender from 'components/header'
 import SiderRender from 'components/siderbar'
 import FooterRender from 'components/footer'
-
 const { Content, Sider, Header } = Layout
 
 const App = (props) => {

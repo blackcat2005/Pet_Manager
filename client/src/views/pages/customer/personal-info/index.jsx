@@ -1,7 +1,8 @@
 import { Button, Avatar, Form, Input } from 'antd'
 import { UserOutlined } from '@ant-design/icons'
 import './personal-info.scss'
-
+import useAuth from 'hooks/useAuth'
+import { useEffect, useState } from 'react'
 // const { RangePicker } = DatePicker;
 const formItemLayout = {
   labelCol: {
@@ -23,12 +24,29 @@ const formItemLayout = {
 }
 
 const PersonalInfo = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  const { userData, updateUserData } = useAuth();
+
+  // console.log(userData);
+  // const [fullname, setFullname] = useState('')
+
+  useEffect(() => {
+    if (userData) {
+      // setFullname(userData.fullname)
+      setIsLoading(false)
+    }
+  }, [userData]);
+
   return (
     <div className='personal-info-wrapper'>
       <div className='personal-info__avatar'>
         <Avatar size={70} icon={<UserOutlined />} />
       </div>
-      <Form
+      {isLoading ? (
+      <div>Loading...</div>
+    ) : (
+      <>
+        <Form
         {...formItemLayout}
         // variant='filled'
         style={{
@@ -36,6 +54,7 @@ const PersonalInfo = () => {
         }}
       >
         <Form.Item
+          initialValue={userData.fullname}
           label='Họ và tên'
           name='name'
           rules={[
@@ -45,10 +64,11 @@ const PersonalInfo = () => {
             }
           ]}
         >
-          <Input />
+          <Input  />
         </Form.Item>
 
         <Form.Item
+        initialValue={userData.username}
           label='Tên đăng nhập'
           name='username'
           rules={[
@@ -62,6 +82,7 @@ const PersonalInfo = () => {
         </Form.Item>
 
         <Form.Item
+        initialValue={userData.email}
           label='Email'
           name='email'
           rules={[
@@ -75,6 +96,7 @@ const PersonalInfo = () => {
         </Form.Item>
 
         <Form.Item
+        initialValue={userData.phone_numbers}
           label='Số điện thoại'
           name='phonenumber'
           rules={[
@@ -152,6 +174,9 @@ const PersonalInfo = () => {
           </Button>
         </Form.Item>
       </Form>
+      </>
+    )}
+      
     </div>
   )
 }
