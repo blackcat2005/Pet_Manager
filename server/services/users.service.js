@@ -8,7 +8,7 @@ const {
     deleteUserDb,
     getAllUsersDb,
     getUserByUsernameDb,
-  } = require("../db/user.db");
+  } = require("../db/users.db");
 class UserService {
     createUser = async (user) => {
         try {
@@ -33,12 +33,12 @@ class UserService {
         throw new ErrorHandler(error.statusCode, error.message);
     }
     };
-    getUserById = async (id) => {
+    getUserById = async (user_id) => {
     try {
-        const user = await getUserByIdDb(id);
+        const user = await getUserByIdDb(user_id);
         user.password = undefined;
         user.google_id = undefined;
-        user.cart_id = undefined;
+        // user.cart_id = undefined;
         return user;
     } catch (error) {
         throw new ErrorHandler(error.statusCode, error.message);
@@ -59,48 +59,48 @@ class UserService {
     }
     };
     updateUser = async (user) => {
-    const { email, username, id } = user;
-    const errors = {};
-    try {
-        const getUser = await getUserByIdDb(id);
-        const findUserByEmail = await getUserByEmailDb(email);
-        const findUserByUsername = await getUserByUsernameDb(username);
-        const emailChanged =
-        email && getUser.email.toLowerCase() !== email.toLowerCase();
-        const usernameChanged =
-        username && getUser.username.toLowerCase() !== username.toLowerCase();
+        const { email, username, user_id } = user;
+        const errors = {};
+        try {
+            const getUser = await getUserByIdDb(user_id);
+            const findUserByEmail = await getUserByEmailDb(email);
+            const findUserByUsername = await getUserByUsernameDb(username);
+            const emailChanged =
+            email && getUser.email.toLowerCase() !== email.toLowerCase();
+            const usernameChanged =
+            username && getUser.username.toLowerCase() !== username.toLowerCase();
 
-        if (emailChanged && typeof findUserByEmail === "object") {
-        errors["email"] = "Email is already taken";
-        }
-        if (usernameChanged && typeof findUserByUsername === "object") {
-        errors["username"] = "Username is already taken";
-        }
+            if (emailChanged && typeof findUserByEmail === "object") {
+            errors["email"] = "Email is already taken";
+            }
+            if (usernameChanged && typeof findUserByUsername === "object") {
+            errors["username"] = "Username is already taken";
+            }
 
-        if (Object.keys(errors).length > 0) {
-        throw new ErrorHandler(403, errors);
-        }
+            if (Object.keys(errors).length > 0) {
+            throw new ErrorHandler(403, errors);
+            }
 
-        return await updateUserDb(user);
-    } catch (error) {
-        throw new ErrorHandler(error.statusCode, error.message);
-    }
+            return await updateUserDb(user);
+        } catch (error) {
+            throw new ErrorHandler(error.statusCode, error.message);
+        }
     };
 
-    deleteUser = async (id) => {
-    try {
-        return await deleteUserDb(id);
-    } catch (error) {
-        throw new ErrorHandler(error.statusCode, error.message);
-    }
+    deleteUser = async (user_id) => {
+        try {
+            return await deleteUserDb(user_id);
+        } catch (error) {
+            throw new ErrorHandler(error.statusCode, error.message);
+        }
     };
 
     getAllUsers = async () => {
-    try {
-        return await getAllUsersDb();
-    } catch (error) {
-        throw new ErrorHandler(error.statusCode, error.message);
-    }
+        try {
+            return await getAllUsersDb();
+        } catch (error) {
+            throw new ErrorHandler(error.statusCode, error.message);
+        }
     };
 }
 

@@ -1,7 +1,7 @@
 const pool = require("../config");
 
 const getAllUsersDb = async () => {
-  const { rows: users } = await pool.query("select * from users");
+  const { rows: users } = await pool.query("SELECT * FROM users");
   return users;
 };
 
@@ -11,26 +11,31 @@ const createUserDb = async ({
   email,
   fullname,
   phone_numbers,
+  address, 
+  city, 
+  country,
+  avatar,
+  roles
 }) => {
   const { rows: user } = await pool.query(
-    `INSERT INTO users(username, password, email, fullname, phone_numbers) 
-        VALUES($1, $2, $3, $4, $5) 
-        returning user_id, username, email, fullname, roles, phone_numbers, address, city, country, created_at`,
-    [username, password, email, fullname, phone_numbers]
+    `INSERT INTO users(username, password, email, fullname, phone_numbers, address, city, country, avatar, roles) 
+        VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
+        returning user_id, username, email, fullname, roles, phone_numbers, address, city, country, created_at, avatar`,
+    [username, password, email, fullname, phone_numbers, address, city, country, avatar, roles]
   );
   return user[0];
 };
 
-const getUserByIdDb = async (id) => {
+const getUserByIdDb = async (user_id) => {
   const { rows: user } = await pool.query(
-    "select users.* from users where users.user_id = $1",
-    [id]
+    "SELECT users.* FROM users WHERE users.user_id = $1",
+    [user_id]
   );
   return user[0];
 };
 const getUserByUsernameDb = async (username) => {
   const { rows: user } = await pool.query(
-    "select users.* from users where lower(users.username) = lower($1)",
+    "SELECT users.* FROM users WHERE lower(users.username) = lower($1)",
     [username]
   );
   return user[0];
@@ -38,7 +43,7 @@ const getUserByUsernameDb = async (username) => {
 
 const getUserByEmailDb = async (email) => {
   const { rows: user } = await pool.query(
-    "select users.* from users where lower(email) = lower($1)",
+    "SELECT users.* FROM users WHERE lower(email) = lower($1)",
     [email]
   );
   return user[0];
@@ -48,24 +53,25 @@ const updateUserDb = async ({
   username,
   email,
   fullname,
-  id,
+  user_id,
   phone_numbers,
   address,
   city,
   country,
+  avatar
 }) => {
   const { rows: user } = await pool.query(
-    `UPDATE users set username = $1, email = $2, fullname = $3, phone_numbers = $4, address = $5, city = $6, country = $7 
-        where user_id = $8 returning username, email, fullname, user_id, phone_numbers, address, city, country`,
-    [username, email, fullname, phone_numbers, address, city, country, id]
+    `UPDATE users set username = $1, email = $2, fullname = $3, phone_numbers = $4, address = $5, city = $6, country = $7, avatar = $8
+        WHERE user_id = $9 returning username, email, fullname, user_id, phone_numbers, address, city, country, avatar`,
+    [username, email, fullname, phone_numbers, address, city, country, avatar, user_id]
   );
   return user[0];
 };
 
-const deleteUserDb = async (id) => {
+const deleteUserDb = async (user_id) => {
   const { rows: user } = await pool.query(
-    "DELETE FROM users where user_id = $1 returning *",
-    [id]
+    "DELETE FROM users WHERE user_id = $1 returning *",
+    [user_id]
   );
   return user[0];
 };
@@ -81,7 +87,7 @@ const createUserGoogleDb = async ({ sub, defaultUsername, email, name }) => {
 };
 
 const changeUserPasswordDb = async (hashedPassword, email) => {
-  return await pool.query("update users set password = $1 where email = $2", [
+  return await pool.query("update users set password = $1 WHERE email = $2", [
     hashedPassword,
     email,
   ]);

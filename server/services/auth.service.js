@@ -8,13 +8,13 @@ const {
 } = require("../db/auth.db");
 const validateUser = require("../helpers/validateUser");
 const { ErrorHandler } = require("../helpers/error");
-const { changeUserPasswordDb } = require("../db/user.db");
+const { changeUserPasswordDb } = require("../db/users.db");
 const {
   getUserByEmailDb,
   getUserByUsernameDb,
   createUserDb,
   createUserGoogleDb,
-} = require("../db/user.db");
+} = require("../db/users.db");
 const mail = require("./mail.service");
 const { OAuth2Client } = require("google-auth-library");
 const crypto = require("crypto");
@@ -51,11 +51,11 @@ class AuthService {
         });
 
         const token = await this.signToken({
-          id: newUser.user_id,
+          user_id: newUser.user_id,
           roles: newUser.roles,
         });
         const refreshToken = await this.signRefreshToken({
-          id: newUser.user_id,
+          user_id: newUser.user_id,
           roles: newUser.roles,
         });
 
@@ -67,6 +67,11 @@ class AuthService {
             fullname: newUser.fullname,
             username: newUser.username,
             email: newUser.email,
+            phone_numbers: newUser.phone_numbers,
+            address: newUser.address,
+            city: newUser.city,
+            country: newUser.country,
+            avatar: newUser.avatar
           },
         };
       } else {
@@ -99,9 +104,9 @@ class AuthService {
         throw new ErrorHandler(403, "Email or password incorrect.");
       }
 
-      const token = await this.signToken({ id: user_id, roles });
+      const token = await this.signToken({ user_id: user_id, roles });
       const refreshToken = await this.signRefreshToken({
-        id: user_id,
+        user_id: user_id,
         roles,
       });
       return {
@@ -140,12 +145,12 @@ class AuthService {
         );
 
         const token = await this.signToken({
-          id: user_id,
+          user_id: user_id,
           roles,
         });
 
         const refreshToken = await this.signRefreshToken({
-          id: user_id,
+          user_id: user_id,
           roles,
         });
 
@@ -276,7 +281,7 @@ class AuthService {
 
   async signToken(data) {
     try {
-      return jwt.sign(data, process.env.SECRET, { expiresIn: "60s" });
+      return jwt.sign(data, process.env.SECRET, { expiresIn: "600s" });
     } catch (error) {
       logger.error(error);
       throw new ErrorHandler(500, "An error occurred");
@@ -296,7 +301,7 @@ class AuthService {
     try {
       const payload = jwt.verify(token, process.env.REFRESH_SECRET);
       return {
-        id: payload.id,
+        user_id: payload.user_id,
         roles: payload.roles,
       };
     } catch (error) {

@@ -49,32 +49,34 @@ CREATE TABLE "resetTokens" (
 );
 
 CREATE TABLE "users" (
-  "user_id" SERIAL PRIMARY KEY NOT NULL
-  , "username" character varying(50) UNIQUE NOT NULL
-  , "email" character varying(100) UNIQUE NOT NULL
-  , "password" character varying(200) NOT NULL
-  , "fullname" character varying(100) NOT NULL
-  , "phone_numbers" character varying(10) NOT NULL
-  , "roles" character varying(10) [] DEFAULT '{customer}': :character varying [] NOT NULL
-  , "address" character varying(200)
-  , "city" character varying(100)
-  , "country" character varying(100)
-  , "created_at" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+  "user_id" SERIAL PRIMARY KEY NOT NULL,
+  "username" character varying(50) UNIQUE NOT NULL,
+  "email" character varying(100) UNIQUE NOT NULL,
+  "password" character varying(200) NOT NULL,
+  "fullname" character varying(100) NOT NULL,
+  "phone_numbers" character varying(10) NOT NULL,
+  "roles" character varying(10)[] DEFAULT '{customer}'::character varying[] NOT NULL,
+  "address" character varying(200),
+  "city" character varying(100),
+  "country" character varying(100),
+  "avatar" character varying(100),
+  "created_at" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 CREATE TABLE "pets" (
-  "pet_id" SERIAL PRIMARY KEY NOT NULL
-  , "fullname" character varying(100) NOT NULL
-  , "species" character varying(5) NOT NULL
-  , "age" real NOT NULL
-  , "weight" real NOT NULL
-  , "sex" character varying(100) NOT NULL
-  , "health" character varying(100)
-  , "describe" character varying(200)
-  , "created_at" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , "plan_id" integer
-  , "medical_record_id" integer
-  , "user_id" integer NOT NULL
+  "pet_id" SERIAL PRIMARY KEY NOT NULL,
+  "fullname" character varying(100) NOT NULL,
+  "species" character varying(5) NOT NULL,
+  "age" real NOT NULL,
+  "weight" real NOT NULL,
+  "sex" character varying(100) NOT NULL,
+  "health" character varying(100),
+  "describe" character varying(200),
+  "avatar" character varying(100),
+  "created_at" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  "plan_id" integer,
+  "medical_record_id" integer,
+  "user_id" integer NOT NULL
 );
 
 CREATE TABLE "appointments" (
