@@ -1,4 +1,4 @@
-import React, {useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Form, Input, Button, Modal, Checkbox } from 'antd'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
 import messages from 'assets/lang/messages'
@@ -9,8 +9,7 @@ import { toast } from 'react-toastify'
 import useAuth from 'hooks/useAuth'
 
 function Login() {
-
-  const { isLoggedIn, setUserState } = useAuth();
+  const { setIsLoggedIn, setUserState } = useAuth()
   const navigate = useNavigate()
 
   const handleSubmit = async (dataUser) => {
@@ -18,7 +17,8 @@ function Login() {
       if (dataUser) {
         const res = await auth.login(dataUser)
         console.log('response', res)
-        setUserState(res.data);
+        setUserState(res.data)
+        setIsLoggedIn(true)
         toast.success('Đăng nhập thành công')
         navigate('/pet')
       }
@@ -49,91 +49,91 @@ function Login() {
   // }
 
   return (
-    <div className='login-container'>
-      <div className='login-container__sub'>
-        <div className='login-container__sub__content'>
+    <div className="login-container">
+      <div className="login-container__sub">
+        <div className="login-container__sub__content">
           <Form
-            layout='vertical'
-            name='login'
-            className='login-container__sub__content__form'
+            layout="vertical"
+            name="login"
+            className="login-container__sub__content__form"
             initialValues={{
-              remember: true
+              remember: true,
             }}
             onFinish={handleSubmit}
           >
-            <div className='login-container__sub__content__form__header'>
-              <h3 className='login-container__sub__content__form__header__title'>
+            <div className="login-container__sub__content__form__header">
+              <h3 className="login-container__sub__content__form__header__title">
                 Đăng nhập
               </h3>
               <hr />
-              <div className='login-container__sub__content__form__header__sub-title'>
+              <div className="login-container__sub__content__form__header__sub-title">
                 Nếu bạn đã có tài khoản, bạn có thể đăng nhập bằng email/tên
                 đăng nhập và mật khẩu
               </div>
             </div>
 
             <Form.Item
-              label='Địa chỉ email'
-              className='form-item'
-              name='email'
+              label="Địa chỉ email"
+              className="form-item"
+              name="email"
               rules={[
                 {
                   required: true,
-                  message: messages['email_required']
+                  message: messages['email_required'],
                 },
                 {
                   type: 'email',
-                  message: messages['invalid_email']
-                }
+                  message: messages['invalid_email'],
+                },
               ]}
             >
               <Input
-                prefix={<UserOutlined className='site-form-item-icon' />}
-                placeholder='Email'
+                prefix={<UserOutlined className="site-form-item-icon" />}
+                placeholder="Email"
               />
             </Form.Item>
 
             <Form.Item
-              label='Mật khẩu'
-              className='form-item'
-              name='password'
+              label="Mật khẩu"
+              className="form-item"
+              name="password"
               rules={[
                 {
                   required: true,
-                  message: 'Please input your Password!'
-                }
+                  message: 'Please input your Password!',
+                },
               ]}
             >
               <Input.Password
-                prefix={<LockOutlined className='site-form-item-icon' />}
-                type='password'
-                placeholder='Password'
-                className='input-password'
+                prefix={<LockOutlined className="site-form-item-icon" />}
+                type="password"
+                placeholder="Password"
+                className="input-password"
               />
             </Form.Item>
             <Form.Item>
-              <div className='remember-forgot'>
-                <Form.Item name='remember' valuePropName='checked' noStyle>
+              <div className="remember-forgot">
+                <Form.Item name="remember" valuePropName="checked" noStyle>
                   <Checkbox>Ghi nhớ tôi</Checkbox>
                 </Form.Item>
 
-                <div className='login-form-forgot'>Quên mật khẩu</div>
+                <div className="login-form-forgot">Quên mật khẩu</div>
               </div>
             </Form.Item>
 
             <Button
-              type='primary'
-              htmlType='submit'
-              className='login-form-button'
+              type="primary"
+              htmlType="submit"
+              className="login-form-button"
               onClick={() => handleSubmit()}
             >
               Đăng nhập
             </Button>
           </Form>
 
-          <div className='register'>
+          <div className="register">
             Chưa có tài khoản?
-            <span className='register-link' onClick={() => handleToRegister()}>
+            <span className="register-link" onClick={() => handleToRegister()}>
               Đăng ký tại đây
             </span>
           </div>

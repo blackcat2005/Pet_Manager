@@ -13,7 +13,7 @@ const App = (props) => {
   return (
     <Layout
       style={{
-        minHeight: '100vh'
+        minHeight: '100vh',
       }}
     >
       <HeaderRender />
@@ -22,7 +22,7 @@ const App = (props) => {
         <Layout>
           <Content
             style={{
-              margin: '16px 16px'
+              margin: '16px 16px',
             }}
           >
             <props.component />

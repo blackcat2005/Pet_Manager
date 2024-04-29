@@ -46,16 +46,16 @@ const getUserProfile = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  const { username, email, fullname, address, city, state, country } = req.body;
+  const { username, email, fullname, address,phone_numbers, city, country } = req.body;
   if (+req.params.id === req.user.id || req.user.roles.includes("admin")) {
     try {
       const results = await userService.updateUser({
         username,
         email,
         fullname,
+        phone_numbers,
         address,
         city,
-        state,
         country,
         id: req.params.id,
       });

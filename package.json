@@ -5,6 +5,7 @@
   "dependencies": {
     "concurrently": "^7.6.0",
     "nodemon": "^3.0.0",
+    "react-spinners": "^0.13.8",
     "sass": "^1.75.0"
   },
   "scripts": {

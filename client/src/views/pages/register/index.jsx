@@ -9,7 +9,7 @@ import {
   Input,
   InputNumber,
   Row,
-  Select
+  Select,
 } from 'antd'
 import './register.scss'
 import { useNavigate } from 'react-router-dom'
@@ -40,97 +40,97 @@ function Register() {
   }
 
   return (
-    <div className='register-container'>
-      <div className='register-container__sub'>
-        <div className='register-container__sub__content'>
+    <div className="register-container">
+      <div className="register-container__sub">
+        <div className="register-container__sub__content">
           <Form
-            layout='vertical'
+            layout="vertical"
             // {...formItemLayout}
             form={form}
-            name='register'
+            name="register"
             onFinish={handleSubmit}
             initialValues={{
-              prefix: '84'
+              prefix: '84',
             }}
             style={{
-              maxWidth: 600
+              maxWidth: 600,
             }}
             scrollToFirstError
           >
-            <div className='register-container__sub__content__form__header'>
-              <h3 className='register-container__sub__content__form__header__title'>
+            <div className="register-container__sub__content__form__header">
+              <h3 className="register-container__sub__content__form__header__title">
                 Tạo tài khoản
               </h3>
               <hr />
-              <div className='register-container__sub__content__form__header__sub-title'>
+              <div className="register-container__sub__content__form__header__sub-title">
                 Tạo một tài khoản để tận hưởng các dịch vụ của chúng tôi
               </div>
             </div>
             <Form.Item
-              name='fullname'
-              label='Họ và tên'
+              name="fullname"
+              label="Họ và tên"
               rules={[
                 {
                   required: true,
-                  message: 'Hãy nhập họ và tên của bạn!'
-                }
+                  message: 'Hãy nhập họ và tên của bạn!',
+                },
               ]}
             >
               <Input />
             </Form.Item>
 
             <Form.Item
-              name='username'
-              label='Tên đăng nhập'
+              name="username"
+              label="Tên đăng nhập"
               rules={[
                 {
                   required: true,
                   message: 'Hãy nhập tên đăng nhập!',
-                  whitespace: true
-                }
+                  whitespace: true,
+                },
               ]}
             >
               <Input />
             </Form.Item>
 
             <Form.Item
-              name='email'
-              label='E-mail'
+              name="email"
+              label="E-mail"
               rules={[
                 {
                   type: 'email',
-                  message: 'Địa chỉ E-mail không hợp lệ!'
+                  message: 'Địa chỉ E-mail không hợp lệ!',
                 },
                 {
                   required: true,
-                  message: 'Hãy nhập E-mail của bạn'
-                }
+                  message: 'Hãy nhập E-mail của bạn',
+                },
               ]}
             >
               <Input />
             </Form.Item>
 
             <Form.Item
-              name='phone_numbers'
-              label='Số điện thoại'
+              name="phone_numbers"
+              label="Số điện thoại"
               rules={[
                 {
                   required: true,
-                  message: 'Hãy nhập số điện thoại!'
-                }
+                  message: 'Hãy nhập số điện thoại!',
+                },
               ]}
             >
               <Input />
             </Form.Item>
 
             <Form.Item
-              name='password'
-              label='Mật khẩu'
+              name="password"
+              label="Mật khẩu"
               rules={[
                 {
                   required: true,
-                  message: 'Hãy nhập mật khẩu!'
-                }
+                  message: 'Hãy nhập mật khẩu!',
+                },
               ]}
               hasFeedback
             >
@@ -138,14 +138,14 @@ function Register() {
             </Form.Item>
 
             <Form.Item
-              name='confirm'
-              label='Xác nhận mật khẩu'
+              name="confirm"
+              label="Xác nhận mật khẩu"
               dependencies={['password']}
               hasFeedback
               rules={[
                 {
                   required: true,
-                  message: 'Hãy xác nhận lại mật khẩu!'
+                  message: 'Hãy xác nhận lại mật khẩu!',
                 },
                 ({ getFieldValue }) => ({
                   validator(_, value) {
@@ -153,40 +153,40 @@ function Register() {
                       return Promise.resolve()
                     }
                     return Promise.reject(
-                      new Error('Mật khẩu của bạn không trùng khớp!')
+                      new Error('Mật khẩu của bạn không trùng khớp!'),
                     )
-                  }
-                })
+                  },
+                }),
               ]}
             >
               <Input.Password />
             </Form.Item>
 
             <Form.Item
-              name='agreement'
-              valuePropName='checked'
+              name="agreement"
+              valuePropName="checked"
               rules={[
                 {
                   validator: (_, value) =>
                     value
                       ? Promise.resolve()
-                      : Promise.reject(new Error('Hãy chấp nhận điều khoản!'))
-                }
+                      : Promise.reject(new Error('Hãy chấp nhận điều khoản!')),
+                },
               ]}
             >
-              <Checkbox className='checkbox-agreement'>
-                Tôi đồng ý với <a href=''>các điều khoản</a>
+              <Checkbox className="checkbox-agreement">
+                Tôi đồng ý với <a href="">các điều khoản</a>
               </Checkbox>
             </Form.Item>
             <Form.Item>
-              <Button type='primary' htmlType='submit' className='btn-register'>
+              <Button type="primary" htmlType="submit" className="btn-register">
                 Tạo tài khoản
               </Button>
             </Form.Item>
           </Form>
-          <div className='to-login'>
+          <div className="to-login">
             Bạn đã có tài khoản?{' '}
-            <span className='login-link' onClick={() => handleToLogin()}>
+            <span className="login-link" onClick={() => handleToLogin()}>
               Đăng nhập
             </span>
           </div>

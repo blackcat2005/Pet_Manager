@@ -1,4 +1,4 @@
-import API from "./axios.config"
+import API from './axios.config'
 
 const auth = {
   login: (credentials) => {
@@ -16,7 +16,7 @@ const auth = {
   changePassword: (credentials) => {
     const url = '/auth/change-password'
     return API.post(url, credentials)
-  }
+  },
 }
 
 export default auth

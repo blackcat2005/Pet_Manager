@@ -6,7 +6,7 @@ const FooterRender = () => {
   return (
     <Footer
       style={{
-        textAlign: 'center'
+        textAlign: 'center',
       }}
     >
       From thang fong with lớp @{new Date().getFullYear()}
