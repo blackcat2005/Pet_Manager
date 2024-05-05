@@ -1,4 +1,5 @@
 const userService = require('../services/users.service')
+const userService = require('../services/users.service')
 const { ErrorHandler } = require('../helpers/error')
 const { hashPassword } = require('../helpers/hashPassword')
 
@@ -64,16 +65,8 @@ const getUserProfile = async (req, res) => {
 }
 
 const updateUser = async (req, res) => {
-  const {
-    username,
-    email,
-    fullname,
-    phone_numbers,
-    address,
-    city,
-    country,
-    avatar,
-  } = req.body
+  const { username, email, fullname, address, phone_numbers, city, country } =
+    req.body
   if (
     +req.params.user_id === req.user.user_id ||
     req.user.roles.includes('admin')
@@ -87,7 +80,6 @@ const updateUser = async (req, res) => {
         address,
         city,
         country,
-        avatar,
         user_id: req.params.user_id,
       })
       return res.status(201).json(results)
