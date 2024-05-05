@@ -5,7 +5,7 @@ import GuestRoute from './guest-route'
 import MainLayout from 'components/layouts/MainLayout'
 import Register from 'views/pages/register'
 import CustomerRoutes from './customer'
-
+import ForgotPassword from 'views/pages/forgot-password/forgot-password'
 const InfoPet = loadableComponent(() => import('views/pages/customer/info-pet'))
 const Login = loadableComponent(() => import('views/pages/login'))
 const PersonalInfo = loadableComponent(
@@ -28,6 +28,8 @@ function AllRoutes() {
       <Route element={<GuestRoute />}>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+
       </Route>
 
       <Route path="*">404 not found</Route>

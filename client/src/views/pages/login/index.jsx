@@ -4,52 +4,46 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons'
 import messages from 'assets/lang/messages'
 import auth from 'api/auth'
 import './login.scss'
-import { useNavigate, Navigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify'
 import useAuth from 'hooks/useAuth'
 
 function Login() {
-  const { setIsLoggedIn, setUserState } = useAuth()
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const {  setUserState } = useAuth();
 
   const handleSubmit = async (dataUser) => {
     try {
       if (dataUser) {
-        const res = await auth.login(dataUser)
-        console.log('response', res)
-        setUserState(res.data)
-        setIsLoggedIn(true)
-        toast.success('Đăng nhập thành công')
-        navigate('/pet')
+        const response = await auth.login(dataUser);
+        if (response.status === 200) {
+          setUserState(response.data)
+          toast.success('Đăng nhập thành công')
+          navigate(`/pet`);
+        }
+
       }
     } catch (error) {
-      console.log('error: ', error)
-      //TODO: hiển bị thông báo theo từng error code (error.request.status === 404)
+      console.log("error: ", error);
       toast.error('Đăng nhập thất bại')
     }
   }
 
-  // const handleForgotPasswordSubmit = async (values) => {
-  //     try {
-  //         const response = await auth.forgotPassword(values)
-  //         alert(response.data.message)
-  //     } catch (error) {
-  //         //TODO: hiển bị thông báo theo từng error code (error.request.status === 404)
-  //         alert(error.response.data.message)
-  //     }
-  //     setIsModalVisible(false)
-  // }
-
   const handleToRegister = () => {
-    navigate('/register')
+    navigate('/register');
+  }
+  const handleToForgotPassword = () => {
+    navigate('/forgot-password');
   }
 
-  // if (isLoggedIn) {
-  //   return <Navigate to={state?.from || "/pet"} />;
-  // }
+  // useEffect(() => {
+  //   if (isLoggedIn === true) {
+  //     navigate('/');
+  //   }
+  // }, [])
 
   return (
-    <div className="login-container">
+    <div className="login-container" >
       <div className="login-container__sub">
         <div className="login-container__sub__content">
           <Form
@@ -61,14 +55,13 @@ function Login() {
             }}
             onFinish={handleSubmit}
           >
-            <div className="login-container__sub__content__form__header">
-              <h3 className="login-container__sub__content__form__header__title">
+            <div className='login-container__sub__content__form__header'>
+              <h3 className='login-container__sub__content__form__header__title'>
                 Đăng nhập
               </h3>
               <hr />
-              <div className="login-container__sub__content__form__header__sub-title">
-                Nếu bạn đã có tài khoản, bạn có thể đăng nhập bằng email/tên
-                đăng nhập và mật khẩu
+              <div className='login-container__sub__content__form__header__sub-title'>
+                Nếu bạn đã có tài khoản, bạn có thể đăng nhập bằng email/tên đăng nhập và mật khẩu
               </div>
             </div>
 
@@ -90,6 +83,7 @@ function Login() {
               <Input
                 prefix={<UserOutlined className="site-form-item-icon" />}
                 placeholder="Email"
+                autoComplete="email"
               />
             </Form.Item>
 
@@ -108,16 +102,20 @@ function Login() {
                 prefix={<LockOutlined className="site-form-item-icon" />}
                 type="password"
                 placeholder="Password"
-                className="input-password"
+                className='input-password'
+                autoComplete="current-password"
               />
             </Form.Item>
+
             <Form.Item>
-              <div className="remember-forgot">
+              <div className='remember-forgot'>
                 <Form.Item name="remember" valuePropName="checked" noStyle>
                   <Checkbox>Ghi nhớ tôi</Checkbox>
                 </Form.Item>
 
-                <div className="login-form-forgot">Quên mật khẩu</div>
+                <div className="login-form-forgot" onClick={() => handleToForgotPassword()}>
+                  Quên mật khẩu
+                </div>
               </div>
             </Form.Item>
 
@@ -125,17 +123,13 @@ function Login() {
               type="primary"
               htmlType="submit"
               className="login-form-button"
-              onClick={() => handleSubmit()}
-            >
+              onClick={() => handleSubmit()}>
               Đăng nhập
             </Button>
           </Form>
-
           <div className="register">
             Chưa có tài khoản?
-            <span className="register-link" onClick={() => handleToRegister()}>
-              Đăng ký tại đây
-            </span>
+            <span className='register-link' onClick={() => handleToRegister()}>Đăng ký tại đây</span>
           </div>
         </div>
       </div>
