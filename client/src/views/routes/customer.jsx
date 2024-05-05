@@ -1,15 +1,13 @@
-import { Navigate, Outlet } from 'react-router-dom'
-import useAuth from 'hooks/useAuth'
+import useAuth from "hooks/useAuth";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 
-const CustomerRoutes = () => {
-  // const token =  localStorage.getItem('token')
-  const { userData } = useAuth()
-  console.log(userData)
-  if (userData) {
-    return <Outlet />
-  } else {
-    return <Navigate to="/login" />
+export const CustomerRoutes = ({ redirectPath = "/login", children }) => {
+  const { authData } = useAuth();
+  const location = useLocation();
+
+  if (!authData) {
+    return <Navigate to={redirectPath} state={{ from: location }} replace />;
   }
-}
 
-export default CustomerRoutes
+  return children ? children : <Outlet />;
+};

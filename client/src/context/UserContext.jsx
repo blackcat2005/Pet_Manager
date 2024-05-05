@@ -11,20 +11,18 @@ export const UserProvider = ({ children }) => {
   const [collapsed, setCollapsed] = useState(
     localStorage.getItem('collapsed') === 'true',
   )
-  const [authData, setAuthData] = useState({
-    token: '',
-  })
+  const [authData, setAuthData] = useState(JSON.parse(localStorage.getItem("token")))
 
   useEffect(() => {
     if (isLoggedIn) {
-      user.getProfile().then((res) => setUserData(res.data))
+      user.getProfile().then((res) => setUserData(res?.data))
     }
   }, [isLoggedIn])
 
   useEffect(() => {
     if (localStorage.getItem('token')) {
       setIsLoggedIn(true)
-      setAuthData(JSON.parse(localStorage.getItem('token')))
+      setAuthData(JSON.parse(localStorage.getItem("token")));
     }
   }, [])
 
@@ -32,10 +30,8 @@ export const UserProvider = ({ children }) => {
     const { user, token } = data
     setIsLoggedIn(true)
     setUserData(user)
-    setAuthData({
-      token,
-    })
-    localStorage.setItem('token', JSON.stringify(token))
+    setAuthData(token)
+    localStorage.setItem("token", JSON.stringify(token));
   }
   const updateUserData = async ({
     fullname,

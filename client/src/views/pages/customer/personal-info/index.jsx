@@ -27,10 +27,7 @@ const formItemLayout = {
 const PersonalInfo = () => {
   const { userData, updateUserData } = useAuth()
 
-  // console.log(userData.roles[0]);
-
   const handleSubmit = (values) => {
-    // console.log('Success:', values);
     updateUserData(values)
   }
   const handleChangePassword = (e) => {
