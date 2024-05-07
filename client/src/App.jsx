@@ -15,9 +15,7 @@ const App = () => {
     if (!localStorage.getItem('selected_sidebar_key')) {
       localStorage.setItem('selected_sidebar_key', 1)
     }
-    // if (!localStorage.getItem('user')) {
-    //     localStorage.setItem('user', null)
-    // }
+
   }, [])
 
   return (

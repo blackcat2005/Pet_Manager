@@ -13,8 +13,8 @@ const auth = {
     const url = '/auth/forgot-password'
     return API.post(url, credentials)
   },
-  changePassword: (credentials) => {
-    const url = '/auth/change-password'
+  resetPassword: (credentials) => {
+    const url = '/auth/reset-password'
     return API.post(url, credentials)
   },
 }

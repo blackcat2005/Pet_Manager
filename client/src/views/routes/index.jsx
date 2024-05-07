@@ -8,6 +8,7 @@ import Register from 'views/pages/register'
 import ForgotPassword from 'views/pages/forgot-password/forgot-password'
 import { CustomerRoutes } from './customer';
 import { Rings } from 'react-loader-spinner';
+import ResetPassword from 'views/pages/forgot-password/reset-password';
 
 const InfoPet = loadableComponent(() => import('views/pages/customer/info-pet'))
 const Login = loadableComponent(() => import('views/pages/login'))
@@ -46,6 +47,7 @@ function AllRoutes() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="*" >Cook</Route>
         </Routes>
       </Suspense>

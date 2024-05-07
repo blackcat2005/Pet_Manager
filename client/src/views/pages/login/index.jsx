@@ -10,7 +10,7 @@ import useAuth from 'hooks/useAuth'
 
 function Login() {
   const navigate = useNavigate();
-  const {  setUserState } = useAuth();
+  const {  isLoggedIn, setUserState } = useAuth();
 
   const handleSubmit = async (dataUser) => {
     try {
@@ -36,11 +36,11 @@ function Login() {
     navigate('/forgot-password');
   }
 
-  // useEffect(() => {
-  //   if (isLoggedIn === true) {
-  //     navigate('/');
-  //   }
-  // }, [])
+  useEffect(() => {
+    if (isLoggedIn === true) {
+      navigate('/');
+    }
+  }, [])
 
   return (
     <div className="login-container" >
