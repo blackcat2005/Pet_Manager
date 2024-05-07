@@ -14,39 +14,41 @@ const Login = loadableComponent(() => import('views/pages/login'))
 const PersonalInfo = loadableComponent(
   () => import('views/pages/customer/personal-info'),
 )
+const ServiceRegisterPet = loadableComponent(() => import('views/pages/customer/service-register'))
 
 function AllRoutes() {
   return (
     <>
-    <Suspense
-      fallback={
-        <div className='loading-container'>
-          <Rings
-            heigth="100"
-            width="100"
-            color='#1877f2'
-            ariaLabel='loading'
-          />
-          <div>Loading data...</div>
-        </div>
-      }
-    >
-      <Routes>
-      <Route path="/" element={<Navigate to={'/pet'} />} />
-        <Route element={<CustomerRoutes />}>
-          <Route path="/pet" element={<MainLayout component={InfoPet} />} />
-          <Route
-            path="/personal-info"
-            element={<MainLayout component={PersonalInfo} />}
-          />
-        </Route>
+      <Suspense
+        fallback={
+          <div className='loading-container'>
+            <Rings
+              heigth="100"
+              width="100"
+              color='#1877f2'
+              ariaLabel='loading'
+            />
+            <div>Loading data...</div>
+          </div>
+        }
+      >
+        <Routes>
+          <Route path="/" element={<Navigate to={'/pet'} />} />
+          <Route element={<CustomerRoutes />}>
+            <Route path="/pet" element={<MainLayout component={InfoPet} />} />
+            <Route
+              path="/personal-info"
+              element={<MainLayout component={PersonalInfo} />}
+            />
+            <Route path="/service-register" element={<MainLayout component={ServiceRegisterPet} />} />
+          </Route>
 
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="*" >Cook</Route>
-      </Routes>
-    </Suspense>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="*" >Cook</Route>
+        </Routes>
+      </Suspense>
     </>
   )
 }

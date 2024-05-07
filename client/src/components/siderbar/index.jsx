@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { TableOutlined, FormOutlined } from '@ant-design/icons'
 import { Breadcrumb, Layout, Menu, theme } from 'antd'
-import { Navigate, Link } from 'react-router-dom'
+import { Navigate, Link, useLocation } from 'react-router-dom'
 const { Sider } = Layout
 import './siderbar.scss'
 
@@ -17,7 +17,7 @@ function getItem(label, key, icon, children) {
 const customerMenu = [
   getItem('Danh sách thú cưng', '/pet', <TableOutlined />),
   getItem('Dịch vụ', 'service', <FormOutlined />, [
-    getItem('Đăng ký dịch vụ', '/login'),
+    getItem('Đăng ký dịch vụ', '/service-register'),
     getItem('Lịch sử đăng ký', '4'),
     getItem('Bảng giá dịch vụ', '5'),
   ]),
@@ -25,6 +25,7 @@ const customerMenu = [
 
 const SiderRender = (props) => {
   const [collapsed, setCollapsed] = useState(false)
+  const location = useLocation();
 
   return (
     <Sider
@@ -34,17 +35,17 @@ const SiderRender = (props) => {
       collapsible
       collapsed={collapsed}
       onCollapse={(value) => setCollapsed(value)}
-      // style = {{height: 'inherit'}}
+    // style = {{height: 'inherit'}}
     >
       <Menu
         className="sider-wrapper__menu-item"
         theme={props.theme}
-        selectedKeys={'/pet'}
+        selectedKeys={location.pathname}
         mode="inline"
         defaultSelectedKeys={['1']}
         defaultOpenKeys={['service']}
-        // openKeys = {'service'}
-        // items={customerMenu}
+      // openKeys = {'service'}
+      // items={customerMenu}
       >
         {customerMenu.map((item) => {
           if (item.children) {

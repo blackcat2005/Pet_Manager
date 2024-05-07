@@ -1,5 +1,4 @@
 const userService = require('../services/users.service')
-const userService = require('../services/users.service')
 const { ErrorHandler } = require('../helpers/error')
 const { hashPassword } = require('../helpers/hashPassword')
 
