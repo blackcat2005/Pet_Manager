@@ -35,7 +35,6 @@ const SiderRender = (props) => {
       collapsible
       collapsed={collapsed}
       onCollapse={(value) => setCollapsed(value)}
-    // style = {{height: 'inherit'}}
     >
       <Menu
         className="sider-wrapper__menu-item"
@@ -44,8 +43,6 @@ const SiderRender = (props) => {
         mode="inline"
         defaultSelectedKeys={['1']}
         defaultOpenKeys={['service']}
-      // openKeys = {'service'}
-      // items={customerMenu}
       >
         {customerMenu.map((item) => {
           if (item.children) {

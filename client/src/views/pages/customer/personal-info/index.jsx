@@ -4,6 +4,8 @@ import './personal-info.scss'
 import useAuth from 'hooks/useAuth'
 import { useState } from 'react'
 import { LoadingOutlined } from '@ant-design/icons'
+import { toast } from 'react-toastify'
+import auth from 'api/auth'
 
 const formItemLayout = {
   labelCol: {
@@ -26,13 +28,32 @@ const formItemLayout = {
 
 const PersonalInfo = () => {
   const { userData, updateUserData } = useAuth()
+  const [isSending, setIsSending] = useState(false);
+
+  const handleChangePassword = async() => {
+    setIsSending(true);
+    const email = userData.email
+    auth
+      .forgotPassword({ email })
+      .then((data) => {
+        if (data.data.status === "OK") {
+          setIsSending(false);
+          toast.success("Email has been sent successfully.");
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        setIsSending(false);
+        toast.error("An error occured. Please try again.");
+      });
+    
+  };
 
   const handleSubmit = (values) => {
     updateUserData(values)
+    toast.success("Cập nhật thành công")
   }
-  const handleChangePassword = (e) => {
-    console.log(e)
-  }
+
 
   return (
     <div className="personal-info-wrapper">
@@ -110,14 +131,8 @@ const PersonalInfo = () => {
           <Form.Item
             label="Mật khẩu"
             name="password"
-            // rules={[
-            //   {
-            //     required: true,
-            //     message: 'Please input!'
-            //   }
-            // ]}
           >
-            <Button type="primary" onClick={handleChangePassword}>
+            <Button disabled={isSending} type="primary" onClick={handleChangePassword}>
               Thay đổi mật khẩu
             </Button>
           </Form.Item>
@@ -160,7 +175,7 @@ const PersonalInfo = () => {
               span: 16,
             }}
           >
-            <Button type="primary" htmlType="submit">
+            <Button  type="primary" htmlType="submit">
               Submit
             </Button>
           </Form.Item>

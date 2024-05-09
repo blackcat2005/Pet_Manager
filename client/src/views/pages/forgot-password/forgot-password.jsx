@@ -13,7 +13,7 @@ function ForgotPassword() {
     const handleSubmit = async (email) => {
         try {
             if (email) {
-                let res = await auth.forgotPassword(email);
+                const res = await auth.forgotPassword(email);
                 if (res && res.status === 200) {
                     toast.success("Hãy kiểm tra email của bạn!");
                 }

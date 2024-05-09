@@ -1,6 +1,5 @@
 import loadableComponent from 'utils/loadable-component'
 import React from 'react'
-import Spinner from 'components/spinner';
 import { Navigate, Routes, Route } from 'react-router-dom'
 import { Suspense } from "react";
 import MainLayout from 'components/layouts/MainLayout'
