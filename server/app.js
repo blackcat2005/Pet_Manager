@@ -22,7 +22,7 @@ app.use(cookieParser())
 app.use('/v1/api', routes)
 
 app.get('/', (req, res) =>
-  res.send("<h1 style='text-align: center'>PET-MANAGER APP</h1>")
+  res.send("<h1 style='text-align: center'>PET-MANAGER APP</h1>"),
 )
 app.use(unknownEndpoint)
 app.use(handleError)
