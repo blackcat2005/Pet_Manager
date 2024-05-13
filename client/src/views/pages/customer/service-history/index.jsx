@@ -93,20 +93,27 @@ function ServiceHistory() {
   };
 
   const showConfirm = () => {
-    confirm({
-      title: 'Bạn có chắc chắn muốn hủy dịch vụ?',
-      icon: <ExclamationCircleOutlined />,
-      content: 'Bạn sẽ được hoàn trả tiền nếu hủy dịch vụ',
-      okText: 'Yes',
-      okType: 'danger',
-      cancelText: 'No',
-      onOk() {
-        setBankFormVisible(true);
-      },
-      onCancel() {
-        
-      },
-    });
+    if (canCancelService()) {
+      confirm({
+        title: 'Bạn có chắc chắn muốn hủy dịch vụ?',
+        icon: <ExclamationCircleOutlined />,
+        content: 'Bạn sẽ được hoàn trả tiền nếu hủy dịch vụ',
+        okText: 'Yes',
+        okType: 'danger',
+        cancelText: 'No',
+        onOk() {
+          setBankFormVisible(true);
+        },
+        onCancel() {
+          
+        },
+      });
+    } else {
+      Modal.error({
+        title: 'Không thể hủy',
+        content: 'Dịch vụ đã được hủy.'
+      })
+    }
   };
 
   const columns = [
@@ -127,7 +134,6 @@ function ServiceHistory() {
 
   return (
     <div style={{ width: '100%', overflow: 'hidden' }}>
-      {/* Existing component content */}
       <Space style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography.Title level={4}>Lịch sử đăng ký</Typography.Title>
         <Space>
