@@ -93,20 +93,27 @@ function ServiceHistory() {
   };
 
   const showConfirm = () => {
-    confirm({
-      title: 'Bạn có chắc chắn muốn hủy dịch vụ?',
-      icon: <ExclamationCircleOutlined />,
-      content: 'Bạn sẽ được hoàn trả tiền nếu hủy dịch vụ',
-      okText: 'Yes',
-      okType: 'danger',
-      cancelText: 'No',
-      onOk() {
-        setBankFormVisible(true);
-      },
-      onCancel() {
-        
-      },
-    });
+    if (canCancelService()) {
+      confirm({
+        title: 'Bạn có chắc chắn muốn hủy dịch vụ?',
+        icon: <ExclamationCircleOutlined />,
+        content: 'Bạn sẽ được hoàn trả tiền nếu hủy dịch vụ',
+        okText: 'Yes',
+        okType: 'danger',
+        cancelText: 'No',
+        onOk() {
+          setBankFormVisible(true);
+        },
+        onCancel() {
+          
+        },
+      });
+    } else {
+      Modal.error({
+        title: 'Không thể hủy',
+        content: 'Dịch vụ đã được hủy.'
+      })
+    }
   };
 
   const columns = [
@@ -127,7 +134,6 @@ function ServiceHistory() {
 
   return (
     <div style={{ width: '100%', overflow: 'hidden' }}>
-      {/* Existing component content */}
       <Space style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography.Title level={4}>Lịch sử đăng ký</Typography.Title>
         <Space>
@@ -150,11 +156,12 @@ function ServiceHistory() {
         onCancel={() => setBankFormVisible(false)}
         footer={null}
       >
-        <Form onFinish={(values) => setBankFormVisible(false)}>
+        <Form onFinish={(values) => setBankFormVisible(false)} layout="vertical" style={{ maxWidth: 400, margin: 'auto' }}>
           <Form.Item
             name="accountNumber"
             label="Số tài khoản"
             rules={[{ required: true, message: 'Vui lòng nhập số tài khoản!' }]}
+            style={{ display: 'flex', marginBottom: 16 }}
           >
             <Input placeholder="example" />
           </Form.Item>
@@ -162,6 +169,7 @@ function ServiceHistory() {
             name="bankName"
             label="Ngân hàng"
             rules={[{ required: true, message: 'Vui lòng chọn ngân hàng!' }]}
+            style={{ display: 'flex', marginBottom: 16 }}
           >
             <Select placeholder="Chọn ngân hàng">
               <Option value="AgriBank">AgriBank</Option>
@@ -169,7 +177,7 @@ function ServiceHistory() {
               <Option value="MB Bank">MB Bank</Option>
             </Select>
           </Form.Item>
-          <Form.Item>
+          <Form.Item style={{ textAlign: 'center' }}>
             <Button type="primary" htmlType="submit" onClick={handleCancelService}>
               Xác nhận
             </Button>
