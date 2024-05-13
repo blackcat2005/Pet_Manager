@@ -19,12 +19,27 @@ function ServiceHistory() {
   const [sortType, setSortType] = useState(null);
   const [isBankFormVisible, setBankFormVisible] = useState(false);
 
+  const canCancelService = () => {
+    const selectedRows = rows.filter(row => selected.includes(row.id));
+    if (selectedRows.some(row => row.status == 'Hủy')) {
+      return false;
+    }
+    return true;
+  };
+
   const handleCancelService = () => {
-    const newRows = rows.map(row => (
-      selected.includes(row.id) ? { ...row, status: 'Hủy' } : row
-    ));
-    setRows(newRows);
-    setSelected([]); 
+    if (canCancelService()) {
+      const newRows = rows.map(row => (
+        selected.includes(row.id) ? { ...row, status: 'Hủy' } : row
+      ));
+      setRows(newRows);
+      setSelected([]);
+    } else {
+      Modal.error({
+        title: 'Không thể hủy',
+        content: 'Dịch vụ đã được hủy.',
+      });
+    }
   };
 
   const handleStatusFilter = (value) => {
@@ -112,17 +127,18 @@ function ServiceHistory() {
 
   return (
     <div style={{ width: '100%', overflow: 'hidden' }}>
+      {/* Existing component content */}
       <Space style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography.Title level={4}>Lịch sử đăng ký</Typography.Title>
         <Space>
-        <Select value={sortType} onChange={handleStatusFilter} style={{ width: 120 }} placeholder="Lọc">
-          <Option value="all">Tất cả</Option>
-          <Option value="Kích hoạt">Kích hoạt</Option>
-          <Option value="Hủy">Hủy</Option>
-          <Option value="Hoàn thành">Hoàn thành</Option>
-          <Option value="Đang thực hiện">Đang thực hiện</Option>
-        </Select>
-          <Button type="primary" danger onClick={() => showConfirm()}>
+          <Select value={sortType} onChange={handleStatusFilter} style={{ width: 120 }} placeholder="Lọc">
+            <Option value="all">Tất cả</Option>
+            <Option value="Kích hoạt">Kích hoạt</Option>
+            <Option value="Hủy">Hủy</Option>
+            <Option value="Hoàn thành">Hoàn thành</Option>
+            <Option value="Đang thực hiện">Đang thực hiện</Option>
+          </Select>
+          <Button type="primary" danger onClick={showConfirm}>
             Hủy dịch vụ
           </Button>
         </Space>
@@ -138,20 +154,24 @@ function ServiceHistory() {
           <Form.Item
             name="accountNumber"
             label="Số tài khoản"
-            rules={[{ required: true, message: 'Please input your account number!' }]}
+            rules={[{ required: true, message: 'Vui lòng nhập số tài khoản!' }]}
           >
             <Input placeholder="example" />
           </Form.Item>
           <Form.Item
             name="bankName"
             label="Ngân hàng"
-            rules={[{ required: true, message: 'Please input your bank name!' }]}
+            rules={[{ required: true, message: 'Vui lòng chọn ngân hàng!' }]}
           >
-            <Input placeholder="example" />
+            <Select placeholder="Chọn ngân hàng">
+              <Option value="AgriBank">AgriBank</Option>
+              <Option value="VietinBank">VietinBank</Option>
+              <Option value="MB Bank">MB Bank</Option>
+            </Select>
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" onClick={() => handleCancelService()}>
-              Submit
+            <Button type="primary" htmlType="submit" onClick={handleCancelService}>
+              Xác nhận
             </Button>
           </Form.Item>
         </Form>
