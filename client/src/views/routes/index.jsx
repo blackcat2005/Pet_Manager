@@ -1,5 +1,6 @@
 import loadableComponent from 'utils/loadable-component'
 import React from 'react'
+import Spinner from 'components/spinner';
 import { Navigate, Routes, Route } from 'react-router-dom'
 import { Suspense } from "react";
 import MainLayout from 'components/layouts/MainLayout'
@@ -8,6 +9,8 @@ import ForgotPassword from 'views/pages/forgot-password/forgot-password'
 import { CustomerRoutes } from './customer';
 import { Rings } from 'react-loader-spinner';
 import ResetPassword from 'views/pages/forgot-password/reset-password';
+import ServiceHistory from 'views/pages/customer/service-history';
+import Homepage from 'views/pages/homePage';
 
 const InfoPet = loadableComponent(() => import('views/pages/customer/info-pet'))
 const Login = loadableComponent(() => import('views/pages/login'))
@@ -33,7 +36,7 @@ function AllRoutes() {
         }
       >
         <Routes>
-          <Route path="/" element={<Navigate to={'/pet'} />} />
+          <Route path="/" element={<Homepage/>} />
           <Route element={<CustomerRoutes />}>
             <Route path="/pet" element={<MainLayout component={InfoPet} />} />
             <Route
@@ -41,6 +44,7 @@ function AllRoutes() {
               element={<MainLayout component={PersonalInfo} />}
             />
             <Route path="/service-register" element={<MainLayout component={ServiceRegisterPet} />} />
+            <Route path="/service-history" element={<MainLayout component={ServiceHistory} />} />
           </Route>
 
           <Route path="/login" element={<Login />} />
