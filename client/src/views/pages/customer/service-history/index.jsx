@@ -156,11 +156,12 @@ function ServiceHistory() {
         onCancel={() => setBankFormVisible(false)}
         footer={null}
       >
-        <Form onFinish={(values) => setBankFormVisible(false)}>
+        <Form onFinish={(values) => setBankFormVisible(false)} layout="vertical" style={{ maxWidth: 400, margin: 'auto' }}>
           <Form.Item
             name="accountNumber"
             label="Số tài khoản"
             rules={[{ required: true, message: 'Vui lòng nhập số tài khoản!' }]}
+            style={{ display: 'flex', marginBottom: 16 }}
           >
             <Input placeholder="example" />
           </Form.Item>
@@ -168,6 +169,7 @@ function ServiceHistory() {
             name="bankName"
             label="Ngân hàng"
             rules={[{ required: true, message: 'Vui lòng chọn ngân hàng!' }]}
+            style={{ display: 'flex', marginBottom: 16 }}
           >
             <Select placeholder="Chọn ngân hàng">
               <Option value="AgriBank">AgriBank</Option>
@@ -175,7 +177,7 @@ function ServiceHistory() {
               <Option value="MB Bank">MB Bank</Option>
             </Select>
           </Form.Item>
-          <Form.Item>
+          <Form.Item style={{ textAlign: 'center' }}>
             <Button type="primary" htmlType="submit" onClick={handleCancelService}>
               Xác nhận
             </Button>
