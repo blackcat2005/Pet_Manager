@@ -135,7 +135,7 @@ function ServiceHistory() {
   return (
     <div style={{ width: '100%', overflow: 'hidden' }}>
       <Space style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography.Title level={4}>Lịch sử đăng ký</Typography.Title>
+        <Typography.Title level={1}>Lịch sử đăng ký</Typography.Title>
         <Space>
           <Select value={sortType} onChange={handleStatusFilter} style={{ width: 120 }} placeholder="Lọc">
             <Option value="all">Tất cả</Option>

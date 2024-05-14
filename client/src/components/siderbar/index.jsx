@@ -19,7 +19,7 @@ const customerMenu = [
   getItem('Dịch vụ', 'service', <FormOutlined />, [
     getItem('Đăng ký dịch vụ', '/service-register'),
     getItem('Lịch sử đăng ký', '/service-history'),
-    getItem('Bảng giá dịch vụ', '5'),
+    getItem('Bảng giá dịch vụ', '/service-cost'),
   ]),
 ]
 
