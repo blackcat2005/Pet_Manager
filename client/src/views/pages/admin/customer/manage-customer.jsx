@@ -4,6 +4,7 @@ import { EditOutlined, DeleteOutlined, PlusOutlined, LoadingOutlined } from '@an
 import './manage-customer.scss';
 import ModalCustomer from "./modal-add-edit"
 import user from 'api/user';
+import { toast } from 'react-toastify';
 
 const ManageCusomer = () => {
     const [form] = Form.useForm();
@@ -48,16 +49,27 @@ const ManageCusomer = () => {
         showModal();
     };
 
-    const handleDelete = () => {
+    const convertDate = (dateString) => {
+        const date = new Date(dateString);
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
 
-    }
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        const seconds = date.getSeconds().toString().padStart(2, '0');
+
+        const formattedDate = `${hours}:${minutes}:${seconds} ${day}/${month}/${year} `;
+        return formattedDate;
+    };
 
     const fetchData = async () => {
         const data = (await user.getAllCustomer()).data;
         const modifiedData = data.map((item) => {
             let newItem = {
                 ...item,
-                key: item.user_id
+                key: item.user_id,
+                created_at: convertDate(item.created_at)
             }
             return newItem;
         });
@@ -68,18 +80,16 @@ const ManageCusomer = () => {
         fetchData();
     }, []);
 
-
     const columns = [
         {
             title: 'ID',
             dataIndex: 'user_id',
-            sorter: true,
-            width: '20px',
+            defaultSortOrder: 'descend',
+            sorter: (a, b) => a.user_id - b.user_id,
         },
         {
             title: 'Tên khách hàng',
             dataIndex: 'fullname',
-            sorter: true,
         },
         {
             title: 'Tên đăng nhập',
@@ -121,14 +131,7 @@ const ManageCusomer = () => {
                 }
                 return (
                     <Button onClick={() => handleUpdate()}  >
-                        <Popconfirm
-                            title="Delete the task"
-                            description="Are you sure to delete this task?"
-                            okText="Yes"
-                            cancelText="No"
-                        >
-                            <EditOutlined style={{ fontSize: '20px', color: 'orange' }} />
-                        </Popconfirm>
+                        <EditOutlined style={{ fontSize: '20px', color: 'orange' }} />
                     </Button >
                 )
             }
@@ -139,18 +142,16 @@ const ManageCusomer = () => {
             render: (text, record) => {
                 const handleDelete = async () => {
                     await user.deleteUser(record.user_id);
+                    toast.success("Xóa khách hàng thành công!")
                     fetchData();
                 }
                 return (
-                    // <Button onClick={() => handleDelete()} >
-                    //     <DeleteOutlined style={{ fontSize: '20px', color: 'red' }} />
-                    // </Button >
                     <Popconfirm
                         title="Xóa khách hàng"
                         description="Bạn có chắc chắn muốn xóa?"
                         okText="Xóa"
                         cancelText="Hủy"
-                        onClick={() => handleDelete()}
+                        onConfirm={() => handleDelete()}
                     >
                         <Button danger>
                             <DeleteOutlined style={{ fontSize: '20px', color: 'red' }} />
@@ -178,16 +179,6 @@ const ManageCusomer = () => {
                                 dataSource={listCustomer}
                                 pagination={{ defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '30'] }}
                                 bordered
-                            // onChange={handleTableChange}
-                            // onRow={(record, rowIndex) => {
-
-                            //     return {
-                            //         onClick: event => {
-                            //             setDataModal(record);
-                            //             // console.log(dataModal, action);
-                            //         },
-                            //     };
-                            // }}
                             />
                             :
                             <Spin indicator={<LoadingOutlined style={{ fontSize: 30 }} spin />}
@@ -206,15 +197,11 @@ const ManageCusomer = () => {
             <ModalCustomer
                 form={form}
                 isModalOpen={isModalOpen}
-                setIsModalOpen={setIsModalOpen}
                 handleOk={handleOk}
                 handleCancel={handleCancel}
-                listCustomer={listCustomer}
-                setListCustomer={setListCustomer}
                 action={action}
-                setAction={setAction}
                 dataModal={dataModal}
-                setDataModal={setDataModal}
+                fetchData={fetchData}
             />
         </>
 
