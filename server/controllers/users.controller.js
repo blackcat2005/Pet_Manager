@@ -7,6 +7,16 @@ const getAllUsers = async (req, res) => {
   res.status(200).json(results)
 }
 
+const getAllCustomers = async (req, res) => {
+  try {
+    const listCustomer = await userService.getAllCustomers()
+    return res.status(200).json(listCustomer)
+  } catch (error) {
+    // throw new ErrorHandler(error.statusCode, 'Error get all customer')
+    console.log(error);
+  }
+}
+
 const createUser = async (req, res) => {
   const {
     username,
@@ -105,6 +115,8 @@ const deleteUser = async (req, res) => {
   // throw new ErrorHandler(401, "Unauthorized");
 }
 
+
+
 module.exports = {
   getAllUsers,
   createUser,
@@ -112,4 +124,5 @@ module.exports = {
   updateUser,
   deleteUser,
   getUserProfile,
+  getAllCustomers
 }

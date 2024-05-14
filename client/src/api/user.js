@@ -13,6 +13,14 @@ const user = {
     localStorage.removeItem('token')
     localStorage.removeItem('expiresAt')
   },
+  getAllCustomer: () => {
+    const url = '/users/customer-list'
+    return API.get(url)
+  },
+  deleteUser: (user_id) => {
+    const url = `/users/${user_id}`
+    return API.delete(url)
+  },
 }
 
 export default user
