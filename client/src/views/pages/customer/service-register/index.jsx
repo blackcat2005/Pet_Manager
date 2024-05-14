@@ -37,7 +37,7 @@ const ServiceRegisterPet = () => {
 
     return (
         <div className="service-register__container">
-            <h1>Service Register</h1>
+            <h1>Đăng ký dịch vụ</h1>
 
             <div className="service-register__content">
                 <div className="service-register__content__step">

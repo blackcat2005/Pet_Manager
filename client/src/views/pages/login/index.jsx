@@ -10,7 +10,7 @@ import useAuth from 'hooks/useAuth'
 
 function Login() {
   const navigate = useNavigate();
-  const {  isLoggedIn, setUserState } = useAuth();
+  const { isLoggedIn, setUserState } = useAuth();
 
   const handleSubmit = async (dataUser) => {
     try {

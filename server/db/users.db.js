@@ -5,6 +5,15 @@ const getAllUsersDb = async () => {
   return users
 }
 
+const getAllCustomersDb = async () => {
+  const { rows: users } = await pool.query(`
+      SELECT user_id, username, email, fullname, phone_numbers, roles, address, city, country, avatar, created_at
+      FROM users
+      WHERE roles = '{customer}'
+    `);
+  return users;
+};
+
 const createUserDb = async ({
   username,
   password,
@@ -124,4 +133,5 @@ module.exports = {
   deleteUserDb,
   getUserByUsernameDb,
   changeUserPasswordDb,
-}
+  getAllCustomersDb
+};

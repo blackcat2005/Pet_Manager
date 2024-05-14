@@ -1,0 +1,10 @@
+.manage-customer {
+    &__content {
+        background: #fff;
+        padding: 10px;
+        padding-top: 30px;
+        min-height: 800px;
+        display: flex;
+        flex-direction: column;
+    }
+}

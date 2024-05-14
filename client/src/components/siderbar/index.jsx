@@ -21,6 +21,8 @@ const customerMenu = [
     getItem('Lịch sử đăng ký', '/service-history'),
     getItem('Bảng giá dịch vụ', '5'),
   ]),
+  getItem('Quản lý khách hàng', '/manage-customer', <TableOutlined />),
+
 ]
 
 const SiderRender = (props) => {
