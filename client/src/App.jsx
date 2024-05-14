@@ -2,11 +2,11 @@ import React, { useEffect } from 'react'
 import AllRoutes from 'views/routes'
 import { BrowserRouter } from 'react-router-dom'
 import { UserProvider } from 'context/UserContext'
+import { PetProvider } from 'context/PetContext'
 import { ToastContainer } from 'react-toastify'
 import { GlobalHistory } from 'components/globalhistory'
 import 'react-toastify/dist/ReactToastify.css'
 const App = () => {
-
   useEffect(() => {
     // Setup local storage
     if (!localStorage.getItem('collapsed')) {
@@ -15,16 +15,17 @@ const App = () => {
     if (!localStorage.getItem('selected_sidebar_key')) {
       localStorage.setItem('selected_sidebar_key', 1)
     }
-
   }, [])
 
   return (
     <>
       <UserProvider>
-        <BrowserRouter>
-          <GlobalHistory />
-          <AllRoutes />
-        </BrowserRouter>
+        <PetProvider>
+          <BrowserRouter>
+            <GlobalHistory />
+            <AllRoutes />
+          </BrowserRouter>
+        </PetProvider>
       </UserProvider>
 
       <ToastContainer
