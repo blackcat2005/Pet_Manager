@@ -11,6 +11,7 @@ import { Rings } from 'react-loader-spinner'
 import ResetPassword from 'views/pages/forgot-password/reset-password'
 import ServiceHistory from 'views/pages/customer/service-history';
 import Homepage from 'views/pages/homePage';
+import ServiceCost from 'views/pages/customer/service-cost';
 
 const PetList = loadableComponent(() => import('views/pages/customer/info-pet'))
 const PetInfo = loadableComponent(() => import('views/pages/customer/info-pet/PetInfo'))
@@ -55,6 +56,7 @@ function AllRoutes() {
               element={<MainLayout component={ServiceRegisterPet} />}
             />
             <Route path="/service-history" element={<MainLayout component={ServiceHistory} />} />
+            <Route path="/service-cost" element={<MainLayout component={ServiceCost} />} />
           </Route>
 
           <Route path="/login" element={<Login />} />
