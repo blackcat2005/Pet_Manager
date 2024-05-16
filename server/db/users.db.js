@@ -31,7 +31,7 @@ const createUserDb = async ({
       city,
       country,
       avatar,
-      roles ?? '{customer}',
+      roles ?? 'customer',
     ],
   )
   return user[0]

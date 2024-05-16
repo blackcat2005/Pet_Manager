@@ -33,7 +33,7 @@ const createStaffDb = async ({
       city,
       country,
       avatar,
-      '{staff}',
+      'staff',
     ],
   )
   return staff[0]
