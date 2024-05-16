@@ -81,7 +81,7 @@ CREATE TABLE "pets" (
 
 CREATE TABLE "appointments" (
   "service_id" SERIAL PRIMARY KEY NOT NULL
-  , "medical_record_id" integer NOT NULL
+  , "medical_record_id" integer 
   , "status" "serviceStatus" NOT NULL
   , "date" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
   , "time_slot" integer NOT NULL
@@ -138,19 +138,19 @@ CREATE TABLE "roomInfo" (
   , "number" integer NOT NULL
 );
 
-CREATE TABLE "storageRegistations" (
+CREATE TABLE "storageRegistrations" (
   "service_id" SERIAL PRIMARY KEY NOT NULL
   , "user_id" integer NOT NULL
   , "pet_id" integer NOT NULL
 );
 
-CREATE TABLE "beautyRegistations" (
+CREATE TABLE "beautyRegistrations" (
   "service_id" SERIAL PRIMARY KEY NOT NULL
   , "user_id" integer NOT NULL
   , "pet_id" integer NOT NULL
 );
 
-CREATE TABLE "appointmentRegistations" (
+CREATE TABLE "appointmentRegistrations" (
   "service_id" SERIAL PRIMARY KEY NOT NULL
   , "user_id" integer NOT NULL
   , "pet_id" integer NOT NULL
@@ -190,39 +190,39 @@ ALTER TABLE "foodItem"
 ADD FOREIGN KEY ("plan_id") REFERENCES "dietPlans" ("plan_id");
 
 ALTER TABLE "storageOrders"
-ADD FOREIGN KEY ("service_id") REFERENCES "storageRegistations" ("service_id");
+ADD FOREIGN KEY ("service_id") REFERENCES "storageRegistrations" ("service_id");
 
 ALTER TABLE "beautyOrders"
-ADD FOREIGN KEY ("service_id") REFERENCES "beautyRegistations" ("service_id");
+ADD FOREIGN KEY ("service_id") REFERENCES "beautyRegistrations" ("service_id");
 
 ALTER TABLE "appointmentOrders"
-ADD FOREIGN KEY ("service_id") REFERENCES "appointmentRegistations" ("service_id");
+ADD FOREIGN KEY ("service_id") REFERENCES "appointmentRegistrations" ("service_id");
 
-ALTER TABLE "storageRegistations"
+ALTER TABLE "storageRegistrations"
 ADD FOREIGN KEY ("pet_id") REFERENCES "pets" ("pet_id");
 
-ALTER TABLE "beautyRegistations"
+ALTER TABLE "beautyRegistrations"
 ADD FOREIGN KEY ("pet_id") REFERENCES "pets" ("pet_id");
 
-ALTER TABLE "appointmentRegistations"
+ALTER TABLE "appointmentRegistrations"
 ADD FOREIGN KEY ("pet_id") REFERENCES "pets" ("pet_id");
 
-ALTER TABLE "appointmentRegistations"
+ALTER TABLE "appointmentRegistrations"
 ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
 
-ALTER TABLE "beautyRegistations"
+ALTER TABLE "beautyRegistrations"
 ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
 
-ALTER TABLE "storageRegistations"
+ALTER TABLE "storageRegistrations"
 ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
 
-ALTER TABLE "storageRegistations"
+ALTER TABLE "storageRegistrations"
 ADD FOREIGN KEY ("service_id") REFERENCES "storageServices" ("service_id");
 
-ALTER TABLE "beautyRegistations"
+ALTER TABLE "beautyRegistrations"
 ADD FOREIGN KEY ("service_id") REFERENCES "beautyServices" ("service_id");
 
-ALTER TABLE "appointmentRegistations"
+ALTER TABLE "appointmentRegistrations"
 ADD FOREIGN KEY ("service_id") REFERENCES "appointments" ("service_id");
 
 ALTER TABLE "storageServices"
