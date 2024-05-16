@@ -1,35 +1,32 @@
-const pool = require("../config");
+const pool = require('../config')
 
 const createStorageServicedb = async ({
-    status,
-    room_id,
-    date_start,
-    date_end,
-    note,
-  }) => {
-    const { rows: StorageService } = await pool.query(
-      `INSERT INTO "storageServices"("status", "room_id", "date_start", "date_end", "note") 
+  status,
+  room_id,
+  date_start,
+  date_end,
+  note,
+}) => {
+  const { rows: StorageService } = await pool.query(
+    `INSERT INTO "storageServices"("status", "room_id", "date_start", "date_end", "note") 
           VALUES($1, $2, $3, $4, $5) 
           returning "service_id", "status", "room_id", "date_start", "date_end", "note"`,
-      [status, room_id, date_start, date_end, note]
-    );
-    // console.log(StorageService);
-    return StorageService[0];
-  };
+    [status, room_id, date_start, date_end, note],
+  )
+  // console.log(StorageService);
+  return StorageService[0]
+}
 
-const createStorageRegistationdb = async ({
-    user_id,
-    pet_id
-  }) => {
-    const { rows: StorageRegistation } = await pool.query(
-      `INSERT INTO "storageRegistations"("user_id", "pet_id") 
+const createStorageRegistrationdb = async ({ user_id, pet_id }) => {
+  const { rows: StorageRegistration } = await pool.query(
+    `INSERT INTO "storageRegistrations"("user_id", "pet_id") 
           VALUES($1, $2) 
           returning "service_id", "user_id", "pet_id"`,
-      [user_id, pet_id]
-    );
-    console.log(StorageRegistation);
-    return StorageRegistation[0];
-  };  
+    [user_id, pet_id],
+  )
+  console.log(StorageRegistration)
+  return StorageRegistration[0]
+}
 const createRoomInfodb = async ({ room_type, number }) => {
   const { rows: RoomInfo } = await pool.query(
     `INSERT INTO "roomInfo"("type", "number") 
@@ -40,50 +37,49 @@ const createRoomInfodb = async ({ room_type, number }) => {
   return RoomInfo[0]
 }
 
-
-const createStorageOrderdb = async({
-    service_id,
-    service_type,
-    date,
-    total
+const createStorageOrderdb = async ({
+  service_id,
+  service_type,
+  date,
+  total,
 }) => {
-    const {rows: StorageOrder} = await pool.query(
-        `INSERT INTO "storageOrders"("service_id","type","date","total") 
+  const { rows: StorageOrder } = await pool.query(
+    `INSERT INTO "storageOrders"("service_id","type","date","total") 
           VALUES($1, $2, $3, $4) 
           returning "order_id", "service_id", "type", "date", "total"`,
-      [service_id, service_type, date, total] 
-    );
-    // console.log(StorageOrder);
-    return StorageOrder[0];
+    [service_id, service_type, date, total],
+  )
+  // console.log(StorageOrder);
+  return StorageOrder[0]
 }
 
 const getAllStorageServicedb = async () => {
-    const { rows: AllStorageService } = await pool.query(
-      `SELECT ss.*, sr.user_id, sr.pet_id, so.total
+  const { rows: AllStorageService } = await pool.query(
+    `SELECT ss.*, sr.user_id, sr.pet_id, so.total
        FROM "storageServices" ss
-       JOIN "storageRegistations" sr ON ss.service_id = sr.service_id
+       JOIN "storageRegistrations" sr ON ss.service_id = sr.service_id
        JOIN "storageOrders" so ON ss.service_id = so.service_id`,
-    )
-    return AllStorageService;
+  )
+  return AllStorageService
 }
 
 const getStorageServicebyIDdb = async (service_id) => {
-    const { rows: StorageServicebyID } = await pool.query(
-      `SELECT ss.*, sr.user_id, sr.pet_id, so.total
+  const { rows: StorageServicebyID } = await pool.query(
+    `SELECT ss.*, sr.user_id, sr.pet_id, so.total
        FROM "storageServices" ss
-       JOIN "storageRegistations" sr ON ss.service_id = sr.service_id
+       JOIN "storageRegistrations" sr ON ss.service_id = sr.service_id
        JOIN "storageOrders" so ON ss.service_id = so.service_id
        WHERE ss.service_id = $1`,
-      [service_id],
-    )
-    return StorageServicebyID;
+    [service_id],
+  )
+  return StorageServicebyID
 }
 
 const getStorageServicebyUser_IDdb = async (user_id) => {
   const { rows: StorageServicebyUser_ID } = await pool.query(
     `SELECT ss.*, sr.user_id, sr.pet_id, so.total
        FROM "storageServices" ss
-       JOIN "storageRegistations" sr ON ss.service_id = sr.service_id
+       JOIN "storageRegistrations" sr ON ss.service_id = sr.service_id
        JOIN "storageOrders" so ON ss.service_id = so.service_id
        WHERE sr.user_id = $1`,
     [user_id],
@@ -93,7 +89,7 @@ const getStorageServicebyUser_IDdb = async (user_id) => {
 // const deleteStorageServicedb = async(service_id) => {
 //   const { rows: deleteStorageService } = await pool.query(
 //     `DELETE FROM "roomInfo" WHERE "room_id" IN (SELECT "room_id" FROM "storageServices" WHERE "service_id" = $1);
-//     DELETE FROM "storageRegistations" WHERE "service_id" = $1;
+//     DELETE FROM "storageRegistrations" WHERE "service_id" = $1;
 //     DELETE FROM "storageOrders" WHERE "service_id" = $1;
 //     DELETE FROM "storageServices" WHERE "service_id" = $1;`,
 //     [service_id]
@@ -102,12 +98,11 @@ const getStorageServicebyUser_IDdb = async (user_id) => {
 // }
 const deleteStorageServicedb = async (service_id) => {
   try {
-
     await pool.query(`DELETE FROM "storageOrders" WHERE "service_id" = $1;`, [
       service_id,
     ])
     await pool.query(
-      `DELETE FROM "storageRegistations" WHERE "service_id" = $1;`,
+      `DELETE FROM "storageRegistrations" WHERE "service_id" = $1;`,
       [service_id],
     )
 
@@ -115,8 +110,10 @@ const deleteStorageServicedb = async (service_id) => {
       `DELETE FROM "storageServices" WHERE "service_id" = $1 RETURNING *;`,
       [service_id],
     )
-    await pool.query(`DELETE FROM "roomInfo" WHERE "room_id" IN (SELECT "room_id" FROM "storageServices" WHERE "service_id" = $1);`,
-    [service_id])
+    await pool.query(
+      `DELETE FROM "roomInfo" WHERE "room_id" IN (SELECT "room_id" FROM "storageServices" WHERE "service_id" = $1);`,
+      [service_id],
+    )
 
     return deleteStorageService
   } catch (error) {
@@ -143,112 +140,108 @@ const updateStorageServicedb = async ({
     returning service_id, status, room_id, date_start, date_end, note`,
     [status, room_id, date_start, date_end, note, service_id],
   )
-  const {rows: updateRowStorageRegistation} = await pool.query(
-    `UPDATE "storageRegistations"
+  const { rows: updateRowStorageRegistration } = await pool.query(
+    `UPDATE "storageRegistrations"
     set pet_id=$1
     WHERE service_id=$2
     returning service_id, user_id, pet_id`,
-    [pet_id, service_id]
-  );
-  const {rows: updateRowStorageOrder} = await pool.query(
+    [pet_id, service_id],
+  )
+  const { rows: updateRowStorageOrder } = await pool.query(
     `UPDATE "storageOrders"
     set date=$1, total=$2
     WHERE service_id=$3
     returning order_id, service_id, type, date, total   `,
-    [date, total, service_id]
-  );
+    [date, total, service_id],
+  )
   console.log({
     updatedRowStorageService,
-    updateRowStorageRegistation,
+    updateRowStorageRegistration,
     updateRowStorageOrder,
   })
   return {
     updatedRowStorageService,
-    updateRowStorageRegistation,
+    updateRowStorageRegistration,
     updateRowStorageOrder,
   }
 }
 
-
-
-const createBeautyServicedb = async ({
-    status,
-    date,
-    time_slot,
-    note
-  }) => {
-    const { rows: BeautyService } = await pool.query(
-      `INSERT INTO beautyServices(status, date, time_slot, note) 
+const createBeautyServicedb = async ({ status, date, time_slot, note }) => {
+  const { rows: BeautyService } = await pool.query(
+    `INSERT INTO beautyServices(status, date, time_slot, note) 
           VALUES($1, $2, $3, $4) 
           returning service_id, status, date, time_slot, note`,
-      [status, date, time_slot, note]
-    );
-    return BeautyService[0];
-  };
-const createBeautyServiceRegistationdb = async({
-  user_id,
-  pet_id
-}) => {
-  const {rows : BeautyServiceRegistation} = await pool.query(
-    `INSERT INTO beautyRegistations(user_id, pet_id)
+    [status, date, time_slot, note],
+  )
+  return BeautyService[0]
+}
+const createBeautyServiceRegistrationdb = async ({ user_id, pet_id }) => {
+  const { rows: BeautyServiceRegistration } = await pool.query(
+    `INSERT INTO beautyRegistrations(user_id, pet_id)
       VALUES($1,$2)
-      returning service_id, user_id, pet_id`
-      [user_id,pet_id]
-  ) ;
-  return BeautyServiceRegistation[0];
+      returning service_id, user_id, pet_id`[(user_id, pet_id)],
+  )
+  return BeautyServiceRegistration[0]
 }
 
-const createBeautyOrderdb = async({
-  type, date, total, service_id
-}) => {
+const createBeautyOrderdb = async ({ type, date, total, service_id }) => {
   const { rows: BeautyOrder } = await pool.query(
     `INSERT INTO beautyOrders(type, date, total, service_id)
      VALUES($1,$2,$3)
-     returning order_id, type, date, total, service_id`
-     [type, date, total, service_id]
-  );
-  return BeautyOrder[0];
+     returning order_id, type, date, total, service_id`[
+      (type, date, total, service_id)
+    ],
+  )
+  return BeautyOrder[0]
 }
 
-const createAppointmentdb = async ({
-    medical_record_id,
-    status,
-    date,
-    time_slot
-  }) => {
-    const { rows: Appointment } = await pool.query(
-      `INSERT INTO appointments(medical_record_id, status, date, time_slot) 
-          VALUES($1, $2, $3, $4) 
-          returning service_id, medical_record_id, status, date, time_slot`,
-      [medical_record_id, status, date, time_slot]
-    );
-    return Appointment[0];
-  };
+const createAppointmentdb = async ({ status, date, time_slot }) => {
+  const { rows: Appointment } = await pool.query(
+    `INSERT INTO appointments(status, date, time_slot) 
+      VALUES($1, $2, $3) 
+      returning service_id, medical_record_id, status, date, time_slot`,
+    [status, date, time_slot],
+  )
+  // console.log(Appointment[0])
+  return Appointment[0]
+}
 
-const createAppointmentRegistationdb = async({
-  user_id, pet_id
-}) => {
-  const {rows : AppointmentRegistation} = await pool.query(
-    `INSERT INTO appointOrders(user_id,pet_id)
-    VALUES ($1,$2)
-    returning service_id, user_id, pet_id`
-    [user_id, pet_id]
-  );
-  return AppointmentRegistation[0];
+const createAppointmentRegistrationdb = async ({ user_id, pet_id }) => {
+  const { rows: AppointmentRegistration } = await pool.query(
+    `INSERT INTO "appointmentRegistrations"(user_id, pet_id)
+      VALUES ($1, $2)
+      RETURNING service_id, user_id, pet_id`,
+    [user_id, pet_id], // Thiếu dấu phẩy ở đây
+  )
+  console.log(AppointmentRegistration[0])
+  return AppointmentRegistration[0]
+}
+
+const createAppointmentOrderdb = async ({ service_id, type, date, total }) => {
+  const { rows: AppointmentOrder } = await pool.query(
+    `INSERT INTO "appointmentOrders"("service_id","type","date","total") 
+        VALUES($1, $2, $3, $4) 
+        returning "order_id", "service_id", "type", "date", "total"`,
+    [service_id, type, date, total],
+  )
+  return AppointmentOrder[0]
 }
 module.exports = {
   createStorageServicedb,
   createRoomInfodb,
-  createStorageRegistationdb,
+  createStorageRegistrationdb,
   createStorageOrderdb,
   createBeautyServicedb,
-  createAppointmentdb,
-  createBeautyServiceRegistationdb,
+
+  createBeautyServiceRegistrationdb,
   createBeautyOrderdb,
-  createAppointmentRegistationdb,
   getAllStorageServicedb,
   getStorageServicebyIDdb,
   getStorageServicebyUser_IDdb,
   deleteStorageServicedb,
   updateStorageServicedb,
+
+  createAppointmentdb,
+  createAppointmentRegistrationdb,
+  createAppointmentOrderdb,
 }

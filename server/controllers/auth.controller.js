@@ -23,7 +23,7 @@ const createAccount = async (req, res) => {
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
-  console.log("email:", email, password);
+  // console.log("email:", email, password); khong log email vs pass xuong console
   const { token, refreshToken, user } = await authService.login(
     email,
     password
