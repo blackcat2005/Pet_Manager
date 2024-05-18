@@ -10,7 +10,7 @@ import useAuth from 'hooks/useAuth'
 
 function Login() {
   const navigate = useNavigate();
-  const {  isLoggedIn, setUserState } = useAuth();
+  const { isLoggedIn, setUserState } = useAuth();
 
   const handleSubmit = async (dataUser) => {
     try {
@@ -19,9 +19,18 @@ function Login() {
         if (response.status === 200) {
           setUserState(response.data)
           toast.success('Đăng nhập thành công')
-          navigate(`/pet`);
+          const role = response.data.user.roles;
+          localStorage.setItem("role", role);
+          if (role === "admin") {
+            navigate(`/manage-customer`);
+          }
+          if (role === "staff") {
+            navigate(`/manage-customer`);
+          }
+          if (role === "customer") {
+            navigate(`/pet`);
+          }
         }
-
       }
     } catch (error) {
       console.log("error: ", error);
