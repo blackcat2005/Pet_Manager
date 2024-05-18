@@ -48,7 +48,7 @@ CREATE TABLE "storage" (
 CREATE TABLE "beauty" (
 	"id" serial NOT NULL,
 	"status" status_t NOT NULL DEFAULT 'created',
-	"date" timestamp NOT NULL,
+	"date" DATE NOT NULL,
 	"time_slot" int NOT NULL,
 	"note" varchar(255),
 	PRIMARY KEY("id")
@@ -57,9 +57,9 @@ CREATE TABLE "beauty" (
 
 CREATE TABLE "appointments" (
 	"id" serial NOT NULL,
-	"medical_record_id" int NOT NULL,
-	"status" status_t NOT NULL,
-	"date" timestamp NOT NULL,
+	"medical_record_id" int,
+	"status" status_t NOT NULL DEFAULT 'created',
+	"date" DATE NOT NULL,
 	"note" varchar(255),
 	"time_slot" int NOT NULL,
 	PRIMARY KEY("id")
@@ -123,7 +123,7 @@ CREATE TABLE "appointment_orders" (
 	"service_id" int NOT NULL,
 	"user_id" int NOT NULL,
 	"pet_id" int NOT NULL,
-	"created_at" time NOT NULL,
+	"created_at" TIMESTAMPTZ NOT NULL,
 	"total" float NOT NULL,
 	PRIMARY KEY("id")
 );
