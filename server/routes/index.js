@@ -10,5 +10,5 @@ router.use('/users', users)
 router.use('/pets', pets)
 router.use('/staffs', staffs)
 router.use('/services', service)
-
+router.use('/services/appointment', service)
 module.exports = router;

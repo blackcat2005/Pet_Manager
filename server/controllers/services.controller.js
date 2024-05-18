@@ -153,7 +153,7 @@ const createTimeSlot = async (req, res) => {
   if (req.user.roles.includes("admin")) {
     // Mảng để lưu trữ kết quả trả về từ cơ sở dữ liệu
     const dbResults = [];
-    
+
     // Lặp qua từng thời gian trong times
     for (const timeValue of times) {
       const { time } = timeValue;
@@ -169,7 +169,7 @@ const createTimeSlot = async (req, res) => {
       time_slots: dbResults, // Trả về kết quả trả về từ cơ sở dữ liệu
     });
   } else {
-      throw new ErrorHandler(401, "Unauthorized");
+    throw new ErrorHandler(401, "Unauthorized");
   }
 };
 
@@ -216,7 +216,7 @@ const createAppointment = async (req, res) => {
     const currentDate = new Date();
     const appointmentDate = new Date(date);
     // Kiểm tra nếu date nhỏ hơn hôm nay
-    if (appointmentDate  < currentDate.setHours(0, 0, 0, 0)) {
+    if (appointmentDate < currentDate.setHours(0, 0, 0, 0)) {
       throw new ErrorHandler(400, "The appointment date cannot be in the past.");
     }
     // Kiểm tra time_slot trong bảng time_slot
@@ -314,7 +314,7 @@ const deleteAppointment = async (req, res) => {
   }
 }
 
- const updateAppointment = async (req, res) => {
+const updateAppointment = async (req, res) => {
   const { user_id } = req.user
   const {
     id, date, note, time_slot, pet_id
@@ -335,6 +335,68 @@ const deleteAppointment = async (req, res) => {
     throw new ErrorHandler(401, 'Unauthorized')
   }
 }
+
+const updateAppointmentStatus = async (req, res) => {
+  // const { user_id } = req.user
+  const { id, status } = req.body;
+  // const user = await userService.getUserById(user_id)
+  // if (!user) {
+  //   throw new ErrorHandler(404, 'User not found')
+  // }
+  // Kiểm tra xem trạng thái có hợp lệ không
+  const validStatuses = ['complete', 'canceled', 'processing'];
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({
+      status: "error",
+      message: "Invalid status"
+    });
+  }
+
+  try {
+    if (req.user.roles.includes('admin') || req.user.roles.includes('staff')) {
+      const response = await servicesServices.updateAppointmentStatus({ id, status });
+      if (response.message === "Appointment not found") {
+        return res.status(404).json({
+          status: "error",
+          message: response.message
+        });
+      }
+
+      res.status(200).json({
+        status: "success",
+        message: response.message
+      });
+    } else if (req.user.roles.includes('customer')) {
+      // Customer chỉ có thể hủy (canceled) cuộc hẹn
+      if (status !== 'canceled') {
+        return res.status(401).json({
+          status: "error",
+          message: "Unauthorized action"
+        });
+      }
+
+      const response = await servicesServices.updateAppointmentStatus({ id, status });
+      if (response.message === "Appointment not found") {
+        return res.status(404).json({
+          status: "error",
+          message: response.message
+        });
+      }
+
+      res.status(200).json({
+        status: "success",
+        message: response.message
+      });
+    } else {
+      throw new ErrorHandler(401, 'Unauthorized')
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: error.message
+    });
+  }
+};
 module.exports = {
   createStorageService,
   getAllStorageService,
@@ -351,6 +413,7 @@ module.exports = {
   getAppointmentbyID,
   deleteAppointment,
   updateAppointment,
+  updateAppointmentStatus,
 
 
 }

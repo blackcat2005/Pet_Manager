@@ -21,6 +21,7 @@ const {
   getAppointmentbyIDdb,
   deleteAppointmentdb,
   updateAppointmentdb,
+  updateAppointmentStatusdb,
 
 
 } = require('../db/servicePet.db')
@@ -200,11 +201,21 @@ class ServiceService {
 
   updateAppointment = async(update_appointment) => {
     try {
-      console.log(update_appointment);
+      // console.log(update_appointment);
       return await updateAppointmentdb(update_appointment);
     } catch (error) {
       console.log(error);
       throw new ErrorHandler(error.statusCode, 'updateAppointment False')
+    }
+  }
+
+  updateAppointmentStatus = async(response) => {
+    try {
+      console.log(response);
+      return await updateAppointmentStatusdb(response);
+    } catch (error) {
+      console.log(error);
+      throw new ErrorHandler(error.statusCode, 'updateAppointmentStatus False')
     }
   }
 }

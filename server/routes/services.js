@@ -12,9 +12,8 @@ const {
   getAllAppointmentbyUser_ID,
   getAppointmentbyID,
   deleteAppointment,
-  updateAppointment
-
-
+  updateAppointment,
+  updateAppointmentStatus,
 
 } = require('../controllers/services.controller')
 const {
@@ -41,10 +40,11 @@ router.route('/add-time-slot').post(createTimeSlot)
 //Beauty
 
 // Appointment
-router.route('/appointment/CreateAppointment').post(createAppointment);
-router.route('/appointment/getAllAppointmentbyUser_ID').get(getAllAppointmentbyUser_ID);
-router.route('/appointment/getAllAppointmentbyID').get(getAppointmentbyID);
-router.route('/appointment/deleteAppointment').delete(deleteAppointment);
-router.route('/appointment/updateAppointment').put(updateAppointment);
+router.route('/CreateAppointment').post(createAppointment);
+router.route('/getAllAppointmentbyUser_ID').get(getAllAppointmentbyUser_ID);
+router.route('/getAllAppointmentbyID').get(getAppointmentbyID);
+router.route('/deleteAppointment').delete(deleteAppointment);
+router.route('/updateAppointment').put(updateAppointment);
+router.route('/updateStatus').put(updateAppointmentStatus);
 module.exports = router;
 

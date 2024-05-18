@@ -372,6 +372,43 @@ const updateAppointmentdb = async ({ id, date, note, time_slot, pet_id }) => {
   }
 };
 
+const updateAppointmentStatusdb = async ({ id, status }) => {
+  try {
+    // Bắt đầu transaction
+    await pool.query('BEGIN');
+
+    // Kiểm tra xem cuộc hẹn có tồn tại không
+    const { rows: existingAppointment } = await pool.query(
+      'SELECT * FROM appointments WHERE id = $1',
+      [id]
+    );
+
+    if (existingAppointment.length === 0) {
+      await pool.query('ROLLBACK');
+      return { message: "Appointment not found" };
+    }
+
+    // Cập nhật trạng thái trong bảng appointments
+    const updateStatusQuery = `
+      UPDATE appointments
+      SET status = $1
+      WHERE id = $2
+    `;
+    await pool.query(updateStatusQuery, [status, id]);
+
+    // Commit transaction nếu mọi thứ suôn sẻ
+    await pool.query('COMMIT');
+
+    return { message: 'Appointment status successfully updated' };
+  } catch (error) {
+    // Rollback transaction nếu có lỗi
+    await pool.query('ROLLBACK');
+    console.error('Error in updateAppointmentStatusdb:', error);
+    throw new ErrorHandler(500, 'Internal server error');
+  }
+};
+
+
 
 module.exports = {
   createStorageServicedb,
@@ -398,5 +435,6 @@ module.exports = {
   getAppointmentbyIDdb,
   deleteAppointmentdb,
   updateAppointmentdb,
+  updateAppointmentStatusdb,
 
 }
