@@ -6,19 +6,19 @@ const takePath = (roles) => {
     case 'customer':
       return '/pet'
     case 'staff':
-      return '/pet-manager'
+      return '/staff/pet-manage'
     case 'admin':
-      return '/staff-manager'
+      return '/admin/statistics'
   }
 }
 
 export const GuestRoute = () => {
-  const {authData, userData} = useAuth()
+  const { authData, userData } = useAuth()
 
-  if(authData) {
+  if (authData) {
     <Navigate to={takePath(userData.roles)} />
   }
-  
+
   return <Outlet />
 }
 

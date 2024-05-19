@@ -86,23 +86,27 @@ const ManageCustomer = () => {
             dataIndex: 'user_id',
             defaultSortOrder: 'descend',
             sorter: (a, b) => a.user_id - b.user_id,
+            fixed: 'left',
+            width: '60px',
         },
         {
             title: 'Tên khách hàng',
             dataIndex: 'fullname',
+            fixed: 'left',
         },
         {
             title: 'Tên đăng nhập',
             dataIndex: 'username',
+            width: '140px',
         },
         {
             title: 'Email',
             dataIndex: 'email',
+            width: '220px',
         },
         {
             title: 'SĐT',
             dataIndex: 'phone_numbers',
-            width: '10%',
         },
         {
             title: 'Địa chỉ',
@@ -134,7 +138,8 @@ const ManageCustomer = () => {
                         <EditOutlined style={{ fontSize: '20px', color: 'orange' }} />
                     </Button >
                 )
-            }
+            },
+            fixed: 'right',
         },
         {
             title: 'Xóa',
@@ -158,7 +163,8 @@ const ManageCustomer = () => {
                         </Button>
                     </Popconfirm>
                 )
-            }
+            },
+            fixed: 'right',
         },
     ];
 
@@ -179,6 +185,9 @@ const ManageCustomer = () => {
                                 dataSource={listCustomer}
                                 pagination={{ defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '30'] }}
                                 bordered
+                                scroll={{
+                                    x: 1500,
+                                }}
                             />
                             :
                             <Spin indicator={<LoadingOutlined style={{ fontSize: 30 }} spin />}

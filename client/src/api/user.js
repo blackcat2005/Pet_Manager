@@ -9,9 +9,15 @@ const user = {
     return API.put(url, params)
   },
   logout: () => {
-    localStorage.removeItem('user')
-    localStorage.removeItem('token')
-    localStorage.removeItem('expiresAt')
+    localStorage.clear();
+  },
+  getAllCustomer: () => {
+    const url = '/users/customer-list'
+    return API.get(url)
+  },
+  deleteUser: (user_id) => {
+    const url = `/users/${user_id}`
+    return API.delete(url)
   },
 }
 

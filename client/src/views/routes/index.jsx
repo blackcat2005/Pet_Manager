@@ -5,47 +5,30 @@ import MainLayout from 'components/layouts/MainLayout'
 import Register from 'views/pages/register'
 import ForgotPassword from 'views/pages/forgot-password/forgot-password'
 import ResetPassword from 'views/pages/forgot-password/reset-password'
-import ServiceHistory from 'views/pages/customer/service-history'
 import Homepage from 'views/pages/homePage'
-import ServiceCost from 'views/pages/customer/service-cost'
 import { RoleProtectedRoute } from './role.protected.route'
 import GuestRoute from './guest-route'
+import PetInfoOverview from 'views/pages/admin/staff/pet-info/info_overview'
 
 const PetList = loadableComponent(() => import('views/pages/customer/info-pet'))
-const PetInfo = loadableComponent(
-  () => import('views/pages/customer/info-pet/PetInfo'),
-)
+const PetInfo = loadableComponent(() => import('views/pages/customer/info-pet/PetInfo'))
+const ServiceRegisterPet = loadableComponent(() => import('views/pages/customer/service-register'))
+const ServiceHistory = loadableComponent(() => import('views/pages/customer/service-history'))
+const ServiceCost = loadableComponent(() => import('views/pages/customer/service-cost'))
 
-const CustomerListPage = loadableComponent(() => import('views/pages/admin/staff/crud_table'))
+const StaffManage = loadableComponent(() => import('views/pages/admin/staff/manage-staff'))
 const ManageCustomer = loadableComponent(() => import('views/pages/admin/customer/manage-customer'))
+const Statistics = loadableComponent(() => import('views/pages/admin/statistics/statistics'))
+// const PetInfoOverview = loadableComponent(() => import('views/pages/admin/staff/pet-info/info_overview'))
 
 
 const Login = loadableComponent(() => import('views/pages/login'))
-const PersonalInfo = loadableComponent(
-  () => import('views/pages/customer/personal-info'),
-)
-const ServiceRegisterPet = loadableComponent(
-  () => import('views/pages/customer/service-register'),
-)
+const PersonalInfo = loadableComponent(() => import('views/pages/customer/personal-info'))
 
-const PetManager = loadableComponent(() => import('views/pages/staff/test'))
 
 function AllRoutes() {
   return (
     <>
-      {/* <Suspense
-        fallback={
-          <div className="loading-container">
-            <Rings
-              heigth="100"
-              width="100"
-              color="#1877f2"
-              ariaLabel="loading"
-            />
-            <div>Loading data...</div>
-          </div>
-        }
-      > */}
       <Routes>
         <Route path="/" element={<Homepage />} />
 
@@ -72,27 +55,36 @@ function AllRoutes() {
 
         <Route element={<RoleProtectedRoute roles={['staff']} />}>
           <Route
-            path="/pet-manager"
-            element={<MainLayout component={PetManager} />}
+            path="/staff/pet-manage"
+            element={<MainLayout component={PetInfoOverview} />}
+          />
+          <Route
+            path="/staff/customer-manage"
+            element={<MainLayout component={ManageCustomer} />}
           />
         </Route>
 
         <Route element={<RoleProtectedRoute roles={['admin']} />}>
           <Route
-            path="/staff-manager"
-            element={<MainLayout component={CustomerListPage} />}
+            path="/admin/statistics"
+            element={<MainLayout component={Statistics} />}
           />
           <Route
-            path="/customer-manager"
+            path="/admin/staff-manage"
+            element={<MainLayout component={StaffManage} />}
+          />
+          <Route
+            path="/admin/customer-manage"
             element={<MainLayout component={ManageCustomer} />}
+          />
+          <Route
+            path="/admin/pet-manage"
+            // element={<MainLayout component={PetInfoOverview} />}
+            element={<MainLayout component={PetInfoOverview} />}
           />
         </Route>
 
-        <Route
-          element={
-            <RoleProtectedRoute roles={['staff', 'customer', 'admin']} />
-          }
-        >
+        <Route element={<RoleProtectedRoute roles={['staff', 'customer', 'admin']} />}>
           <Route
             path="/personal-info"
             element={<MainLayout component={PersonalInfo} />}
@@ -108,7 +100,6 @@ function AllRoutes() {
 
         <Route path="*">Cook</Route>
       </Routes>
-      {/* </Suspense> */}
     </>
   )
 }

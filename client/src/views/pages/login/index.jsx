@@ -13,9 +13,9 @@ const takePath = (roles) => {
     case 'customer':
       return '/pet'
     case 'staff':
-      return '/pet-manager'
+      return '/staff/pet-manage'
     case 'admin':
-      return '/staff-manager'
+      return '/admin/statistics'
   }
 }
 
