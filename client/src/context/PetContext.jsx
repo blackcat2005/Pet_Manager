@@ -4,7 +4,7 @@ import useAuth from "hooks/useAuth";
 const PetContext = createContext();
 
 export const PetProvider = ({ children }) => {
-  const [pets, setPets] = useState(null);
+  const [pets, setPets] = useState([]);
   const {isLoggedIn} = useAuth()
   useEffect(() => {
     pet.getPetList().then((response) => {

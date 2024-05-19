@@ -14,7 +14,7 @@ const createPetDb = async ({
     const { rows: pet } = await pool.query(
       `INSERT INTO pets(fullname, species, age, weight, sex, health, describe, avatar, user_id) 
           VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) 
-          returning pet_id, fullname, species, age, weight, sex, health, describe, created_at, avatar, user_id`,
+          returning pet_id, fullname, species, age, weight, sex, health, describe, avatar, user_id`,
       [fullname, species, age, weight, sex, health, describe, avatar, user_id]
     );
     return pet[0];

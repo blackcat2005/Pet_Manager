@@ -45,7 +45,7 @@ const HomePart1 = () => {
 
     return (
         <div className='Homepage-part1'>
-            <div className='Homepage-part1-left'>
+            <div className='Homepage-part1-left '>
                 <img src={thumnail1} alt="" width="560" height="667" />
             </div>
             <div className='Homepage-part1-right'>

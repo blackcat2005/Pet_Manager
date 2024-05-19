@@ -6,7 +6,7 @@ import ModalCustomer from "./modal-add-edit"
 import user from 'api/user';
 import { toast } from 'react-toastify';
 
-const ManageCusomer = () => {
+const ManageCustomer = () => {
     const [form] = Form.useForm();
     const dataModalDefault = {
         key: "",
@@ -208,4 +208,4 @@ const ManageCusomer = () => {
     )
 }
 
-export default ManageCusomer;
+export default ManageCustomer;

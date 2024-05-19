@@ -4,6 +4,7 @@ import { Breadcrumb, Layout, Menu, theme } from 'antd'
 import { Navigate, Link, useLocation } from 'react-router-dom'
 const { Sider } = Layout
 import './siderbar.scss'
+import useAuth from 'hooks/useAuth'
 
 function getItem(label, key, icon, children) {
   return {
@@ -23,10 +24,52 @@ const customerMenu = [
   ]),
 ]
 
+const staffMenu = [
+  getItem('Quản lí khách hàng', '/customer-manager', <TableOutlined />),
+  getItem('Quản lí thú cưng', '/pet-manager', <TableOutlined />),
+  getItem('Dịch vụ vệ sinh', 'sanitation-service', <FormOutlined />, [
+    getItem('Sử dụng dịch vụ', '/sanitation-used'),
+    getItem('Thông tin dịch vụ', '/sanitation-info'),
+  ]),
+  getItem('Quản lý dịch vụ lưu trữ', 'storage-service', <FormOutlined />, [
+    getItem('Sử dụng dịch vụ', '/storage-used'),
+    getItem('Thông tin dịch vụ', '/storage-info'),
+  ]),
+  getItem('Quản lý khám bệnh', 'medical-service', <FormOutlined />, [
+    getItem('Sử dụng dịch vụ', '/medical-used'),
+    getItem('Thông tin dịch vụ', '/medical-info'),
+  ]),
+]
+
+const adminMenu = [
+  getItem('Quản lí khách hàng', '/pet', <TableOutlined />),
+  getItem('Dịch vụ vệ sinh', 'sanitation-service', <FormOutlined />, [
+    getItem('Sử dụng dịch vụ', '/sanitation-used'),
+    getItem('Thông tin dịch vụ', '/sanitation-info'),
+  ]),
+]
+
+const takeMenu = (roles) => {
+  switch (roles) {
+    case 'customer':
+      return customerMenu
+    case 'staff':
+      return staffMenu
+    case 'admin':
+      return adminMenu
+
+    default:
+      break
+  }
+}
+
 const SiderRender = (props) => {
   const [collapsed, setCollapsed] = useState(false)
-  const location = useLocation();
+  const location = useLocation()
+  const { userData } = useAuth()
+  // const [menu, setMenu] = useState(takeMenu(userData.roles))
 
+  
   return (
     <Sider
       width={200}
@@ -35,19 +78,17 @@ const SiderRender = (props) => {
       collapsible
       collapsed={collapsed}
       onCollapse={(value) => setCollapsed(value)}
-    // style = {{height: 'inherit'}}
     >
+      {userData && userData.roles === 'customer'}
       <Menu
         className="sider-wrapper__menu-item"
         theme={props.theme}
         selectedKeys={location.pathname}
         mode="inline"
-        defaultSelectedKeys={['1']}
-        defaultOpenKeys={['service']}
-      // openKeys = {'service'}
-      // items={customerMenu}
+        // defaultSelectedKeys={1}
+        // defaultOpenKeys={['service']}
       >
-        {customerMenu.map((item) => {
+        {userData && takeMenu(userData.roles).map((item) => {
           if (item.children) {
             return (
               <Menu.SubMenu

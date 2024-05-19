@@ -31,12 +31,12 @@ const PetList = () => {
       </div>
 
       <div className="pet-info__card-list">
-        {petList === null ? (
+        { petList.length === 0 ? (
           <div className="pet-info__card-list__none">
             Bạn dell có thú cưng!!!!
           </div>
         ) : (
-          petList.map((petinfo) => (
+          petList && petList.map((petinfo) => (
             <Card
               hoverable
               className="pet-info__card-list__card"

@@ -31,7 +31,7 @@ function PetInfo() {
         <>
             <div className="flex flex-col">
                 <PetHeader />
-                <div className="flex flex-col justify-center px-6 mt-7 w-full bg-white max-md:pl-5 max-md:max-w-full">
+                <div className="flex flex-col justify-center px-6 mt-3 w-full bg-white max-md:pl-5 max-md:max-w-full">
                     <div className="px-10 py-10 max-md:px-5 max-md:max-w-full">
                         <div className="flex gap-5 max-md:flex-col max-md:gap-0">
                             <PetSider activeButton={activeButton} onButtonClick={handleButtonClick} />

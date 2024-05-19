@@ -41,30 +41,31 @@ function DietPlan() {
       </h1>
       <section className="flex flex-col justify-center mt-11 w-full bg-white rounded-sm border border-solid border-zinc-100 max-md:mt-10 max-md:max-w-full">
         <div className="flex flex-col p-6 w-full max-md:px-5 max-md:max-w-full">
-          <div className="flex gap-5 justify-center max-md:flex-wrap max-md:max-w-full">
-            <p className="pr-52 mr-48 -ml-0.5 text-base font-medium leading-6 text-black text-opacity-80">
+          <div className="flex gap-7 flex-row ">
+            <p className="w-[130px] text-base font-medium leading-6 text-black text-opacity-80">
               {dietPlan.name}
             </p>
-            <p className="mr-20 ml-6 text-sm leading-5 text-black text-opacity-80">
+            <p className="text-sm leading-5 text-black text-opacity-80">
               {dietPlan.type}
             </p>
           </div>
-          <div className="flex gap-5 justify-between mt-2 max-md:flex-wrap max-md:max-w-full">
-            <p className="text-base font-medium leading-6 text-black text-opacity-80">
+          <div className="flex gap-7 items-center mt-2 ">
+            <p className="w-[130px] text-base font-medium leading-6 text-black text-opacity-80">
               Thời gian áp dụng
             </p>
-            <p className="text-sm leading-5 text-black text-opacity-80">
+            <p className="text-base font-medium leading-6 text-black text-opacity-80">
               {dietPlan.duration}
             </p>
           </div>
         </div>
       </section>
+      <div className="overflow-y-auto max-h-[300px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
       {dietPlan.meals.map((meal, index) => (
         <React.Fragment key={index}>
           <h2 className="mt-7 w-full text-base font-medium leading-6 text-black text-opacity-80 max-md:max-w-full">
             {meal.name}
           </h2>
-          <div className="overflow-y-auto max-h-[300px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
+          <div className="">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
@@ -90,6 +91,8 @@ function DietPlan() {
           </div>
         </React.Fragment>
       ))}
+      </div>
+      
     </div>
   );
 }

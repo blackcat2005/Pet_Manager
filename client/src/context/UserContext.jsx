@@ -15,7 +15,11 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     if (isLoggedIn) {
-      user.getProfile().then((res) => setUserData(res?.data))
+      const fetchInfoUser = async() => {
+        const res = await user.getProfile()
+        setUserData(res?.data)
+      }
+      fetchInfoUser()
     }
   }, [isLoggedIn])
 

@@ -17,7 +17,7 @@ function getLabel(key) {
       return 'Cân nặng';
     case 'health':
       return 'Tình trạng sức khỏe';
-    case 'description':
+    case 'describe':
       return 'Mô tả';
     default:
       return '';
@@ -49,15 +49,15 @@ export default function BasicInfo() {
     age: '',
     weight: '',
     health: '',
-    description: '',
+    describe: '',
   });
 
   useEffect(() => {
     const fetchPetInfo = async () => {
       try {
         const res = await pet.getPetInfo(slug);
-        const { fullname, sex, species, age, weight, health, description } = res.data;
-        setPetInfo({ fullname, sex, species, age, weight, health, description });
+        const { fullname, sex, species, age, weight, health, describe } = res.data;
+        setPetInfo({ fullname, sex, species, age, weight, health, describe });
       } catch (error) {
         console.error("Error fetching pet info:", error);
       }
@@ -67,7 +67,7 @@ export default function BasicInfo() {
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    if (["fullname", "sex", "species", "age", "weight", "health", "description"].includes(name)) {
+    if (["fullname", "sex", "species", "age", "weight", "health", "describe"].includes(name)) {
       setPetInfo(prevState => ({
         ...prevState,
         [name]: value,
