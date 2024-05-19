@@ -1,247 +1,221 @@
-CREATE TYPE "serviceStatus" AS ENUM ('created', 'processing', 'completed', 'canceled');
-
-CREATE TYPE "roomType" AS ENUM ('vip', 'normal');
-
-CREATE TYPE "foodTimeType" AS ENUM ('breakfast', 'lunch', 'dinner');
-
-CREATE TYPE "serviceType" AS ENUM ('storageService', 'beautyService', 'appointment');
-
-CREATE TABLE "storageOrders" (
-  "order_id" SERIAL PRIMARY KEY NOT NULL
-  , "service_id" integer NOT NULL
-  , "type" "serviceType" NOT NULL
-  , "date" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , "total" real NOT NULL
-);
-
-CREATE TABLE "beautyOrders" (
-  "order_id" SERIAL PRIMARY KEY NOT NULL
-  , "type" "serviceType" NOT NULL
-  , "date" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , "total" real NOT NULL
-  , "service_id" integer NOT NULL
-);
-
-CREATE TABLE "appointmentOrders" (
-  "order_id" SERIAL PRIMARY KEY NOT NULL
-  , "type" "serviceType" NOT NULL
-  , "date" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , "total" real NOT NULL
-  , "service_id" integer NOT NULL
-);
-
-CREATE TABLE "presciptionsOrders" (
-  "order_id" SERIAL PRIMARY KEY NOT NULL
-  , "prescription_id" integer NOT NULL
-  , "user_id" integer NOT NULL
-  , "pet_id" integer NOT NULL
-  , "type" "serviceType" NOT NULL
-  , "date" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , "total" real NOT NULL
-);
-
-CREATE TABLE "resetTokens" (
-  "id" SERIAL PRIMARY KEY NOT NULL
-  , "email" character varying NOT NULL
-  , "token" character varying NOT NULL
-  , "used" boolean NOT NULL
-  , "expiration" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
+CREATE TYPE "roles_t" AS ENUM ('customer', 'staff', 'admin');
+CREATE TYPE "status_t" AS ENUM ('created', 'processing', 'completed', 'canceled');
+CREATE TYPE "type_t" AS ENUM ('vip', 'normal');
+CREATE TYPE "time_t" AS ENUM ('breakfast', 'lunch', 'dinner');
 
 CREATE TABLE "users" (
-  "user_id" SERIAL PRIMARY KEY NOT NULL,
-  "username" character varying(50) UNIQUE NOT NULL,
-  "email" character varying(100) UNIQUE NOT NULL,
-  "password" character varying(200) NOT NULL,
-  "fullname" character varying(100) NOT NULL,
-  "phone_numbers" character varying(10) NOT NULL,
-  "roles" character varying(10)[] DEFAULT '{customer}'::character varying[] NOT NULL,
-  "address" character varying(200),
-  "city" character varying(100),
-  "country" character varying(100),
-  "avatar" character varying(100),
-  "created_at" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+	"id" serial NOT NULL,
+	"username" varchar(55) NOT NULL,
+	"email" varchar(100) NOT NULL,
+	"password" varchar(200) NOT NULL,
+	"fullname" varchar(100) NOT NULL,
+	"phone_numbers" varchar(10) NOT NULL,
+	"roles" roles_t NOT NULL DEFAULT 'customer',
+	"address" varchar(256),
+	"city" varchar(100),
+	"country" varchar(100),
+	"created_at" TIMESTAMPTZ,
+	"avatar" varchar(255),
+	PRIMARY KEY("id")
 );
 
 CREATE TABLE "pets" (
-  "pet_id" SERIAL PRIMARY KEY NOT NULL,
-  "fullname" character varying(100) NOT NULL,
-  "species" character varying(5) NOT NULL,
-  "age" real NOT NULL,
-  "weight" real NOT NULL,
-  "sex" character varying(100) NOT NULL,
-  "health" character varying(100),
-  "describe" character varying(200),
-  "avatar" character varying(100),
-  "created_at" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-  "plan_id" integer,
-  "medical_record_id" integer,
-  "user_id" integer NOT NULL
+	"id" serial NOT NULL,
+	"fullname" varchar(100) NOT NULL,
+	"species" varchar(10) NOT NULL,
+	"age" float NOT NULL,
+	"weight" float NOT NULL,
+	"sex" varchar(10) NOT NULL,
+	"health" varchar(100),
+	"describe" varchar(256),
+	"plan_id" int,
+	"medical_record_id" int,
+	"user_id" int,
+	"avatar" varchar(255),
+	PRIMARY KEY("id")
 );
+
+
+
+CREATE TABLE "storage" (
+	"id" serial NOT NULL,
+	"status" "status_t" NOT NULL DEFAULT 'created',
+	"room_id" int NOT NULL,
+	"date_start" timestamp NOT NULL,
+	"date_end" timestamp NOT NULL,
+	"note" varchar(255),
+	PRIMARY KEY("id")
+);
+
+
+CREATE TABLE "beauty" (
+	"id" serial NOT NULL,
+	"status" status_t NOT NULL DEFAULT 'created',
+	"date" timestamp NOT NULL,
+	"time_slot" int NOT NULL,
+	"note" varchar(255),
+	PRIMARY KEY("id")
+);
+
 
 CREATE TABLE "appointments" (
-  "service_id" SERIAL PRIMARY KEY NOT NULL
-  , "medical_record_id" integer NOT NULL
-  , "status" "serviceStatus" NOT NULL
-  , "date" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , "time_slot" integer NOT NULL
+	"id" serial NOT NULL,
+	"medical_record_id" int NOT NULL,
+	"status" status_t NOT NULL,
+	"date" timestamp NOT NULL,
+	"note" varchar(255),
+	"time_slot" int NOT NULL,
+	PRIMARY KEY("id")
 );
 
-CREATE TABLE "timeSlots" (
-  "time_slot" SERIAL PRIMARY KEY NOT NULL
-  , "time" time NOT NULL
+CREATE TABLE "medical_records" (
+	"id" serial NOT NULL,
+	"neutered" boolean NOT NULL,
+	"symptoms" varchar(255) NOT NULL,
+	"diagnostic" varchar(255) NOT NULL,
+	"prescription_id" int NOT NULL,
+	"created_at" TIMESTAMPTZ,
+	PRIMARY KEY("id")
 );
 
-CREATE TABLE "medicalRecords" (
-  "medical_record_id" SERIAL PRIMARY KEY NOT NULL
-  , "neutered" bool NOT NULL
-  , "symptoms" character varying(200) NOT NULL
-  , "diagnostic" character varying(200) NOT NULL
-  , "prescription_id" integer NOT NULL
-  , "created_at" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+CREATE TABLE "prescription_item" (
+	"id" serial NOT NULL,
+	"medical_record_id" int NOT NULL,
+	"medicine" varchar(255) NOT NULL,
+	"dosage" varchar(255) NOT NULL,
+	"note" varchar(255) NOT NULL,
+	PRIMARY KEY("id")
 );
 
-CREATE TABLE "prescriptions" (
-  "prescription_id" SERIAL PRIMARY KEY NOT NULL
-  , "note" character varying(100) NOT NULL
-  , "created_at" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+
+
+CREATE TABLE "room" (
+	"id" serial NOT NULL,
+	"type" type_t NOT NULL,
+	"max_slot" int NOT NULL,
+	"current_slot" int NOT NULL,
+	PRIMARY KEY("id")
 );
 
-CREATE TABLE "prescriptionItem" (
-  "prescription_item_id" SERIAL PRIMARY KEY NOT NULL
-  , "prescription_id" integer
-  , "medicine" character varying(100) NOT NULL
-  , "dosage" character varying(100) NOT NULL
-  , "note" character varying(100) NOT NULL
+CREATE TABLE "time_slot" (
+	"id" serial NOT NULL,
+	"time" time NOT NULL,
+	PRIMARY KEY("id")
 );
 
-CREATE TABLE "beautyServices" (
-  "service_id" SERIAL PRIMARY KEY NOT NULL
-  , "status" "serviceStatus" NOT NULL
-  , "date" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , "time_slot" integer
-  , "note" character varying(100)
+CREATE TABLE "storage_orders" (
+	"id" serial NOT NULL,
+	"service_id" int NOT NULL,
+	"user_id" int NOT NULL,
+	"pet_id" int NOT NULL,
+	"create_at" time NOT NULL,
+	"total" float NOT NULL,
+	PRIMARY KEY("id")
 );
 
-CREATE TABLE "storageServices" (
-  "service_id" SERIAL PRIMARY KEY NOT NULL
-  , "status" "serviceStatus" NOT NULL
-  , "room_id" integer NOT NULL
-  , "date_start" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , "date_end" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , "note" character varying(100)
+CREATE TABLE "beauty_orders" (
+	"id" serial NOT NULL,
+	"service_id" int NOT NULL,
+	"user_id" int NOT NULL,
+	"pet_id" int NOT NULL,
+	"create_at" time NOT NULL,
+	"total" float NOT NULL,
+	PRIMARY KEY("id")
 );
 
-CREATE TABLE "roomInfo" (
-  "room_id" SERIAL PRIMARY KEY NOT NULL
-  , "type" "roomType" NOT NULL
-  , "number" integer NOT NULL
+CREATE TABLE "appoinment_orders" (
+	"id" serial NOT NULL,
+	"service_id" int NOT NULL,
+	"user_id" int NOT NULL,
+	"pet_id" int NOT NULL,
+	"created_at" time NOT NULL,
+	"total" float NOT NULL,
+	PRIMARY KEY("id")
 );
 
-CREATE TABLE "storageRegistations" (
-  "service_id" SERIAL PRIMARY KEY NOT NULL
-  , "user_id" integer NOT NULL
-  , "pet_id" integer NOT NULL
+CREATE TABLE "diet_plans" (
+	"id" serial NOT NULL,
+	"name" varchar(255) NOT NULL,
+	"description" varchar(255) NOT NULL,
+	"date_start" timestamp NOT NULL,
+	"date_end" timestamp NOT NULL,
+	"created_at" TIMESTAMPTZ,
+	PRIMARY KEY("id")
 );
 
-CREATE TABLE "beautyRegistations" (
-  "service_id" SERIAL PRIMARY KEY NOT NULL
-  , "user_id" integer NOT NULL
-  , "pet_id" integer NOT NULL
+
+
+CREATE TABLE "food_item" (
+	"id" serial NOT NULL,
+	"plan_id" int NOT NULL,
+	"name" varchar(255) NOT NULL,
+	"amount" real NOT NULL,
+	"unit" varchar(10) NOT NULL,
+	"description" varchar(255),
+	"time" time_t NOT NULL,
+	PRIMARY KEY("id")
 );
 
-CREATE TABLE "appointmentRegistations" (
-  "service_id" SERIAL PRIMARY KEY NOT NULL
-  , "user_id" integer NOT NULL
-  , "pet_id" integer NOT NULL
-);
-
-CREATE TABLE "dietPlans" (
-  "plan_id" SERIAL PRIMARY KEY NOT NULL
-  , "name" character varying(100) NOT NULL
-  , "description" character varying(200) NOT NULL
-  , "date_start" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , "date_end" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-  , "created_at" timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-CREATE TABLE "foodItem" (
-  "food_id" SERIAL PRIMARY KEY NOT NULL
-  , "plan_id" integer NOT NULL
-  , "name" character varying(100) NOT NULL
-  , "amount" real NOT NULL
-  , "unit" character varying(10) NOT NULL
-  , "description" character varying(200) NOT NULL
-  , "time" "foodTimeType" NOT NULL
-);
-
-CREATE TABLE "servicePrice" (
-  "service_name" "serviceType" PRIMARY KEY NOT NULL
-  , "price" real NOT NULL
+CREATE TABLE "reset_tokens" (
+	"id" serial NOT NULL,
+	"email" varchar(255) NOT NULL,
+	"token" varchar(255) NOT NULL,
+	"used" boolean NOT NULL,
+	"expiration" TIMESTAMPTZ,
+	PRIMARY KEY("id")
 );
 
 ALTER TABLE "pets"
-ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
-
+ADD FOREIGN KEY("user_id") REFERENCES "users"("id")
+ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "pets"
-ADD FOREIGN KEY ("plan_id") REFERENCES "dietPlans" ("plan_id");
-
-ALTER TABLE "foodItem"
-ADD FOREIGN KEY ("plan_id") REFERENCES "dietPlans" ("plan_id");
-
-ALTER TABLE "storageOrders"
-ADD FOREIGN KEY ("service_id") REFERENCES "storageRegistations" ("service_id");
-
-ALTER TABLE "beautyOrders"
-ADD FOREIGN KEY ("service_id") REFERENCES "beautyRegistations" ("service_id");
-
-ALTER TABLE "appointmentOrders"
-ADD FOREIGN KEY ("service_id") REFERENCES "appointmentRegistations" ("service_id");
-
-ALTER TABLE "storageRegistations"
-ADD FOREIGN KEY ("pet_id") REFERENCES "pets" ("pet_id");
-
-ALTER TABLE "beautyRegistations"
-ADD FOREIGN KEY ("pet_id") REFERENCES "pets" ("pet_id");
-
-ALTER TABLE "appointmentRegistations"
-ADD FOREIGN KEY ("pet_id") REFERENCES "pets" ("pet_id");
-
-ALTER TABLE "appointmentRegistations"
-ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
-
-ALTER TABLE "beautyRegistations"
-ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
-
-ALTER TABLE "storageRegistations"
-ADD FOREIGN KEY ("user_id") REFERENCES "users" ("user_id");
-
-ALTER TABLE "storageRegistations"
-ADD FOREIGN KEY ("service_id") REFERENCES "storageServices" ("service_id");
-
-ALTER TABLE "beautyRegistations"
-ADD FOREIGN KEY ("service_id") REFERENCES "beautyServices" ("service_id");
-
-ALTER TABLE "appointmentRegistations"
-ADD FOREIGN KEY ("service_id") REFERENCES "appointments" ("service_id");
-
-ALTER TABLE "storageServices"
-ADD FOREIGN KEY ("room_id") REFERENCES "roomInfo" ("room_id");
-
-ALTER TABLE "beautyServices"
-ADD FOREIGN KEY ("time_slot") REFERENCES "timeSlots" ("time_slot");
-
+ADD FOREIGN KEY("plan_id") REFERENCES "diet_plans"("id")
+ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "food_item"
+ADD FOREIGN KEY("plan_id") REFERENCES "diet_plans"("id")
+ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "storage_orders"
+ADD FOREIGN KEY("service_id") REFERENCES "storage"("id")
+ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "storage_orders"
+ADD FOREIGN KEY("pet_id") REFERENCES "pets"("id")
+ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "storage_orders"
+ADD FOREIGN KEY("user_id") REFERENCES "users"("id")
+ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "beauty_orders"
+ADD FOREIGN KEY("service_id") REFERENCES "beauty"("id")
+ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "beauty_orders"
+ADD FOREIGN KEY("user_id") REFERENCES "users"("id")
+ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "beauty_orders"
+ADD FOREIGN KEY("pet_id") REFERENCES "pets"("id")
+ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "appoinment_orders"
+ADD FOREIGN KEY("service_id") REFERENCES "appointments"("id")
+ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "appoinment_orders"
+ADD FOREIGN KEY("user_id") REFERENCES "users"("id")
+ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "appoinment_orders"
+ADD FOREIGN KEY("pet_id") REFERENCES "pets"("id")
+ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "storage"
+ADD FOREIGN KEY("room_id") REFERENCES "room"("id")
+ON UPDATE NO ACTION ON DELETE SET NULL;
+ALTER TABLE "beauty"
+ADD FOREIGN KEY("time_slot") REFERENCES "time_slot"("id")
+ON UPDATE CASCADE ON DELETE SET NULL;
 ALTER TABLE "appointments"
-ADD FOREIGN KEY ("time_slot") REFERENCES "timeSlots" ("time_slot");
-
+ADD FOREIGN KEY("time_slot") REFERENCES "time_slot"("id")
+ON UPDATE CASCADE ON DELETE SET NULL;
 ALTER TABLE "appointments"
-ADD FOREIGN KEY ("medical_record_id") REFERENCES "medicalRecords" ("medical_record_id");
-
-ALTER TABLE "medicalRecords"
-ADD FOREIGN KEY ("prescription_id") REFERENCES "prescriptions" ("prescription_id");
-
-ALTER TABLE "prescriptionItem"
-ADD FOREIGN KEY ("prescription_id") REFERENCES "prescriptions" ("prescription_id");
-
-ALTER TABLE "presciptionsOrders"
-ADD FOREIGN KEY ("prescription_id") REFERENCES "prescriptions" ("prescription_id");
+ADD FOREIGN KEY("medical_record_id") REFERENCES "medical_records"("id")
+ON UPDATE CASCADE ON DELETE SET NULL;
+ALTER TABLE "prescription_item"
+ADD FOREIGN KEY("medical_record_id") REFERENCES "medical_records"("id")
+ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE "pets"
+ADD FOREIGN KEY("medical_record_id") REFERENCES "medical_records"("id")
+ON UPDATE CASCADE ON DELETE SET NULL;

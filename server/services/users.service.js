@@ -9,6 +9,7 @@ const {
     getAllUsersDb,
     getUserByUsernameDb,
   } = require("../db/users.db");
+const { ErrorHandler } = require('../helpers/error')
 class UserService {
     createUser = async (user) => {
         try {

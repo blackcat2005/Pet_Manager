@@ -1,49 +1,34 @@
 const { ErrorHandler } = require('../helpers/error')
 const {
   createStorageServicedb,
-  createRoomInfodb,
-  createStorageRegistationdb,
-  createStorageOrderdb,
   createBeautyServicedb,
-  createAppointmentdb,
+  createBeautyServiceRegistationdb,
+  createBeautyOrderdb,
   getAllStorageServicedb,
   getStorageServicebyIDdb,
   getStorageServicebyUser_IDdb,
   deleteStorageServicedb,
   updateStorageServicedb,
+  getAllBeautyServicedb,
+  getBeautyServicebyIDdb,
+  getBeautyServicebyUser_IDdb,
+  deleteBeautyServicedb,
+  createStorage_Orderdb,
 } = require('../db/servicePet.db')
 
 class ServiceService {
-  createRoomInfo = async (RoomInfo) => {
-    try {
-      return await createRoomInfodb(RoomInfo)
-    } catch (error) {
-      throw new ErrorHandler(error.statusCode, error.message)
-    }
-  }
+
   createStorageService = async (StorageService) => {
     try {
-      const a = await createStorageServicedb(StorageService)
-      // console.log(a)
-      return a
+      return await createStorageServicedb(StorageService);
     } catch (error) {
       console.log(error)
       throw new ErrorHandler(error.statusCode, 'createStorageService False')
     }
   }
-  createStorageRegistation = async (StorageRegistation) => {
-    try {
-      const b = await createStorageRegistationdb(StorageRegistation)
-      return b
-    } catch (error) {
-      console.log(error)
-      throw new ErrorHandler(error.statusCode, 'CreateStorageRegistation False')
-    }
-  }
   createStorageOrder = async (StorageOrder) => {
     try {
-      const c = await createStorageOrderdb(StorageOrder)
-      return c
+      return await createStorage_Orderdb(StorageOrder);
     } catch (error) {
       console.log(error)
       throw new ErrorHandler(error.statusCode, 'createStorageOrderdb False')
@@ -72,41 +57,116 @@ class ServiceService {
       return await getStorageServicebyUser_IDdb(StorageServicebyUser_ID)
     } catch (error) {
       console.log(error)
-      throw new ErrorHandler(error.statusCode, 'getStorageServicebyUser_IDdb False')
+      throw new ErrorHandler(
+        error.statusCode,
+        'getStorageServicebyUser_IDdb False',
+      )
     }
   }
-  deleteStorageService = async(service_id) => {
+  deleteStorageService = async (service_id) => {
     try {
-      return await deleteStorageServicedb(service_id);
+      return await deleteStorageServicedb(service_id)
     } catch (error) {
-      console.log(error);
-      throw new ErrorHandler(error.statusCode, 'deleteStorageService False') 
+      console.log(error)
+      throw new ErrorHandler(error.statusCode, 'deleteStorageService False')
     }
   }
-  updateStorageService = async(updateService) => {
+  updateStorageService = async (updateService) => {
     try {
-      console.log(updateService);
-      return await updateStorageServicedb(updateService);
+      // console.log(updateService);
+      return await updateStorageServicedb(updateService)
     } catch (error) {
-      console.log(error);
+      console.log(error)
       throw new ErrorHandler(error.statusCode, 'updateStorageService False')
     }
   }
+  updateBeautyService = async (BeautyService) => {
+    try {
+      console.log(BeautyService);
+      return await updateStorageServicedb(BeautyService)
+    } catch (error) {
+      console.log(error)
+      throw new ErrorHandler(error.statusCode, 'updateBeautyService False')
+    }
+  }
 
-  // createBeautyService = async(BeautyService) => {
-  //     try {
-  //         return await createBeautyServicedb(BeautyService);
-  //     } catch (error) {
-  //         throw new ErrorHandler(error.statusCode, error.message);
-  //     }
-  // }
-  // createAppointment = async(Appointment) => {
-  //     try {
-  //         return await createAppointmentdb(Appointment);
-  //     } catch (error) {
-  //         throw new ErrorHandler(error.statusCode, error.message);
-  //     }
-  // }
+  createTimeSlot = async (TimeSlot) => {
+    try {
+      console.log(TimeSlot)
+      return await createTimeSlotdb(TimeSlot)
+    } catch (error) {
+      console.log(error)
+      throw new ErrorHandler(error.statusCode, 'createTimeslot False')
+    }
+  }
+
+  createBeautyService = async (BeautyService) => {
+    try {
+      console.log(BeautyService)
+      return await createBeautyServicedb(BeautyService)
+    } catch (error) {
+      console.log(error)
+      throw new ErrorHandler(error.statusCode, 'createBeautyServicedb False')
+    }
+  }
+
+  createBeautyServiceRegistation = async (BeautyServiceRegistation) => {
+    try {
+      console.log(BeautyServiceRegistation)
+      return await createBeautyServiceRegistationdb(BeautyServiceRegistation)
+    } catch (error) {
+      console.log(error)
+      throw new ErrorHandler(
+        error.statusCode,
+        'createBeautyServiceRegistationdb False',
+      )
+    }
+  }
+
+  createBeautyOrder = async (BeautyOrder) => {
+    try {
+      console.log(BeautyOrder)
+      return await createBeautyOrderdb(BeautyOrder)
+    } catch (error) {
+      console.log(error)
+      throw new ErrorHandler(error.statusCode, 'createBeautyOrderdb False')
+    }
+  }
+  getAllBeautyService = async () => {
+    try {
+      return await getAllBeautyServicedb()
+    } catch (error) {
+      console.log(error)
+      throw new ErrorHandler(error.statusCode, 'getAllBeautyService False')
+    }
+  }
+  getBeautyServicebyID = async (service_id) => {
+    try {
+      return await getBeautyServicebyIDdb(service_id)
+    } catch (error) {
+      console.log(error)
+      throw new ErrorHandler(error.statusCode, 'getBeautyServicebyIDdb Flase')
+    }
+  }
+  getBeautyServicebyUser_ID = async (user_id) => {
+    try {
+      return await getBeautyServicebyUser_IDdb(user_id)
+    } catch (error) {
+      console.log(error)
+      throw new ErrorHandler(
+        error.statusCode,
+        ' getBeautyServicebyUser_ID False',
+      )
+    }
+  }
+  deleteBeautyService = async (service_id) => {
+    try {
+      return await deleteBeautyServicedb(service_id)
+    } catch (error) {
+      console.log(error)
+      throw new ErrorHandler(error.statusCode, 'deletaBeautyService False')
+    }
+  }
 }
 
 module.exports = new ServiceService()

@@ -5,11 +5,8 @@ const connectionString = process.env.DATABASE_URL;
 
 const pool = new Pool({
   connectionString,
-  /*
-    SSL is not supported in development
-    */
   ssl: { rejectUnauthorized: false },
-});
+})
 
 module.exports = {
   connect: async () => await pool.connect(),
