@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import { readdirSync } from 'fs'
 import path from 'path'
 import { defineConfig } from 'vite'
-
+import tailwindcss from "tailwindcss";
 const absolutePathAliases = {}
 const srcPath = path.resolve('./src/')
 const srcRootContent = readdirSync(srcPath, { withFileTypes: true }).map(
@@ -28,5 +28,10 @@ export default defineConfig({
     host: true,
     strictPort: true,
     port: 3000,
+  },
+  css: {
+    postcss: {
+      plugins: [tailwindcss()],
+    },
   },
 })

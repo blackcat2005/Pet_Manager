@@ -18,8 +18,8 @@ const customerMenu = [
   getItem('Danh sách thú cưng', '/pet', <TableOutlined />),
   getItem('Dịch vụ', 'service', <FormOutlined />, [
     getItem('Đăng ký dịch vụ', '/service-register'),
-    getItem('Lịch sử đăng ký', '4'),
-    getItem('Bảng giá dịch vụ', '5'),
+    getItem('Lịch sử đăng ký', '/service-history'),
+    getItem('Bảng giá dịch vụ', '/service-cost'),
   ]),
 ]
 

@@ -6,7 +6,7 @@
     "src",
     "src/components/footer",
     "src/components/siderbar",
-    "src/components/header"
-  ],
+    "src/components/header",
+    ],
   "exclude": ["node_modules"]
 }

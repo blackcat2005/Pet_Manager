@@ -1,10 +1,10 @@
+CREATE TYPE "status_t" AS ENUM ('created', 'processing', 'complete', 'canceled');
 CREATE TYPE "roles_t" AS ENUM ('customer', 'staff', 'admin');
-CREATE TYPE "status_t" AS ENUM ('created', 'processing', 'completed', 'canceled');
 CREATE TYPE "type_t" AS ENUM ('vip', 'normal');
 CREATE TYPE "time_t" AS ENUM ('breakfast', 'lunch', 'dinner');
 
 CREATE TABLE "users" (
-	"id" serial NOT NULL,
+	"user_id" serial NOT NULL,
 	"username" varchar(55) NOT NULL,
 	"email" varchar(100) NOT NULL,
 	"password" varchar(200) NOT NULL,
@@ -16,11 +16,11 @@ CREATE TABLE "users" (
 	"country" varchar(100),
 	"created_at" TIMESTAMPTZ,
 	"avatar" varchar(255),
-	PRIMARY KEY("id")
+	PRIMARY KEY("user_id")
 );
 
 CREATE TABLE "pets" (
-	"id" serial NOT NULL,
+	"pet_id" serial NOT NULL,
 	"fullname" varchar(100) NOT NULL,
 	"species" varchar(10) NOT NULL,
 	"age" float NOT NULL,
@@ -32,21 +32,18 @@ CREATE TABLE "pets" (
 	"medical_record_id" int,
 	"user_id" int,
 	"avatar" varchar(255),
-	PRIMARY KEY("id")
+	PRIMARY KEY("pet_id")
 );
-
-
 
 CREATE TABLE "storage" (
 	"id" serial NOT NULL,
-	"status" "status_t" NOT NULL DEFAULT 'created',
+	"status " "status_t" NOT NULL DEFAULT 'created',
 	"room_id" int NOT NULL,
 	"date_start" timestamp NOT NULL,
 	"date_end" timestamp NOT NULL,
 	"note" varchar(255),
 	PRIMARY KEY("id")
 );
-
 
 CREATE TABLE "beauty" (
 	"id" serial NOT NULL,
@@ -87,8 +84,6 @@ CREATE TABLE "prescription_item" (
 	PRIMARY KEY("id")
 );
 
-
-
 CREATE TABLE "room" (
 	"id" serial NOT NULL,
 	"type" type_t NOT NULL,
@@ -123,7 +118,7 @@ CREATE TABLE "beauty_orders" (
 	PRIMARY KEY("id")
 );
 
-CREATE TABLE "appoinment_orders" (
+CREATE TABLE "appointment_orders" (
 	"id" serial NOT NULL,
 	"service_id" int NOT NULL,
 	"user_id" int NOT NULL,
@@ -142,8 +137,6 @@ CREATE TABLE "diet_plans" (
 	"created_at" TIMESTAMPTZ,
 	PRIMARY KEY("id")
 );
-
-
 
 CREATE TABLE "food_item" (
 	"id" serial NOT NULL,
@@ -166,7 +159,7 @@ CREATE TABLE "reset_tokens" (
 );
 
 ALTER TABLE "pets"
-ADD FOREIGN KEY("user_id") REFERENCES "users"("id")
+ADD FOREIGN KEY("user_id") REFERENCES "users"("user_id")
 ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "pets"
 ADD FOREIGN KEY("plan_id") REFERENCES "diet_plans"("id")
@@ -178,28 +171,28 @@ ALTER TABLE "storage_orders"
 ADD FOREIGN KEY("service_id") REFERENCES "storage"("id")
 ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "storage_orders"
-ADD FOREIGN KEY("pet_id") REFERENCES "pets"("id")
+ADD FOREIGN KEY("pet_id") REFERENCES "pets"("pet_id")
 ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "storage_orders"
-ADD FOREIGN KEY("user_id") REFERENCES "users"("id")
+ADD FOREIGN KEY("user_id") REFERENCES "users"("user_id")
 ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "beauty_orders"
 ADD FOREIGN KEY("service_id") REFERENCES "beauty"("id")
 ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "beauty_orders"
-ADD FOREIGN KEY("user_id") REFERENCES "users"("id")
+ADD FOREIGN KEY("user_id") REFERENCES "users"("user_id")
 ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "beauty_orders"
-ADD FOREIGN KEY("pet_id") REFERENCES "pets"("id")
+ADD FOREIGN KEY("pet_id") REFERENCES "pets"("pet_id")
 ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE "appoinment_orders"
+ALTER TABLE "appointment_orders"
 ADD FOREIGN KEY("service_id") REFERENCES "appointments"("id")
 ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE "appoinment_orders"
-ADD FOREIGN KEY("user_id") REFERENCES "users"("id")
+ALTER TABLE "appointment_orders"
+ADD FOREIGN KEY("user_id") REFERENCES "users"("user_id")
 ON UPDATE CASCADE ON DELETE CASCADE;
-ALTER TABLE "appoinment_orders"
-ADD FOREIGN KEY("pet_id") REFERENCES "pets"("id")
+ALTER TABLE "appointment_orders"
+ADD FOREIGN KEY("pet_id") REFERENCES "pets"("pet_id")
 ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE "storage"
 ADD FOREIGN KEY("room_id") REFERENCES "room"("id")
