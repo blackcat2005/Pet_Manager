@@ -27,17 +27,17 @@ const customerMenu = [
 const staffMenu = [
   getItem('Quản lí thú cưng', '/staff/pet-manage', <TableOutlined />),
   getItem('Quản lí khách hàng', '/staff/customer-manage', <TableOutlined />),
-  getItem('Dịch vụ vệ sinh', 'sanitation-service', <FormOutlined />, [
-    getItem('Sử dụng dịch vụ', '/sanitation-used'),
-    getItem('Thông tin dịch vụ', '/sanitation-info'),
-  ]),
-  getItem('Quản lý dịch vụ lưu trữ', 'storage-service', <FormOutlined />, [
-    getItem('Sử dụng dịch vụ', '/storage-used'),
-    getItem('Thông tin dịch vụ', '/storage-info'),
-  ]),
-  getItem('Quản lý khám bệnh', 'medical-service', <FormOutlined />, [
+  getItem('Khám bệnh', 'medical-service', <FormOutlined />, [
     getItem('Sử dụng dịch vụ', '/medical-used'),
     getItem('Thông tin dịch vụ', '/medical-info'),
+  ]),
+  getItem('Dịch vụ vệ sinh', 'cleaning-service', <FormOutlined />, [
+    getItem('Sử dụng dịch vụ', '/cleaning-used'),
+    getItem('Thông tin dịch vụ', '/cleaning-info'),
+  ]),
+  getItem('Dịch vụ lưu trữ', 'storage-service', <FormOutlined />, [
+    getItem('Sử dụng dịch vụ', '/storage-used'),
+    getItem('Thông tin dịch vụ', '/storage-info'),
   ]),
 ]
 
@@ -50,9 +50,9 @@ const adminMenu = [
     getItem('Sử dụng dịch vụ', '/medical-used'),
     getItem('Thông tin dịch vụ', '/medical-info'),
   ]),
-  getItem('Dịch vụ vệ sinh', 'sanitation-service', <FormOutlined />, [
-    getItem('Sử dụng dịch vụ', '/sanitation-used'),
-    getItem('Thông tin dịch vụ', '/sanitation-info'),
+  getItem('Dịch vụ vệ sinh', 'cleaning-service', <FormOutlined />, [
+    getItem('Sử dụng dịch vụ', '/cleaning-used'),
+    getItem('Thông tin dịch vụ', '/cleaning-info'),
   ]),
   getItem('Dịch vụ lưu trữ', 'storage-service', <FormOutlined />, [
     getItem('Sử dụng dịch vụ', '/storage-used'),

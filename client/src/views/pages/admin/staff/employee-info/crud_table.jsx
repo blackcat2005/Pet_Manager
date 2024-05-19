@@ -97,17 +97,10 @@ const StaffManage = () => {
             okType: 'danger',
             cancelText: 'No',
             onOk() {
-<<<<<<<< HEAD:client/src/views/pages/admin/staff/manage-staff.jsx
-                handleDelete();
-            },
-            onCancel() {
-
-========
                 handleDelete(key);
             },
             onCancel() {
                 console.log('Cancel');
->>>>>>>> 55aa299ca5dab3349be75ce62d61f6a1340d2bd9:client/src/views/pages/admin/staff/employee-info/crud_table.jsx
             },
         });
     };
@@ -121,27 +114,36 @@ const StaffManage = () => {
             <Space style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, width: '100%' }}>
                 <Typography.Title level={3}>Search Table</Typography.Title>
                 <div>
-<<<<<<<< HEAD:client/src/views/pages/admin/staff/manage-staff.jsx
-                    <Input placeholder="Tên nhân viên" style={{ width: 200 }} onChange={e => setSearchName(e.target.value)} />
-                    <Input placeholder="SDT" style={{ width: 200, marginLeft: 8 }} onChange={e => setSearchPhone(e.target.value)} />
-                    <Button type="primary" onClick={handleSearch} style={{ marginLeft: 8, marginRight: 10 }}>Tìm kiếm</Button>
-========
-                    <Input 
-                        name="searchName" 
-                        placeholder="Tên nhân viên" 
-                        style={{ width: 200 }} 
+                    <Input
+                        name="searchName"
+                        placeholder="Tên nhân viên"
+                        style={{ width: 200 }}
                         value={searchName}
-                        onChange={handleSearchChange} 
+                        onChange={handleSearchChange}
                     />
-                    <Input 
-                        name="searchPhone" 
-                        placeholder="SDT" 
-                        style={{ width: 200, marginLeft: 8 }} 
+                    <Input
+                        name="searchPhone"
+                        placeholder="SDT"
+                        style={{ width: 200, marginLeft: 8 }}
                         value={searchPhone}
-                        onChange={handleSearchChange} 
+                        onChange={handleSearchChange}
                     />
-                    <Button type="primary" onClick={handleSearchChange} style={{ marginLeft: 8, marginRight: 10}}>Tìm kiếm</Button>
->>>>>>>> 55aa299ca5dab3349be75ce62d61f6a1340d2bd9:client/src/views/pages/admin/staff/employee-info/crud_table.jsx
+                    <Button type="primary" onClick={handleSearchChange} style={{ marginLeft: 8, marginRight: 10 }}>Tìm kiếm</Button>
+                    <Input
+                        name="searchName"
+                        placeholder="Tên nhân viên"
+                        style={{ width: 200 }}
+                        value={searchName}
+                        onChange={handleSearchChange}
+                    />
+                    <Input
+                        name="searchPhone"
+                        placeholder="SDT"
+                        style={{ width: 200, marginLeft: 8 }}
+                        value={searchPhone}
+                        onChange={handleSearchChange}
+                    />
+                    <Button type="primary" onClick={handleSearchChange} style={{ marginLeft: 8, marginRight: 10 }}>Tìm kiếm</Button>
                     <Select placeholder="Sắp xếp" style={{ width: 180 }} onChange={handleSortChange}>
                         <Option value="name-ascend">Tên (A-Z)</Option>
                         <Option value="name-descend">Tên (Z-A)</Option>

@@ -8,7 +8,7 @@ import ResetPassword from 'views/pages/forgot-password/reset-password'
 import Homepage from 'views/pages/homePage'
 import { RoleProtectedRoute } from './role.protected.route'
 import GuestRoute from './guest-route'
-import PetInfoOverview from 'views/pages/admin/staff/pet-info/info_overview'
+
 
 const PetList = loadableComponent(() => import('views/pages/customer/info-pet'))
 const PetInfo = loadableComponent(() => import('views/pages/customer/info-pet/PetInfo'))
@@ -19,7 +19,14 @@ const ServiceCost = loadableComponent(() => import('views/pages/customer/service
 const StaffManage = loadableComponent(() => import('views/pages/admin/staff/manage-staff'))
 const ManageCustomer = loadableComponent(() => import('views/pages/admin/customer/manage-customer'))
 const Statistics = loadableComponent(() => import('views/pages/admin/statistics/statistics'))
-// const PetInfoOverview = loadableComponent(() => import('views/pages/admin/staff/pet-info/info_overview'))
+const PetInfoOverview = loadableComponent(() => import('views/pages/admin/staff/pet-info/info_overview'))
+
+const CleaningInfo = loadableComponent(() => import('views/pages/admin/staff/service-management/cleaning-service/cleaning_info'))
+const CleaningServiceUsage = loadableComponent(() => import('views/pages/admin/staff/service-management/cleaning-service/cleaning_useage'))
+const MedicalInfo = loadableComponent(() => import('views/pages/admin/staff/service-management/medical-service/medical_info'))
+const MedicalServiceUsage = loadableComponent(() => import('views/pages/admin/staff/service-management/medical-service/medical_useage'))
+const StorageInfo = loadableComponent(() => import('views/pages/admin/staff/service-management/storage-service/storage_info'))
+const StorageServiceUsage = loadableComponent(() => import('views/pages/admin/staff/service-management/storage-service/storage_useage'))
 
 
 const Login = loadableComponent(() => import('views/pages/login'))
@@ -79,15 +86,41 @@ function AllRoutes() {
           />
           <Route
             path="/admin/pet-manage"
-            // element={<MainLayout component={PetInfoOverview} />}
             element={<MainLayout component={PetInfoOverview} />}
+          />
+        </Route>
+
+        <Route element={<RoleProtectedRoute roles={['staff', 'admin']} />}>
+          <Route
+            path="/personal-info"
+            element={<MainLayout component={PersonalInfo} />}
           />
         </Route>
 
         <Route element={<RoleProtectedRoute roles={['staff', 'customer', 'admin']} />}>
           <Route
-            path="/personal-info"
-            element={<MainLayout component={PersonalInfo} />}
+            path="/cleaning-info"
+            element={<MainLayout component={CleaningInfo} />}
+          />
+          <Route
+            path="/cleaning-used"
+            element={<MainLayout component={CleaningServiceUsage} />}
+          />
+          <Route
+            path="/medical-info"
+            element={<MainLayout component={MedicalInfo} />}
+          />
+          <Route
+            path="/medical-used"
+            element={<MainLayout component={MedicalServiceUsage} />}
+          />
+          <Route
+            path="/storage-info"
+            element={<MainLayout component={StorageInfo} />}
+          />
+          <Route
+            path="/storage-used"
+            element={<MainLayout component={StorageServiceUsage} />}
           />
         </Route>
 
