@@ -152,159 +152,45 @@ const updateStorageServicedb = async({id, room_id, note, pet_id, date_start, dat
     throw new ErrorHandler(500, 'Internal server error');
   }
 }
-const deleteBeautyServicedb = async (service_id) => {
+
+const updateStorageServiceStatusdb = async({id, status}) => {
   try {
-    await pool.query(`DELETE FROM "beautyOrders" WHERE "service_id" = $1;`, [
-      service_id,
-    ])
-    await pool.query(
-      `DELETE FROM "beautyRegistations" WHERE "service_id" = $1;`,
-      [service_id],
-    )
+      await pool.query(`BEGIN`)
 
-    const { rows: deleteBeautyService } = await pool.query(
-      `DELETE FROM "beautyServices" WHERE "service_id" = $1 RETURNING *;`,
-      [service_id],
-    )
-    await pool.query(
-      `DELETE FROM "timeSlots" WHERE "time_slot" IN (SELECT "time_slot" FROM "beautyServices" WHERE "service_id" = $1);`,
-      [service_id],
-    )
+      const { rows: existingStorage } = await pool.query(
+        `SELECT * FROM storage where id = $1`,
+        [id],
+      )
+      if (existingStorage.length == 0) {
+        await pool.query(`ROLLBACK`)
+        return { message: 'storage not found' }
+      }
 
-    return deleteBeautyService
+      const updateStatusQuery = `
+      UPDATE storage
+      SET "status " = $1
+      WHERE id = $2
+    `
+      await pool.query(updateStatusQuery, [status, id])
+
+      await pool.query('COMMIT')
+
+      return { message: 'storage status successfully updated' }
   } catch (error) {
-    console.error('Error in deleteBeautyServicedb:', error)
-    throw error
+      await pool.query('ROLLBACK');
+      console.error('Error in updateStorageServiceStatusdb:', error);
+      throw new ErrorHandler(500, 'Internal server error');
   }
+
 }
 
-const updateBeautyServicedb = async ({
-  service_id,
-  status,
-  date_1,
-  note,
-  pet_id,
-  date_2,
-  total,
-  time,
-}) => {
-  const { rows: updatedRowBeautyService } = await pool.query(
-    `UPDATE "beautyServices"
-    set status=$1, date=$2, time_Slot=$3, note=$4
-    WHERE service_id=$5
-    returning service_id, status, date, time_slot, note`,
-    [status, date_1, time_slot, note, service_id],
-  )
-  const { rows: updateRowBeautyRegistation } = await pool.query(
-    `UPDATE "beautyRegistations"
-    set pet_id=$1
-    WHERE service_id=$2
-    returning service_id, user_id, pet_id`,
-    [pet_id, service_id],
-  )
-  const { rows: updateRowBeautyOrder } = await pool.query(
-    `UPDATE "beautyOrders"
-    set date=$1, total=$2
-    WHERE service_id=$3
-    returning order_id, service_id, type, date, total`,
-    [date_2, total, service_id],
-  )
-  const time_slot = updatedRowBeautyService.time_slot
-  const { rows: updateTime_Slot } = await pool.query(
-    `UPDATE "time_Slots
-    set time=$1
-    WHERE time_slot=$2
-    returning time_slot, time`,
-    [time, time_slot],
-  )
-  console.log({
-    updatedRowBeautyService,
-    updateRowBeautyRegistation,
-    updateRowBeautyOrder,
-    updateTime_Slot,
-  })
-  return {
-    updatedRowBeautyService,
-    updateRowBeautyRegistation,
-    updateRowBeautyOrder,
-    updateTime_Slot,
-  }
-}
-
-
-
-const createBeautyServicedb = async ({ status, date, time_slot, note }) => {
-  const { rows: BeautyService } = await pool.query(
-    `INSERT INTO beautyServices(status, date, time_slot, note) 
-          VALUES($1, $2, $3, $4) 
-          returning service_id, status, date, time_slot, note`,
-    [status, date, time_slot, note],
-  )
-  return BeautyService[0]
-}
-const createBeautyServiceRegistrationdb = async ({ user_id, pet_id }) => {
-  const { rows: BeautyServiceRegistration } = await pool.query(
-    `INSERT INTO beautyRegistrations(user_id, pet_id)
-      VALUES($1,$2)
-      returning service_id, user_id, pet_id`[(user_id, pet_id)],
-  )
-  return BeautyServiceRegistration[0]
-}
-
-const createBeautyOrderdb = async ({ type, date, total, service_id }) => {
-  const { rows: BeautyOrder } = await pool.query(
-    `INSERT INTO beautyOrders(type, date, total, service_id)
-     VALUES($1,$2,$3)
-     returning order_id, type, date, total, service_id`[
-      (type, date, total, service_id)
-    ],
-  )
-  return BeautyOrder[0]
-}
-
-const createAppointmentdb = async ({ status, date, time_slot }) => {
-  const { rows: Appointment } = await pool.query(
-    `INSERT INTO appointments(status, date, time_slot) 
-      VALUES($1, $2, $3) 
-      returning service_id, medical_record_id, status, date, time_slot`,
-    [status, date, time_slot],
-  )
-  // console.log(Appointment[0])
-  return Appointment[0]
-}
-
-const createAppointmentRegistrationdb = async ({ user_id, pet_id }) => {
-  const { rows: AppointmentRegistration } = await pool.query(
-    `INSERT INTO "appointmentRegistrations"(user_id, pet_id)
-      VALUES ($1, $2)
-      RETURNING service_id, user_id, pet_id`,
-    [user_id, pet_id], // Thiếu dấu phẩy ở đây
-  )
-  console.log(AppointmentRegistration[0])
-  return AppointmentRegistration[0]
-}
-
-const createAppointmentOrderdb = async ({ service_id, type, date, total }) => {
-  const { rows: AppointmentOrder } = await pool.query(
-    `INSERT INTO "appointmentOrders"("service_id","type","date","total") 
-        VALUES($1, $2, $3, $4) 
-        returning "order_id", "service_id", "type", "date", "total"`,
-    [service_id, type, date, total],
-  )
-  return AppointmentOrder[0]
-}
 module.exports = {
   createStorageServicedb,
   createStorage_Orderdb,
-  createBeautyServicedb,
-  createBeautyServiceRegistrationdb,
-  createBeautyOrderdb,
   getAllStorageServiceDB,
   getStorageServicebyIDdb,
   getStorageServicebyUser_IDdb,
   deleteStorageServicedb,
   updateStorageServicedb,
-  createAppointmentdb,
-  createAppointmentRegistrationdb,
-  createAppointmentOrderdb,
+  updateStorageServiceStatusdb,
 }

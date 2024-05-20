@@ -5,12 +5,7 @@ const {
   getStorageServicebyUser_ID,
   deleteStorageService,
   updateStorageService,
-  createBeautyService,
-  getAllBeautyService,
-  getBeautyServicebyID,
-  getBeautyServicebyUser_ID,
-  deleteBeautyService,
-  updateBeautyService,
+  updateStorageServiceStatus,
 } = require('../controllers/services.controller')
 const {
   getAllUsers,
@@ -27,7 +22,7 @@ router.route('/getStorageServicebyID').get(getStorageServicebyID);
 router.route('/getStorageServicebyUser_ID').get(getStorageServicebyUser_ID);
 router.route('/deleteStorageService').delete(deleteStorageService);
 router.route('/updateStorageService').put(updateStorageService);
-
+router.route('/updateStorageServiceStatus').put(updateStorageServiceStatus);
 
 module.exports = router;
 

@@ -1,21 +1,19 @@
 const { ErrorHandler } = require('../helpers/error')
 const {
   createStorageServicedb,
-  createBeautyServicedb,
-  createBeautyOrderdb,
   getAllStorageServiceDB,
   getStorageServicebyIDdb,
   getStorageServicebyUser_IDdb,
   deleteStorageServicedb,
   updateStorageServicedb,
   createStorage_Orderdb,
+  updateStorageServiceStatusdb,
 } = require('../db/servicePet.db')
 
 class ServiceService {
-
   createStorageService = async (StorageService) => {
     try {
-      return await createStorageServicedb(StorageService);
+      return await createStorageServicedb(StorageService)
     } catch (error) {
       console.log(error)
       throw new ErrorHandler(error.statusCode, 'createStorageService False')
@@ -24,7 +22,7 @@ class ServiceService {
 
   createStorageOrder = async (StorageOrder) => {
     try {
-      return await createStorage_Orderdb(StorageOrder);
+      return await createStorage_Orderdb(StorageOrder)
     } catch (error) {
       console.log(error)
       throw new ErrorHandler(error.statusCode, 'createStorageOrderdb False')
@@ -48,7 +46,7 @@ class ServiceService {
       throw new ErrorHandler(error.statusCode, 'getStorageServicebyIDdb False')
     }
   }
-  
+
   getStorageServicebyUser_ID = async (StorageServicebyUser_ID) => {
     try {
       return await getStorageServicebyUser_IDdb(StorageServicebyUser_ID)
@@ -76,91 +74,12 @@ class ServiceService {
       throw new ErrorHandler(error.statusCode, 'updateStorageService False')
     }
   }
-  updateBeautyService = async (BeautyService) => {
+  updateStorageServiceStatus = async(StorageServiceStatus) => {
     try {
-      console.log(BeautyService);
-      return await updateStorageServicedb(BeautyService)
+      return await updateStorageServiceStatusdb(StorageServiceStatus)
     } catch (error) {
-      console.log(error)
-      throw new ErrorHandler(error.statusCode, 'updateBeautyService False')
-    }
-  }
-
-  createTimeSlot = async (TimeSlot) => {
-    try {
-      console.log(TimeSlot)
-      return await createTimeSlotdb(TimeSlot)
-    } catch (error) {
-      console.log(error)
-      throw new ErrorHandler(error.statusCode, 'createTimeslot False')
-    }
-  }
-
-  createBeautyService = async (BeautyService) => {
-    try {
-      console.log(BeautyService)
-      return await createBeautyServicedb(BeautyService)
-    } catch (error) {
-      console.log(error)
-      throw new ErrorHandler(error.statusCode, 'createBeautyServicedb False')
-    }
-  }
-
-  createBeautyServiceRegistation = async (BeautyServiceRegistation) => {
-    try {
-      console.log(BeautyServiceRegistation)
-      return await createBeautyServiceRegistationdb(BeautyServiceRegistation)
-    } catch (error) {
-      console.log(error)
-      throw new ErrorHandler(
-        error.statusCode,
-        'createBeautyServiceRegistationdb False',
-      )
-    }
-  }
-
-  createBeautyOrder = async (BeautyOrder) => {
-    try {
-      console.log(BeautyOrder)
-      return await createBeautyOrderdb(BeautyOrder)
-    } catch (error) {
-      console.log(error)
-      throw new ErrorHandler(error.statusCode, 'createBeautyOrderdb False')
-    }
-  }
-  getAllBeautyService = async () => {
-    try {
-      return await getAllBeautyServicedb()
-    } catch (error) {
-      console.log(error)
-      throw new ErrorHandler(error.statusCode, 'getAllBeautyService False')
-    }
-  }
-  getBeautyServicebyID = async (service_id) => {
-    try {
-      return await getBeautyServicebyIDdb(service_id)
-    } catch (error) {
-      console.log(error)
-      throw new ErrorHandler(error.statusCode, 'getBeautyServicebyIDdb Flase')
-    }
-  }
-  getBeautyServicebyUser_ID = async (user_id) => {
-    try {
-      return await getBeautyServicebyUser_IDdb(user_id)
-    } catch (error) {
-      console.log(error)
-      throw new ErrorHandler(
-        error.statusCode,
-        ' getBeautyServicebyUser_ID False',
-      )
-    }
-  }
-  deleteBeautyService = async (service_id) => {
-    try {
-      return await deleteBeautyServicedb(service_id)
-    } catch (error) {
-      console.log(error)
-      throw new ErrorHandler(error.statusCode, 'deletaBeautyService False')
+      console.log(error);
+      throw new ErrorHandler(error.statusCode, 'updateStorageServiceStatus False');
     }
   }
 }
