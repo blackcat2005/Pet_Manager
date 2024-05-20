@@ -1,4 +1,5 @@
 const pool = require("../config");
+const { ErrorHandler } = require("../helpers/error");
 
 const createPetDb = async ({
     fullname, 
@@ -63,10 +64,11 @@ const updatePetDb = async ({
   return pet[0];
 };
 
+
   module.exports = {
     createPetDb,
     getPetListByUser_idDb,
     getPetByIdDb,
     updatePetDb,
-    deletePetDb
+    deletePetDb,
   }      

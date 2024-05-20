@@ -1,10 +1,11 @@
 const {
-    createPetDb,
-    getPetListByUser_idDb,
-    getPetByIdDb,
-    updatePetDb,
-    deletePetDb
-  } = require("../db/pets.db");
+  createPetDb,
+  getPetListByUser_idDb,
+  getPetByIdDb,
+  updatePetDb,
+  deletePetDb,
+  getDetailPetdb,
+} = require('../db/pets.db')
   const { ErrorHandler } = require("../helpers/error");
 class PetService {
   createPet = async (pet) => {
@@ -49,6 +50,8 @@ class PetService {
         throw new ErrorHandler(error.statusCode, error.message);
     }
   };
+
+
 
 }
 

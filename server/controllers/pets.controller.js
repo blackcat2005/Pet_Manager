@@ -105,10 +105,11 @@ const getPetById = async (req, res) => {
     }
   };
 
+
 module.exports = {
-    createPet,
-    getPetList,
-    getPetById,
-    updatePet,
-    deletePet
-};
+  createPet,
+  getPetList,
+  getPetById,
+  updatePet,
+  deletePet,
+}

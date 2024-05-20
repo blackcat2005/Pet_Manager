@@ -9,14 +9,14 @@ const getRoombyIDdb = async ({ room_id }) => {
 }
 
 const updateRoomdb = async ({ room_id, current_slot }) => {
-    const { rows: rooms } = await pool.query(
-        `UPDATE "room"
+  const { rows: rooms } = await pool.query(
+    `UPDATE "room"
         SET current_slot = $1
         WHERE id = $2
         RETURNING id, type, max_slot, current_slot, price, unit`,
-        [current_slot, room_id]
-    );
-    return rooms[0];
-};
+    [current_slot, room_id],
+  )
+  return rooms[0]
+}
 
 module.exports = { getRoombyIDdb, updateRoomdb }

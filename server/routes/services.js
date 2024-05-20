@@ -6,6 +6,13 @@ const {
   deleteStorageService,
   updateStorageService,
   updateStorageServiceStatus,
+  createBeauty,
+  getAllBeautybyUser_ID,
+  getBeautybyID,
+  deleteBeauty,
+  updateBeauty,
+  updateBeautyStatus,
+  detailPet,
 } = require('../controllers/services.controller')
 const {
   getAllUsers,
@@ -24,5 +31,13 @@ router.route('/deleteStorageService').delete(deleteStorageService);
 router.route('/updateStorageService').put(updateStorageService);
 router.route('/updateStorageServiceStatus').put(updateStorageServiceStatus);
 
+router.route('/createBeauty').post(createBeauty);
+router.route('/getAllBeautybyUser_ID').get(getAllBeautybyUser_ID);
+router.route('/getBeautybyID').get(getBeautybyID);
+router.route('/deleteBeauty').delete(deleteBeauty);
+router.route('/updateBeauty').put(updateBeauty);
+router.route('/updateBeautyStatus').put(updateBeautyStatus);
+
+router.route('/detailPet').get(detailPet)
 module.exports = router;
 
