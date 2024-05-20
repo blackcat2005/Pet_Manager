@@ -2,90 +2,72 @@ const petService = require("../services/pets.service");
 const userService = require("../services/users.service");
 const { ErrorHandler } = require("../helpers/error");
 const servicesServices = require("../services/services.service");
-const createStorageService = async (req,res) => {
-    const { room_id, date_start, date_end, note, pet_id, total, create_at} = req.body;
-    const user_id = req.params['user_id'];
-    console.log(user_id);
-    const status = "created";
-    const user = await userService.getUserById(user_id);
-
-    if (!user){
-        throw new ErrorHandler(404, "User not found");
-    }
-    if (+user_id === req.user.user_id || req.user.roles.includes("admin")){
-        const StorageService = await servicesServices.createStorageService({
-            status, room_id, date_start, date_end, note
-        });
-        const service_id = StorageService.service_id;
-        const StorageOrder = await servicesServices.createStorageOrder({
-            service_id, user_id, pet_id, create_at, total
-        });
-        
-        res.status(201).json({
-            status: "success",
-            StorageService,
-            StorageOrder,
-        });   
-    }else {
-        throw new ErrorHandler(401, "Unauthorized");
-    }
-};
-
-const createBeautyService = async (req, res) => {
-  const {
-    status,
-    date_1,
-    note,
-    pet_id,
-    type,
-    date_2,
-    total,
-    user_id,
-    time
-  } = req.body
-  // const {user_id} = req.params;
-  // console.log(user_id);
-  const user = await userService.getUserById(user_id)
-
-  if (!user) {
-    throw new ErrorHandler(404, 'User not found')
-  }
-  if (+user_id === req.user.user_id || req.user.roles.includes('admin')) {
-    const TimeSlot = await servicesServices.createTimeSlot({
-      time
-    });
-    const time_slot = TimeSlot.time_slot;
-    const BeautyService = await servicesServices.createBeautyService({
-      status,
-      date_1,
-      time_slot,
+const roomService = require("../services/room.service");
+const createStorageService = async (req, res) => {
+  try {
+    const {
+      room_id,
+      date_start,
+      date_end,
       note,
-    })
-    const service_id = BeautyService.service_id
-    const BeautyRegistation = await servicesServices.createBeautyServiceRegistation({
-      service_id,
-      user_id,
       pet_id,
-    })
-    // console.log(service_id);
-    const BeautyOrder = await servicesServices.createBeautyOrder({
-      type,
-      date_2,
       total,
-      service_id,
-    })
+      create_at,
+      user_id,
+    } = req.body
+    const user = await userService.getUserById(user_id)
 
-    res.status(201).json({
-      status: 'success',
-      BeautyService,
-      BeautyRegistation,
-      BeautyOrder,
-      TimeSlot,
-    })
-  } else {
-    throw new ErrorHandler(401, 'Unauthorized')
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    if (+user_id === req.user.user_id || req.user.roles.includes('admin')) {
+      const room = await roomService.getRoombyID({ room_id })
+      if (!room) {
+        return res.status(404).json({ message: 'Room not found' })
+      }
+
+      const { max_slot, current_slot } = room
+      if (current_slot < max_slot) {
+        const storageService = await servicesServices.createStorageService({
+          status: 'created',
+          room_id,
+          date_start,
+          date_end,
+          note,
+        })
+
+        const storageOrder = await servicesServices.createStorageOrder({
+          service_id: storageService.id,
+          user_id,
+          pet_id,
+          create_at,
+          total,
+        })
+
+        const updatedRoom = await roomService.updateRoom({
+          room_id,
+          current_slot: current_slot + 1
+        })
+
+        return res.status(201).json({
+          status: 'success',
+          storageService,
+          storageOrder,
+          updatedRoom,
+        })
+      } else {
+        return res.status(400).json({ message: 'Maximum slot reached' })
+      }
+    } else {
+      return res.status(401).json({ message: 'Unauthorized' })
+    }
+  } catch (error) {
+    return res.status(500).json({ message: error.message })
   }
 }
+
+
 const getAllStorageService = async(req, res) => {
     const { user_id } = req.user;
 
@@ -105,24 +87,7 @@ const getAllStorageService = async(req, res) => {
     }
   };
 
-const getAllBeautyService = async(req,res) => {
-    const { user_id } = req.user
 
-    const user = await userService.getUserById(user_id)
-    if (!user) {
-      throw new ErrorHandler(404, 'User not found')
-    }
-    if (req.user.roles.includes('admin')) {
-      const AllBeautyService = await servicesServices.getAllBeautyService();
-      res.status(201).json({
-        status: 'success',
-        AllBeautyService,
-      })
-      console.log(user_id)
-    } else {
-      throw new ErrorHandler(401, 'No Permission')
-    }  
-}
 const getStorageServicebyID = async(req, res) => {
     const { user_id } = req.user
 
@@ -132,7 +97,7 @@ const getStorageServicebyID = async(req, res) => {
     }
     if (req.user.roles.includes('admin')) {
         const { service_id } = req.body
-        const StorageServicebyID = await servicesServices.getStorageServicebyID(service_id)
+        const StorageServicebyID = await servicesServices.getStorageServicebyID({service_id})
         res.status(200).json({
             status: 'success',
             StorageServicebyID,
@@ -143,29 +108,7 @@ const getStorageServicebyID = async(req, res) => {
     }
 }
 
-const getBeautyServicebyID = async (req, res) => {
-  const { user_id } = req.user
 
-  const user = await userService.getUserById(user_id)
-  if (!user) {
-    throw new ErrorHandler(404, 'User not found')
-  }
-  const a = req.user.roles.includes('admin');
-  console.log(a);
-  if (a) {
-    const { service_id } = req.body
-    const BeautyServicebyID = await servicesServices.getBeautyServicebyID(
-      service_id,
-    )
-    res.status(200).json({
-      status: 'success',
-      BeautyServicebyID,
-    })
-    console.log(user_id)
-  } else {
-    throw new ErrorHandler(401, 'No Permission')
-  }
-}
 
 const getStorageServicebyUser_ID = async(req, res) => {
     const {user_id} =  req.user;
@@ -173,36 +116,14 @@ const getStorageServicebyUser_ID = async(req, res) => {
     if (!user){
         throw new ErrorHandler(404, 'User not found');
     }
-    if (+user_id === req.user.user_id || req.user.roles.includes('admin')) {
       const getStorageServicebyUser_ID =
-        await servicesServices.getStorageServicebyUser_ID(user_id)
+        await servicesServices.getStorageServicebyUser_ID({user_id})
       res.status(200).json({
         status: 'success',
         getStorageServicebyUser_ID,
       })
-    } else {
-      throw new ErrorHandler(401, 'Unauthorized')
-    }
 }
 
-const getBeautyServicebyUser_ID = async(req, res) => {
-    const {user_id} =  req.user;
-    // console.log("user_id = " + user_id);
-    const user = await userService.getUserById(user_id);
-    if (!user){
-        throw new ErrorHandler(404, 'User not found');
-    }
-    if (+user_id === req.user.user_id || req.user.roles.includes('admin')) {
-      const BeautyServicebyUser_ID =
-        await servicesServices.getBeautyServicebyUser_ID(user_id)
-      res.status(200).json({
-        status: 'success',
-        BeautyServicebyUser_ID,
-      })
-    } else {
-      throw new ErrorHandler(401, 'No Permission')
-    }
-}
 
 const deleteStorageService = async(req, res) => {
     const { user_id } = req.user
@@ -211,108 +132,74 @@ const deleteStorageService = async(req, res) => {
     if (!user) {
       throw new ErrorHandler(404, 'User not found')
     }
-    if (+user_id === req.user.user_id || req.user.roles.includes('admin')) {
-      const deleteStorageService = await servicesServices.deleteStorageService(service_id)
+    if (req.user.roles.includes('admin')) {
+      const storage = await servicesServices.getStorageServicebyID({service_id})
+      const room_id = storage[0].room_id
+      const room = await roomService.getRoombyID({ room_id })
+      const {current_slot} = room
+      const newRoom = await roomService.updateRoom({
+        room_id,
+        current_slot: current_slot -1 ,
+      })
+      const deleteStorageService = await servicesServices.deleteStorageService({service_id})
+
       res.status(200).json({
         status: 'success',
-        deleteStorageService,
+        newRoom,
       })
     } else {
-      throw new ErrorHandler(401, 'Unauthorized')
+      throw new ErrorHandler(401, 'No permission')
     }
-}
-
-const deleteBeautyService = async (req, res) => {
-  const { user_id } = req.user
-  const { service_id } = req.body
-  const user = await userService.getUserById(user_id)
-  if (!user) {
-    throw new ErrorHandler(404, 'User not found')
-  }
-  if (+user_id === req.user.user_id || req.user.roles.includes('admin')) {
-    const deleteBeautyService = await servicesServices.deleteBeautyService(service_id)
-    res.status(200).json({
-      status: 'success',
-      deleteBeautyService,
-    })
-  } else {
-    throw new ErrorHandler(401, 'Unauthorized')
-  }
 }
 
 const updateStorageService =  async(req, res) => {
     const { user_id } = req.user
-    const {
-      service_id,
-      status,
-      room_id,
-      date_start,
-      date_end,
-      note,
-      pet_id,
-      total,
-      date,
-    } = req.body
+    const { service_id, room_id, note, pet_id, date_start, date_end } = req.body
     const user = await userService.getUserById(user_id)
     if (!user) {
       throw new ErrorHandler(404, 'User not found')
     }
     if (+user_id === req.user.user_id || req.user.roles.includes('admin')) {
-      const updateStorageService = await servicesServices.updateStorageService({
-        service_id,
-        status,
+      const storage = await servicesServices.getStorageServicebyID({service_id});
+      const old_room_id = storage.room_id;
+      console.log(old_room_id);
+      const old_room = await roomService.getRoombyID({ room_id: old_room_id });
+      const old_slot = old_room.current_slot;
+      console.log(old_slot);
+      const update_Oldroom = await roomService.updateRoom({
+        room_id: old_room_id,
+        current_slot: old_slot + 1,
+      })
+      const update_storage = await servicesServices.updateStorageService({
+        id: service_id,
         room_id,
-        date_start,
-        date_end,
         note,
         pet_id,
-        total,
-        date,
-        })
+        date_start,
+        date_end,
+      })
+      const new_room = await roomService.getRoombyID({ room_id })
+      const { current_slot } = new_room
+      console.log("Current_slot = " + current_slot);
+      console.log(new_room);
+      console.log(old_room);
+      const update_Newroom = await roomService.updateRoom({
+        room_id,
+        current_slot: current_slot -1
+      });
+
       res.status(200).json({
         status: 'success',
-        updateStorageService,
+        update_storage,
+        update_Oldroom,
+        update_Newroom,
       })
     } else {
       throw new ErrorHandler(401, 'Unauthorized')
     }   
 }
 
-const updateBeautyService = async (req, res) => {
-  const { user_id } = req.user
-  const {
-    service_id,
-    status,
-    date_1,
-    note,
-    pet_id,
-    total,
-    date_2,
-    time,
-  } = req.body
-  const user = await userService.getUserById(user_id)
-  if (!user) {
-    throw new ErrorHandler(404, 'User not found')
-  }
-  if (+user_id === req.user.user_id || req.user.roles.includes('admin')) {
-    const updateBeautyService = await servicesServices.updateBeautyService({
-      service_id,
-      status,
-      date_1,
-      note,
-      pet_id,
-      total,
-      date_2,
-      time,
-    })
-    res.status(200).json({
-      status: 'success',
-      updateBeautyService,
-    })
-  } else {
-    throw new ErrorHandler(401, 'Unauthorized')
-  }
-}
+
 
 module.exports = {
   createStorageService,
@@ -320,11 +207,5 @@ module.exports = {
   getStorageServicebyID,
   getStorageServicebyUser_ID,
   deleteStorageService,
-  updateStorageService,
-  createBeautyService,
-  getAllBeautyService,
-  getBeautyServicebyID,
-  getBeautyServicebyUser_ID,
-  deleteBeautyService,
-  updateBeautyService
-}
+  updateStorageService
+}   

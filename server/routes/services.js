@@ -27,11 +27,7 @@ router.route('/getStorageServicebyID').get(getStorageServicebyID);
 router.route('/getStorageServicebyUser_ID').get(getStorageServicebyUser_ID);
 router.route('/deleteStorageService').delete(deleteStorageService);
 router.route('/updateStorageService').put(updateStorageService);
-router.route('/createBeautyService').post(createBeautyService);
-router.route('/getAllBeautyService').get(getAllBeautyService);
-router.route('/getBeautyServicebyID').get(getBeautyServicebyID);
-router.route('/getBeautyServicebyUser_ID').get(getBeautyServicebyUser_ID);
-router.route('/deleteBeautyService').delete(deleteBeautyService);
-router.route('/updateBeautyService').put(updateBeautyService);
+
+
 module.exports = router;
 

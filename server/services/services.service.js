@@ -2,17 +2,12 @@ const { ErrorHandler } = require('../helpers/error')
 const {
   createStorageServicedb,
   createBeautyServicedb,
-  createBeautyServiceRegistationdb,
   createBeautyOrderdb,
-  getAllStorageServicedb,
+  getAllStorageServiceDB,
   getStorageServicebyIDdb,
   getStorageServicebyUser_IDdb,
   deleteStorageServicedb,
   updateStorageServicedb,
-  getAllBeautyServicedb,
-  getBeautyServicebyIDdb,
-  getBeautyServicebyUser_IDdb,
-  deleteBeautyServicedb,
   createStorage_Orderdb,
 } = require('../db/servicePet.db')
 
@@ -26,6 +21,7 @@ class ServiceService {
       throw new ErrorHandler(error.statusCode, 'createStorageService False')
     }
   }
+
   createStorageOrder = async (StorageOrder) => {
     try {
       return await createStorage_Orderdb(StorageOrder);
@@ -36,7 +32,7 @@ class ServiceService {
   }
   getAllStorageService = async () => {
     try {
-      const d = await getAllStorageServicedb()
+      const d = await getAllStorageServiceDB()
       return d
     } catch (error) {
       console.log(error)
@@ -52,6 +48,7 @@ class ServiceService {
       throw new ErrorHandler(error.statusCode, 'getStorageServicebyIDdb False')
     }
   }
+  
   getStorageServicebyUser_ID = async (StorageServicebyUser_ID) => {
     try {
       return await getStorageServicebyUser_IDdb(StorageServicebyUser_ID)
@@ -73,7 +70,6 @@ class ServiceService {
   }
   updateStorageService = async (updateService) => {
     try {
-      // console.log(updateService);
       return await updateStorageServicedb(updateService)
     } catch (error) {
       console.log(error)

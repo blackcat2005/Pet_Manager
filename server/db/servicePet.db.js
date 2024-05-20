@@ -1,4 +1,10 @@
 const pool = require('../config')
+const { ErrorHandler } = require('../helpers/error')
+
+const formatDateToISO = (dateString) => {
+  const [day, month, year] = dateString.split('/')
+  return new Date(`${year}-${month}-${day}`).toISOString()
+}
 
 const createStorageServicedb = async ({
   status,
@@ -7,134 +13,145 @@ const createStorageServicedb = async ({
   date_end,
   note,
 }) => {
-  const { rows: StorageService } = await pool.query(
-    `INSERT INTO "storageServices"("status", "room_id", "date_start", "date_end", "note") 
-          VALUES($1, $2, $3, $4, $5) 
-          returning "service_id", "status", "room_id", "date_start", "date_end", "note"`,
-    [status, room_id, date_start, date_end, note],
-  )
-  // console.log(StorageService);
-  return StorageService[0]
+    const formattedDateStart = formatDateToISO(date_start)
+    const formattedDateEnd = formatDateToISO(date_end)
+    const { rows: StorageService } = await pool.query(
+      `INSERT INTO "storage" ("status ","room_id", "date_start", "date_end", "note") 
+       VALUES ($1, $2, $3, $4, $5) 
+       RETURNING "id", "status ", "room_id", "date_start", "date_end", "note"`,
+      [status, room_id, formattedDateStart, formattedDateEnd, note],
+    )
+    return StorageService[0];
 }
 
-const createStorageRegistrationdb = async ({ user_id, pet_id }) => {
-  const { rows: StorageRegistration } = await pool.query(
-    `INSERT INTO "storageRegistrations"("user_id", "pet_id") 
-          VALUES($1, $2) 
-          returning "service_id", "user_id", "pet_id"`,
-    [user_id, pet_id],
-  )
-  console.log(StorageRegistration)
-  return StorageRegistration[0]
-}
-const createRoomInfodb = async ({ room_type, number }) => {
-  const { rows: RoomInfo } = await pool.query(
-    `INSERT INTO "roomInfo"("type", "number") 
-          VALUES($1, $2) 
-          RETURNING "room_id", "type", "number"`,
-    [room_type, number],
-  )
-  return RoomInfo[0]
-}
-
-const createStorageOrderdb = async ({
+const createStorage_Orderdb = async ({
   service_id,
-  service_type,
-  date,
+  user_id,
+  pet_id,
+  create_at,
   total,
 }) => {
   const { rows: StorageOrder } = await pool.query(
-    `INSERT INTO "storageOrders"("service_id","type","date","total") 
-          VALUES($1, $2, $3, $4) 
-          returning "order_id", "service_id", "type", "date", "total"`,
-    [service_id, service_type, date, total],
+    `INSERT INTO "storage_orders"("service_id","user_id","pet_id","create_at","total") 
+          VALUES($1, $2, $3, $4,$5) 
+          returning "id", "service_id","user_id","pet_id","create_at","total"`,
+    [service_id, user_id, pet_id, create_at, total],
   )
-  // console.log(StorageOrder);
   return StorageOrder[0]
 }
 
-const getAllStorageServicedb = async () => {
-  const { rows: AllStorageService } = await pool.query(
-    `SELECT ss.*, sr.user_id, sr.pet_id, so.total
-       FROM "storageServices" ss
-       JOIN "storageRegistrations" sr ON ss.service_id = sr.service_id
-       JOIN "storageOrders" so ON ss.service_id = so.service_id`,
-  )
-  return AllStorageService
-}
+const getAllStorageServiceDB = async () => {
+    const query = `
+      SELECT 
+        s.*, 
+        r.type AS room_type,
+        so.id AS order_id,
+        so.service_id AS order_service_id,
+        so.user_id AS order_user_id,
+        so.pet_id AS order_pet_id,
+        so.create_at AS order_created_at,
+        so.total AS order_total
+      FROM 
+        storage s
+      LEFT JOIN 
+        room r ON s.room_id = r.id
+      LEFT JOIN 
+        storage_orders so ON s.id = so.service_id
+    `
+    const { rows: allStorageService } = await pool.query(query)
+    return allStorageService;
 
-const getStorageServicebyIDdb = async (service_id) => {
+}   
+
+
+const getStorageServicebyIDdb = async ({service_id}) => {
   const { rows: StorageServicebyID } = await pool.query(
-    `SELECT ss.*, sr.user_id, sr.pet_id, so.total
-       FROM "storageServices" ss
-       JOIN "storageRegistrations" sr ON ss.service_id = sr.service_id
-       JOIN "storageOrders" so ON ss.service_id = so.service_id
-       WHERE ss.service_id = $1`,
+    `SELECT ss.*, so.user_id, so.pet_id, so.total, so.create_at
+       FROM "storage" ss
+       JOIN "storage_orders" so ON ss.id = so.service_id
+       JOIN "room" ro ON ss.room_id = ro.id
+       WHERE ss.id = $1`,
     [service_id],
   )
-  return StorageServicebyID
+  return StorageServicebyID[0]
 }
 
-const getStorageServicebyUser_IDdb = async (user_id) => {
+const getStorageServicebyUser_IDdb = async ({user_id}) => {
   const { rows: StorageServicebyUser_ID } = await pool.query(
-    `SELECT ss.*, sr.user_id, sr.pet_id, so.total
-       FROM "storageServices" ss
-       JOIN "storageRegistrations" sr ON ss.service_id = sr.service_id
-       JOIN "storageOrders" so ON ss.service_id = so.service_id
-       WHERE sr.user_id = $1`,
+    `SELECT ss.*, so.user_id, so.pet_id, so.total, so.create_at
+       FROM "storage" ss
+       JOIN "storage_orders" so ON ss.id = so.service_id
+       JOIN "room" ro ON ss.room_id = ro.id
+       WHERE so.user_id = $1`,
     [user_id],
   )
   return StorageServicebyUser_ID
 }
 
-const getBeautyServicebyUser_IDdb = async (user_id) => {
-  const { rows: BeautyServicebyUser_ID } = await pool.query(
-    `SELECT ss.*, sr.user_id, sr.pet_id, so.total
-       FROM "beautyServices" ss
-       JOIN "beautyRegistations" sr ON ss.service_id = sr.service_id
-       JOIN "beautyOrders" so ON ss.service_id = so.service_id
-       WHERE sr.user_id = $1`,
-    [user_id],
-  )
-  return BeautyServicebyUser_ID
-}
 
-// const deleteStorageServicedb = async(service_id) => {
-//   const { rows: deleteStorageService } = await pool.query(
-//     `DELETE FROM "roomInfo" WHERE "room_id" IN (SELECT "room_id" FROM "storageServices" WHERE "service_id" = $1);
-//     DELETE FROM "storageRegistrations" WHERE "service_id" = $1;
-//     DELETE FROM "storageOrders" WHERE "service_id" = $1;
-//     DELETE FROM "storageServices" WHERE "service_id" = $1;`,
-//     [service_id]
-//   )
-//   return deleteStorageService;
-// }
-const deleteStorageServicedb = async (service_id) => {
+const deleteStorageServicedb = async ({service_id}) => {
   try {
-    await pool.query(`DELETE FROM "storageOrders" WHERE "service_id" = $1;`, [
+    await pool.query(`DELETE FROM "storage_orders" WHERE "id" = $1;`, [
       service_id,
     ])
-    await pool.query(
-      `DELETE FROM "storageRegistrations" WHERE "service_id" = $1;`,
-      [service_id],
-    )
 
-    const { rows: deleteStorageService } = await pool.query(
-      `DELETE FROM "storageServices" WHERE "service_id" = $1 RETURNING *;`,
-      [service_id],
-    )
     await pool.query(
-      `DELETE FROM "roomInfo" WHERE "room_id" IN (SELECT "room_id" FROM "storageServices" WHERE "service_id" = $1);`,
+      `DELETE FROM "storage" WHERE "id" = $1 RETURNING *;`,
       [service_id],
     )
-
-    return deleteStorageService
+    return "Success";
   } catch (error) {
     console.error('Error in deleteStorageServicedb:', error)
     throw error
   }
 }
 
+const updateStorageServicedb = async({id, room_id, note, pet_id, date_start, date_end}) => {
+  try {
+    await pool.query(`BEGIN`);
+    
+    const {rows: existingStorage} = await pool.query(
+      `SELECT * FROM storage where id = $1`,
+      [id]
+    );
+    if (existingStorage.length == 0) {
+      await pool.query(`ROLLBACK`);
+      return {message: "storage not found"};
+    }
+
+    const {rows: existingStorageOrder} = await pool.query(
+      `SELECT * FROM storage_orders where service_id = $1`,
+      [id]
+    );
+
+    if (existingStorageOrder.length == 0 ) {
+      await pool.query(`ROLLBACK`);
+      return {message: "storage order not found"};
+    }
+
+    // Update storage
+    const storageQuery = `
+      UPDATE storage 
+      set room_id = $1, date_start=$2, date_end=$3, note=$4
+      where id = $5`;
+    await pool.query(storageQuery, [room_id, date_start, date_end, note, id]);
+
+    const storage_ordersQuery = `
+      UPDATE storage_orders
+      set pet_id=$1
+      where service_id=$2`;
+    await pool.query(storage_ordersQuery, [pet_id, id]);
+
+    await pool.query('COMMIT');
+
+    return { message: 'storage successfully updated'};
+
+  } catch (error) {
+    await pool.query('ROLLBACK');
+    console.log(error);
+    throw new ErrorHandler(500, 'Internal server error');
+  }
+}
 const deleteBeautyServicedb = async (service_id) => {
   try {
     await pool.query(`DELETE FROM "beautyOrders" WHERE "service_id" = $1;`, [
@@ -214,49 +231,7 @@ const updateBeautyServicedb = async ({
   }
 }
 
-const updateStorageServicedb = async ({
-  service_id,
-  status,
-  room_id,
-  date_start,
-  date_end,
-  note,
-  pet_id,
-  total,
-  date,
-}) => {
-  const { rows: updatedRowStorageService } = await pool.query(
-    `UPDATE "storageServices"
-    set status=$1, room_id=$2, date_start=$3, date_end=$4, note=$5
-    WHERE service_id=$6
-    returning service_id, status, room_id, date_start, date_end, note`,
-    [status, room_id, date_start, date_end, note, service_id],
-  )
-  const { rows: updateRowStorageRegistration } = await pool.query(
-    `UPDATE "storageRegistrations"
-    set pet_id=$1
-    WHERE service_id=$2
-    returning service_id, user_id, pet_id`,
-    [pet_id, service_id],
-  )
-  const { rows: updateRowStorageOrder } = await pool.query(
-    `UPDATE "storageOrders"
-    set date=$1, total=$2
-    WHERE service_id=$3
-    returning order_id, service_id, type, date, total   `,
-    [date, total, service_id],
-  )
-  console.log({
-    updatedRowStorageService,
-    updateRowStorageRegistration,
-    updateRowStorageOrder,
-  })
-  return {
-    updatedRowStorageService,
-    updateRowStorageRegistration,
-    updateRowStorageOrder,
-  }
-}
+
 
 const createBeautyServicedb = async ({ status, date, time_slot, note }) => {
   const { rows: BeautyService } = await pool.query(
@@ -320,19 +295,15 @@ const createAppointmentOrderdb = async ({ service_id, type, date, total }) => {
 }
 module.exports = {
   createStorageServicedb,
-  createRoomInfodb,
-  createStorageRegistrationdb,
-  createStorageOrderdb,
+  createStorage_Orderdb,
   createBeautyServicedb,
-
   createBeautyServiceRegistrationdb,
   createBeautyOrderdb,
-  getAllStorageServicedb,
+  getAllStorageServiceDB,
   getStorageServicebyIDdb,
   getStorageServicebyUser_IDdb,
   deleteStorageServicedb,
   updateStorageServicedb,
-
   createAppointmentdb,
   createAppointmentRegistrationdb,
   createAppointmentOrderdb,
