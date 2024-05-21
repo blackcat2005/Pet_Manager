@@ -13,6 +13,7 @@ const {
   updateBeauty,
   updateBeautyStatus,
   detailPet,
+  servicePrice,
 } = require('../controllers/services.controller')
 const {
   getAllUsers,
@@ -39,5 +40,7 @@ router.route('/updateBeauty').put(updateBeauty);
 router.route('/updateBeautyStatus').put(updateBeautyStatus);
 
 router.route('/detailPet').get(detailPet)
+
+router.route('/servicePrice').get(servicePrice);
 module.exports = router;
 
