@@ -30,8 +30,13 @@ const StorageServiceUsage = loadableComponent(() => import('views/pages/admin/st
 
 
 const Login = loadableComponent(() => import('views/pages/login'))
-const PersonalInfo = loadableComponent(() => import('views/pages/customer/personal-info'))
+const PersonalInfo = loadableComponent(
+  () => import('views/pages/customer/personal-info'),
+)
 
+const PetManager = loadableComponent(
+  () => import('views/pages/staff/pet-manager'),
+)
 
 function AllRoutes() {
   return (
