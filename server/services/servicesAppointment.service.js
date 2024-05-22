@@ -8,7 +8,7 @@ const {
   deleteAppointmentdb,
   updateAppointmentdb,
   updateAppointmentStatusdb,
-} = require('../db/servicePet.db')
+} = require('../db/serviceAppointment.db')
 
 class ServiceAppointment {
   //Apointment
