@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Space, Typography, Select, message, Input, Modal } from 'antd';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
 const { Option } = Select;
 const { confirm } = Modal;
@@ -10,8 +11,9 @@ const StaffManage = () => {
     const [sortedData, setSortedData] = useState([]);
     const [searchName, setSearchName] = useState('');
     const [searchPhone, setSearchPhone] = useState('');
+    const navigate = useNavigate();
 
-    const [customers, setCustomers] = useState([
+    const [staffs, setStaffs] = useState([
         { key: '1', name: 'TradeCode 99', email: 'abc123@mail.com', phone: '0123456789', address: '1', city: 'Hà Nội', country: 'Việt Nam', lastDispatch: '2021-02-05 08:28:36' },
         { key: '2', name: 'AradeCode 12', email: 'abc123@mail.com', phone: '0123456789', address: '1', city: 'Hà Nội', country: 'Việt Nam', lastDispatch: '2021-02-05 08:28:36' },
         { key: '3', name: 'TradeCode 34', email: 'xyz456@mail.com', phone: '0987654321', address: '2', city: 'Hồ Chí Minh', country: 'Việt Nam', lastDispatch: '2023-07-15 10:45:21' },
@@ -32,7 +34,7 @@ const StaffManage = () => {
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    <a>Update</a>
+                    <a onClick={() => handleUpdate(record)}>Update</a>
                     <a onClick={() => showConfirm(record.key)}>Delete</a>
                 </Space>
             ),
@@ -40,10 +42,14 @@ const StaffManage = () => {
     ];
 
     const handleDelete = (key) => {
-        const newCustomers = customers.filter(item => item.key !== key);
-        setCustomers(newCustomers);
-        setSortedData(newCustomers);
+        const newStaffs = staffs.filter(item => item.key !== key);
+        setStaffs(newStaffs);
+        setSortedData(newStaffs);
         message.success('Xóa nhân viên thành công!');
+    };
+
+    const handleUpdate = (record) => {
+        navigate('/admin/staff-manage/update', { state: { staff: record } });
     };
 
     const handleSearchChange = (e) => {
@@ -56,20 +62,20 @@ const StaffManage = () => {
     };
 
     useEffect(() => {
-        const filteredData = customers.filter(customer => {
-            return (customer.name.toLowerCase().includes(searchName.toLowerCase()) || !searchName) &&
-                (customer.phone.includes(searchPhone) || !searchPhone);
+        const filteredData = staffs.filter(staff => {
+            return (staff.name.toLowerCase().includes(searchName.toLowerCase()) || !searchName) &&
+                (staff.phone.includes(searchPhone) || !searchPhone);
         });
         setSortedData(filteredData);
-    }, [searchName, searchPhone, customers]);
+    }, [searchName, searchPhone, staffs]);
 
     useEffect(() => {
         if (!sortOrder.field || !sortOrder.order) {
-            setSortedData(customers);
+            setSortedData(staffs);
             return;
         }
 
-        const sorted = [...customers].sort((a, b) => {
+        const sorted = [...staffs].sort((a, b) => {
             let fieldA = a[sortOrder.field];
             let fieldB = b[sortOrder.field];
             if (sortOrder.field === 'lastDispatch') {
@@ -81,7 +87,7 @@ const StaffManage = () => {
             return 0;
         });
         setSortedData(sorted);
-    }, [sortOrder, customers]);
+    }, [sortOrder, staffs]);
 
     const handleSortChange = (value) => {
         const [field, order] = value.split('-');
@@ -105,10 +111,14 @@ const StaffManage = () => {
         });
     };
 
+    const handleAddNew = () => {
+        navigate('/admin/staff-manage/add');
+    };
+
     return (
         <div>
             <Space>
-                <Typography.Title level={1}>Danh sách nhân viên</Typography.Title>
+                <Typography.Title level={2}>Danh sách nhân viên</Typography.Title>
             </Space>
             <br /><br /><br /><br />
             <Space style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, width: '100%' }}>
@@ -139,10 +149,10 @@ const StaffManage = () => {
                         <Option value="lastDispatch-ascend">Ngày (tăng)</Option>
                         <Option value="lastDispatch-descend">Ngày (giảm)</Option>
                     </Select>
-                    <Button type="primary" icon={<PlusOutlined />} style={{ margin: '0 15px' }}>Add New</Button>
+                    <Button type="primary" icon={<PlusOutlined />} style={{ margin: '0 15px' }} onClick={handleAddNew}>Add New</Button>
                 </div>
             </Space>
-            <Table columns={columns} dataSource={sortedData} pagination={{ pageSize: 10 }} />
+            <Table columns={columns} dataSource={sortedData} pagination={{ pageSize: 5}} />
         </div>
     );
 };

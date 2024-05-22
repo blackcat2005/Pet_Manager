@@ -9,7 +9,6 @@ import Homepage from 'views/pages/homePage'
 import { RoleProtectedRoute } from './role.protected.route'
 import GuestRoute from './guest-route'
 
-
 const PetList = loadableComponent(() => import('views/pages/customer/info-pet'))
 const PetInfo = loadableComponent(() => import('views/pages/customer/info-pet/PetInfo'))
 const ServiceRegisterPet = loadableComponent(() => import('views/pages/customer/service-register'))
@@ -28,10 +27,11 @@ const MedicalServiceUsage = loadableComponent(() => import('views/pages/admin/st
 const StorageInfo = loadableComponent(() => import('views/pages/admin/staff/service-management/storage-service/storage_info'))
 const StorageServiceUsage = loadableComponent(() => import('views/pages/admin/staff/service-management/storage-service/storage_useage'))
 
-
 const Login = loadableComponent(() => import('views/pages/login'))
 const PersonalInfo = loadableComponent(() => import('views/pages/customer/personal-info'))
 
+const AddStaffForm = loadableComponent(() => import('views/pages/admin/staff/staff-info/add_form'))
+const UpdateStaffForm = loadableComponent(() => import('views/pages/admin/staff/staff-info/update_form'))
 
 function AllRoutes() {
   return (
@@ -87,6 +87,14 @@ function AllRoutes() {
           <Route
             path="/admin/pet-manage"
             element={<MainLayout component={PetInfoOverview} />}
+          />
+          <Route
+            path="/admin/staff-manage/add"
+            element={<MainLayout component={AddStaffForm} />}
+          />
+          <Route
+            path="/admin/staff-manage/update"
+            element={<MainLayout component={UpdateStaffForm} />}
           />
         </Route>
 
