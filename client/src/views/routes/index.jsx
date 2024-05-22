@@ -16,9 +16,12 @@ const PetInfo = loadableComponent(
   () => import('views/pages/customer/info-pet/PetInfo'),
 )
 
-const CustomerListPage = loadableComponent(() => import('views/pages/admin/staff/crud_table'))
-const ManageCustomer = loadableComponent(() => import('views/pages/admin/customer/manage-customer'))
-
+const CustomerListPage = loadableComponent(
+  () => import('views/pages/admin/staff/crud_table'),
+)
+const ManageCustomer = loadableComponent(
+  () => import('views/pages/admin/customer/manage-customer'),
+)
 
 const Login = loadableComponent(() => import('views/pages/login'))
 const PersonalInfo = loadableComponent(
@@ -28,24 +31,13 @@ const ServiceRegisterPet = loadableComponent(
   () => import('views/pages/customer/service-register'),
 )
 
-const PetManager = loadableComponent(() => import('views/pages/staff/test'))
+const PetManager = loadableComponent(
+  () => import('views/pages/staff/pet-manager'),
+)
 
 function AllRoutes() {
   return (
     <>
-      {/* <Suspense
-        fallback={
-          <div className="loading-container">
-            <Rings
-              heigth="100"
-              width="100"
-              color="#1877f2"
-              ariaLabel="loading"
-            />
-            <div>Loading data...</div>
-          </div>
-        }
-      > */}
       <Routes>
         <Route path="/" element={<Homepage />} />
 
@@ -108,7 +100,6 @@ function AllRoutes() {
 
         <Route path="*">Cook</Route>
       </Routes>
-      {/* </Suspense> */}
     </>
   )
 }
