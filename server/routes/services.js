@@ -6,43 +6,45 @@ const {
   deleteStorageService,
   updateStorageService,
   updateStorageServiceStatus,
+} = require('../controllers/servicesStorage.controller')
+const {
   createBeauty,
   getAllBeautybyUser_ID,
   getBeautybyID,
   deleteBeauty,
   updateBeauty,
   updateBeautyStatus,
-  detailPet,
+} = require('../controllers/servicesBeauty.controller')
+const { servicePet } = require('../controllers/pets.controller')
+const {
   servicePrice,
   allPrice,
-} = require('../controllers/services.controller')
-const {
-  getAllUsers,
-} = require('../controllers/users.controller')
-const router = require("express").Router();   
-// const verifyAdmin = require("../middleware/verifyAdmin");
-const verifyToken = require("../middleware/verifyToken");
+} = require('../controllers/servicePrice.controller')
 
-router.use(verifyToken);
-// router.route('/').get(verifyAdmin, getAllUsers)
-router.route('/CreateStorageService').post(createStorageService);
-router.route('/getAllStorageService').get(getAllStorageService);
-router.route('/getStorageServicebyID').get(getStorageServicebyID);
-router.route('/getStorageServicebyUser_ID').get(getStorageServicebyUser_ID);
-router.route('/deleteStorageService').delete(deleteStorageService);
-router.route('/updateStorageService').put(updateStorageService);
-router.route('/updateStorageServiceStatus').put(updateStorageServiceStatus);
+const router = require('express').Router()
+const verifyStaff = require('../middleware/verifyStaff')
+const verifyToken = require('../middleware/verifyToken')
 
-router.route('/createBeauty').post(createBeauty);
-router.route('/getAllBeautybyUser_ID').get(getAllBeautybyUser_ID);
-router.route('/getBeautybyID').get(getBeautybyID);
-router.route('/deleteBeauty').delete(deleteBeauty);
-router.route('/updateBeauty').put(updateBeauty);
-router.route('/updateBeautyStatus').put(updateBeautyStatus);
+router.use(verifyToken)
+router.route('/CreateStorageService').post(createStorageService)
+router.route('/getAllStorageService').get(verifyStaff, getAllStorageService)
+router.route('/getStorageServicebyID').get(verifyStaff, getStorageServicebyID)
+router.route('/getStorageServicebyUser_ID').get(getStorageServicebyUser_ID)
+router.route('/deleteStorageService').delete(deleteStorageService)
+router.route('/updateStorageService').put(verifyStaff, updateStorageService)
+router
+  .route('/updateStorageServiceStatus')
+  .put(verifyStaff, updateStorageServiceStatus)
 
-router.route('/detailPet').get(detailPet)
+router.route('/createBeauty').post(createBeauty)
+router.route('/getAllBeautybyUser_ID').get(getAllBeautybyUser_ID)
+router.route('/getBeautybyID').get(verifyStaff, getBeautybyID)
+router.route('/deleteBeauty').delete(verifyStaff, deleteBeauty)
+router.route('/updateBeauty').put(verifyStaff, updateBeauty)
+router.route('/updateBeautyStatus').put(verifyStaff, updateBeautyStatus)
 
-router.route('/servicePrice').get(servicePrice);
-router.route('/allPrice').get(allPrice);
-module.exports = router;
+router.route('/detailPet').get(servicePet)
 
+router.route('/servicePrice').get(servicePrice)
+router.route('/allPrice').get(allPrice)
+module.exports = router
