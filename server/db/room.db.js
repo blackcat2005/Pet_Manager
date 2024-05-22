@@ -18,5 +18,8 @@ const updateRoomdb = async ({ room_id, current_slot }) => {
   )
   return rooms[0]
 }
-
-module.exports = { getRoombyIDdb, updateRoomdb }
+const getAll_Roomdb = async () => {
+  const { rows: rooms } = await pool.query(`SELECT * FROM "room"`)
+  return rooms
+}
+module.exports = { getRoombyIDdb, updateRoomdb, getAll_Roomdb }

@@ -1,5 +1,5 @@
 const { ErrorHandler } = require('../helpers/error')
-const { getRoombyIDdb, updateRoomdb } = require('../db/room.db')
+const { getRoombyIDdb, updateRoomdb, getAll_Roomdb } = require('../db/room.db')
 class RoomService {
   getRoombyID = async(room_id) => {
     try {
@@ -16,6 +16,14 @@ class RoomService {
     } catch (error) {
       console.log(error)
       throw new ErrorHandler(error.statusCode, 'Update room false')
+    }
+  }
+  allRoom = async() => {
+    try {
+      return await getAll_Roomdb();
+    } catch (error) {
+            console.log(error)
+            throw new ErrorHandler(error.statusCode, 'allRoom')
     }
   }
 }

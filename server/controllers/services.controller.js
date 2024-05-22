@@ -487,7 +487,7 @@ const servicePrice =  async(req, res) => {
     const {name, room_id, time_slot} = req.body;
     if (!room_id) {
       if (name == 'Dịch vụ khám chữa bệnh') {
-        const time_slot_price = await time_slotService.getTime_SlotbyID({
+        const time_slot_price = await time_slotService.getTimeSlotApointment({
           id: time_slot,
         })
         console.log(time_slot_price)
@@ -517,6 +517,13 @@ const servicePrice =  async(req, res) => {
   }
 }
 
+const allPrice = async(req, res) => {
+  res.json({
+    storage : await roomService.allRoom(),
+    beauty : await time_slotService.getAllTime_Slot_beauty(),
+    appointment : await time_slotService.getAllTime_Slot_appointment()
+  });
+}
 
 module.exports = {
   createStorageService,
@@ -537,4 +544,5 @@ module.exports = {
   detailPet,
 
   servicePrice,
+  allPrice,
 }   
