@@ -5,6 +5,16 @@ const {
   getStorageServicebyUser_ID,
   deleteStorageService,
   updateStorageService,
+
+  createTimeSlot,
+
+  createAppointment,
+  getAllAppointmentbyUser_ID,
+  getAppointmentbyID,
+  deleteAppointment,
+  updateAppointment,
+  updateAppointmentStatus,
+
 } = require('../controllers/services.controller')
 const {
   getAllUsers,
@@ -15,11 +25,26 @@ const verifyToken = require("../middleware/verifyToken");
 
 router.use(verifyToken);
 // router.route('/').get(verifyAdmin, getAllUsers)
+
+//Storage
 router.route('/CreateStorageService').post(createStorageService)
 router.route('/getAllStorageService').get(getAllStorageService)
 router.route('/getStorageServicebyID').get(getStorageServicebyID);
 router.route('/getStorageServicebyUser_ID').get(getStorageServicebyUser_ID);
 router.route('/deleteStorageService').delete(deleteStorageService);
 router.route('/updateStorageService').put(updateStorageService);
+
+//Time slot
+router.route('/add-time-slot').post(createTimeSlot)
+
+//Beauty
+
+// Appointment
+router.route('/CreateAppointment').post(createAppointment);
+router.route('/getAllAppointmentbyUser_ID').get(getAllAppointmentbyUser_ID);
+router.route('/getAllAppointmentbyID').get(getAppointmentbyID);
+router.route('/deleteAppointment').delete(deleteAppointment);
+router.route('/updateAppointment').put(updateAppointment);
+router.route('/updateStatus').put(updateAppointmentStatus);
 module.exports = router;
 
