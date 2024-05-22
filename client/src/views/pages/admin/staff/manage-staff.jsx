@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Table, Button, Space, Typography, Select, message, Input, Modal } from 'antd';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import './index.css'; 
 
 const { Option } = Select;
 const { confirm } = Modal;
@@ -34,8 +35,8 @@ const StaffManage = () => {
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    <a onClick={() => handleUpdate(record)}>Update</a>
-                    <a onClick={() => showConfirm(record.key)}>Delete</a>
+                    <a className="action-link" onClick={() => handleUpdate(record)}>Update</a>
+                    <a className="action-link" onClick={() => showConfirm(record.key)}>Delete</a>
                 </Space>
             ),
         },

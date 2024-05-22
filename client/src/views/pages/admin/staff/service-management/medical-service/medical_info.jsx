@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Space, Typography, Select, message, Form, Row, Popconfirm, Modal, Input } from 'antd';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import '../../index.css';
 
 const { Option } = Select;
 
@@ -159,10 +160,10 @@ const MedicalInfo = () => {
           </span>
         ) : (
           <Space size="middle">
-            <a disabled={editingKey !== ''} onClick={() => edit(record)}>
+            <a className="action-link" disabled={editingKey !== ''} onClick={() => edit(record)}>
               Cập nhật
             </a>
-            <a onClick={() => showConfirm(record.id)}>Xóa</a>
+            <a className="action-link" onClick={() => showConfirm(record.id)}>Xóa</a>
           </Space>
         );
       },
@@ -195,7 +196,7 @@ const MedicalInfo = () => {
             <Option value="price-ascend">Giá tiền (Tăng dần)</Option>
             <Option value="price-descend">Giá tiền (Giảm dần)</Option>
           </Select>
-          <Button type="primary" icon={<PlusOutlined />} onClick={addNewRow}>Add New</Button>
+          <Button type="primary" icon={<PlusOutlined />} onClick={addNewRow}>Thêm mới</Button>
         </Space>
       </Row>
       <Form form={form} component={false}>

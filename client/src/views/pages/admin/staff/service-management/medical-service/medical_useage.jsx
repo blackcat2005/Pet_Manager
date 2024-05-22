@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Typography, Select, message, Input, Form, Row, Popconfirm, Modal } from 'antd';
+import { Table, Button, Space, Typography, Select, message, Input, Form, Row, Popconfirm, Modal, DatePicker } from 'antd';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import '../../index.css';
 
 const { Option } = Select;
 
@@ -163,7 +164,18 @@ const MedicalServiceUsage = () => {
     { title: 'Ca khám', dataIndex: 'examination', key: 'examination', editable: true },
     { title: 'Mô tả triệu chứng', dataIndex: 'description', key: 'description', editable: true },
     { title: 'Ngày đăng ký', dataIndex: 'registrationDate', key: 'registrationDate', editable: true },
-    { title: 'Trạng thái', dataIndex: 'status', key: 'status', editable: true, inputType: 'select' },
+    { 
+      title: 'Trạng thái', 
+      dataIndex: 'status', 
+      key: 'status', 
+      editable: true, 
+      inputType: 'select', 
+      render: (status) => (
+        <span className={`status-tag ${status.toLowerCase()}`}>
+          {status}
+        </span>
+    ),
+  },
     {
       title: 'Action',
       key: 'action',
@@ -185,15 +197,15 @@ const MedicalServiceUsage = () => {
           </span>
         ) : (
           <Space size="middle">
-            <a disabled={editingKey !== ''} onClick={() => edit(record)}>
+            <a className="action-link" disabled={editingKey !== ''} onClick={() => edit(record)}>
               Cập nhật
             </a>
             {record.status === 'Created' ? (
-              <a onClick={() => message.info('Tạo hồ sơ bệnh án')}>Tạo hồ sơ bệnh án</a>
+              <a className="action-link" onClick={() => message.info('Tạo hồ sơ bệnh án')}>Tạo hồ sơ bệnh án</a>
             ) : (
-              <a onClick={() => message.info('Xem chi tiết hồ sơ bệnh án')}>Xem chi tiết hồ sơ bệnh án</a>
+              <a className="action-link" onClick={() => message.info('Xem chi tiết hồ sơ bệnh án')}>Xem chi tiết hồ sơ bệnh án</a>
             )}
-            <a onClick={() => showConfirm(record.id)}>Xóa</a>
+            <a className="action-link" onClick={() => showConfirm(record.id)}>Xóa</a>
           </Space>
         );
       },

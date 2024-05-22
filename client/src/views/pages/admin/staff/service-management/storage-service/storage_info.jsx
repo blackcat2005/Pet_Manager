@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Space, Typography, Select, message, Form, Row, Popconfirm, Modal, Input } from 'antd';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import '../../index.css';
 
 const { Option } = Select;
 
@@ -160,10 +161,10 @@ const StorageInfo = () => {
           </span>
         ) : (
           <Space size="middle">
-            <a disabled={editingKey !== ''} onClick={() => edit(record)}>
+            <a className="action-link" disabled={editingKey !== ''} onClick={() => edit(record)}>
               Cập nhật
             </a>
-            <a onClick={() => showConfirm(record.id)}>Xóa</a>
+            <a className="action-link" onClick={() => showConfirm(record.id)}>Xóa</a>
           </Space>
         );
       },
