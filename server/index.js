@@ -20,9 +20,9 @@ const START_SERVER = () => {
 };
 (async () => {
   try {
-    console.log("1. Connecting to Heroku database...");
+    console.log("1. Connecting database...");
     await pool.connect();
-    console.log("2. Connected to Heroku database!");
+    console.log("2. Connected database!");
 
     START_SERVER();
   } catch (error) {

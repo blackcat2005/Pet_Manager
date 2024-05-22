@@ -38,5 +38,5 @@ router.route("/:pet_id/plan").get(getPlanByPet_id).put(updatePlan).delete(delete
 router.route("/:pet_id/plan/add-food-item").post(createFoodItem);
 router.route("/:pet_id/plan/food-item").get(getFoodItemList)
 router.route("/:pet_id/plan/food-item/:food_id").put(updateFoodItem).delete(deleteFoodItem)
-                                        
+
 module.exports = router;

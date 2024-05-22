@@ -21,7 +21,6 @@ const crypto = require("crypto");
 const moment = require("moment");
 const { logger } = require("../utils/logger");
 let curDate = moment().format();
-
 class AuthService {
   async signUp(user) {
     try {

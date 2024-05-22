@@ -37,7 +37,7 @@ CREATE TABLE "pets" (
 
 CREATE TABLE "storage" (
 	"id" serial NOT NULL,
-	"status " "status_t" NOT NULL DEFAULT 'created',
+	"status " status_t NOT NULL DEFAULT 'created',
 	"room_id" int NOT NULL,
 	"date_start" timestamp NOT NULL,
 	"date_end" timestamp NOT NULL,
