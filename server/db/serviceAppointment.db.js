@@ -1,44 +1,5 @@
 const pool = require('../config')
 
-const createTimeSlotdb = async ({ time }) => {
-  const { rows: time_slot } = await pool.query(
-    `INSERT INTO time_slot(time) 
-          VALUES($1) 
-          returning id, time`,
-    [time],
-  )
-  return time_slot
-}
-
-const createBeautyServicedb = async ({ status, date, time_slot, note }) => {
-  const { rows: BeautyService } = await pool.query(
-    `INSERT INTO beautyServices(status, date, time_slot, note) 
-          VALUES($1, $2, $3, $4) 
-          returning service_id, status, date, time_slot, note`,
-    [status, date, time_slot, note],
-  )
-  return BeautyService[0]
-}
-const createBeautyServiceRegistrationdb = async ({ user_id, pet_id }) => {
-  const { rows: BeautyServiceRegistration } = await pool.query(
-    `INSERT INTO beautyRegistrations(user_id, pet_id)
-      VALUES($1,$2)
-      returning service_id, user_id, pet_id`[(user_id, pet_id)],
-  )
-  return BeautyServiceRegistration[0]
-}
-
-const createBeautyOrderdb = async ({ type, date, total, service_id }) => {
-  const { rows: BeautyOrder } = await pool.query(
-    `INSERT INTO beautyOrders(type, date, total, service_id)
-     VALUES($1,$2,$3)
-     returning order_id, type, date, total, service_id`[
-      (type, date, total, service_id)
-    ],
-  )
-  return BeautyOrder[0]
-}
-
 const createAppointmentdb = async ({ date, note, time_slot }) => {
   const { rows: appointment } = await pool.query(
     `INSERT INTO appointments(date, note, time_slot) 
@@ -236,23 +197,6 @@ const updateAppointmentStatusdb = async ({ id, status }) => {
 }
 
 module.exports = {
-  createStorageServicedb,
-  createRoomInfodb,
-  createStorageRegistrationdb,
-  createStorageOrderdb,
-  createBeautyServicedb,
-
-  createTimeSlotdb,
-  getTimeSlotByIddb,
-
-  createBeautyServiceRegistrationdb,
-  createBeautyOrderdb,
-  getAllStorageServicedb,
-  getStorageServicebyIDdb,
-  getStorageServicebyUser_IDdb,
-  deleteStorageServicedb,
-  updateStorageServicedb,
-
   createAppointmentdb,
   createAppointmentOrderdb,
   getAppointmentsByDateAndTimeSlotdb,
