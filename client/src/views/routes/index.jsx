@@ -9,31 +9,81 @@ import Homepage from 'views/pages/homePage'
 import { RoleProtectedRoute } from './role.protected.route'
 import GuestRoute from './guest-route'
 
-
 const PetList = loadableComponent(() => import('views/pages/customer/info-pet'))
-const PetInfo = loadableComponent(() => import('views/pages/customer/info-pet/PetInfo'))
-const ServiceRegisterPet = loadableComponent(() => import('views/pages/customer/service-register'))
-const ServiceHistory = loadableComponent(() => import('views/pages/customer/service-history'))
-const ServiceCost = loadableComponent(() => import('views/pages/customer/service-cost'))
+const PetInfo = loadableComponent(
+  () => import('views/pages/customer/info-pet/PetInfo'),
+)
+const ServiceRegisterPet = loadableComponent(
+  () => import('views/pages/customer/service-register'),
+)
+const ServiceHistory = loadableComponent(
+  () => import('views/pages/customer/service-history'),
+)
+const ServiceCost = loadableComponent(
+  () => import('views/pages/customer/service-cost'),
+)
 
-const StaffManage = loadableComponent(() => import('views/pages/admin/staff/manage-staff'))
-const ManageCustomer = loadableComponent(() => import('views/pages/admin/customer/manage-customer'))
-const Statistics = loadableComponent(() => import('views/pages/admin/statistics/statistics'))
-const PetInfoOverview = loadableComponent(() => import('views/pages/admin/staff/pet-info/info_overview'))
+const StaffManage = loadableComponent(
+  () => import('views/pages/admin/staff/manage-staff'),
+)
+const ManageCustomer = loadableComponent(
+  () => import('views/pages/admin/customer/manage-customer'),
+)
+const Statistics = loadableComponent(
+  () => import('views/pages/admin/statistics/statistics'),
+)
+const PetInfoOverview = loadableComponent(
+  () => import('views/pages/admin/staff/pet-info/info_overview'),
+)
 
-const CleaningInfo = loadableComponent(() => import('views/pages/admin/staff/service-management/cleaning-service/cleaning_info'))
-const CleaningServiceUsage = loadableComponent(() => import('views/pages/admin/staff/service-management/cleaning-service/cleaning_useage'))
-const MedicalInfo = loadableComponent(() => import('views/pages/admin/staff/service-management/medical-service/medical_info'))
-const MedicalServiceUsage = loadableComponent(() => import('views/pages/admin/staff/service-management/medical-service/medical_useage'))
-const StorageInfo = loadableComponent(() => import('views/pages/admin/staff/service-management/storage-service/storage_info'))
-const StorageServiceUsage = loadableComponent(() => import('views/pages/admin/staff/service-management/storage-service/storage_useage'))
-
+const CleaningInfo = loadableComponent(
+  () =>
+    import(
+      'views/pages/admin/staff/service-management/cleaning-service/cleaning_info'
+    ),
+)
+const CleaningServiceUsage = loadableComponent(
+  () =>
+    import(
+      'views/pages/admin/staff/service-management/cleaning-service/cleaning_useage'
+    ),
+)
+const MedicalInfo = loadableComponent(
+  () =>
+    import(
+      'views/pages/admin/staff/service-management/medical-service/medical_info'
+    ),
+)
+const MedicalServiceUsage = loadableComponent(
+  () =>
+    import(
+      'views/pages/admin/staff/service-management/medical-service/medical_useage'
+    ),
+)
+const StorageInfo = loadableComponent(
+  () =>
+    import(
+      'views/pages/admin/staff/service-management/storage-service/storage_info'
+    ),
+)
+const StorageServiceUsage = loadableComponent(
+  () =>
+    import(
+      'views/pages/admin/staff/service-management/storage-service/storage_useage'
+    ),
+)
 
 const Login = loadableComponent(() => import('views/pages/login'))
 const PersonalInfo = loadableComponent(
   () => import('views/pages/customer/personal-info'),
 )
 
+const AddStaffForm = loadableComponent(
+  () => import('views/pages/admin/staff/staff-info/add_form'),
+)
+const UpdateStaffForm = loadableComponent(
+  () => import('views/pages/admin/staff/staff-info/update_form'),
+)
 const PetManager = loadableComponent(
   () => import('views/pages/staff/pet-manager'),
 )
@@ -93,6 +143,14 @@ function AllRoutes() {
             path="/admin/pet-manage"
             element={<MainLayout component={PetInfoOverview} />}
           />
+          <Route
+            path="/admin/staff-manage/add"
+            element={<MainLayout component={AddStaffForm} />}
+          />
+          <Route
+            path="/admin/staff-manage/update"
+            element={<MainLayout component={UpdateStaffForm} />}
+          />
         </Route>
 
         <Route element={<RoleProtectedRoute roles={['staff', 'admin']} />}>
@@ -102,7 +160,11 @@ function AllRoutes() {
           />
         </Route>
 
-        <Route element={<RoleProtectedRoute roles={['staff', 'customer', 'admin']} />}>
+        <Route
+          element={
+            <RoleProtectedRoute roles={['staff', 'customer', 'admin']} />
+          }
+        >
           <Route
             path="/cleaning-info"
             element={<MainLayout component={CleaningInfo} />}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Typography, Select, message, Input, Form, Row, Popconfirm, Modal, DatePicker } from 'antd';
+import { Table, Button, Space, Typography, Select, message, Input, Form, Row, Popconfirm, Modal } from 'antd';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import '../../index.css';
 
 const { Option } = Select;
 
@@ -14,16 +15,15 @@ const EditableCell = ({
   children,
   ...restProps
 }) => {
-  const inputNode = inputType === 'number' ? <Input /> : (inputType === 'select' ? (
-    <Select>
-      <Option value="Created">Created</Option>
-      <Option value="Processing">Processing</Option>
-      <Option value="Completed">Completed</Option>
-      <Option value="Canceled">Canceled</Option>
-    </Select>
-  ) : inputType === 'date' ? (
-    <DatePicker format="YYYY-MM-DD" />
-  ) : <Input />);
+  const inputNode = inputType === 'number' ? <Input /> : 
+    (inputType === 'select' ? (
+      <Select>
+        <Option value="Created">Created</Option>
+        <Option value="Processing">Processing</Option>
+        <Option value="Completed">Completed</Option>
+        <Option value="Canceled">Canceled</Option>
+      </Select>
+    ) : <Input />);
   return (
     <td {...restProps}>
       {editing ? (
@@ -165,10 +165,16 @@ const StorageServiceUsage = () => {
     { title: 'ID', dataIndex: 'id', key: 'id', editable: false },
     { title: 'Tên thú cưng', dataIndex: 'petName', key: 'petName', editable: true },
     { title: 'Loại phòng', dataIndex: 'roomType', key: 'roomType', editable: true },
-    { title: 'Ngày bắt đầu', dataIndex: 'startDate', key: 'startDate', editable: true, inputType: 'date' },
-    { title: 'Ngày kết thúc', dataIndex: 'endDate', key: 'endDate', editable: true, inputType: 'date' },
-    { title: 'Ngày đăng ký', dataIndex: 'registrationDate', key: 'registrationDate', editable: true, inputType: 'date' },
-    { title: 'Trạng thái', dataIndex: 'status', key: 'status', editable: true, inputType: 'select' },
+    { title: 'Ngày bắt đầu', dataIndex: 'startDate', key: 'startDate', editable: true },
+    { title: 'Ngày kết thúc', dataIndex: 'endDate', key: 'endDate', editable: true },
+    { title: 'Ngày đăng ký', dataIndex: 'registrationDate', key: 'registrationDate', editable: true },
+    { title: 'Trạng thái', dataIndex: 'status', key: 'status', editable: true, inputType: 'select',
+      render: (status) => (
+        <span className={`status-tag ${status.toLowerCase()}`}>
+          {status}
+        </span>
+      ),
+    },
     {
       title: 'Action',
       key: 'action',
@@ -190,10 +196,10 @@ const StorageServiceUsage = () => {
           </span>
         ) : (
           <Space size="middle">
-            <a disabled={editingKey !== ''} onClick={() => edit(record)}>
+            <a className="action-link" disabled={editingKey !== ''} onClick={() => edit(record)}>
               Cập nhật
             </a>
-            <a onClick={() => showConfirm(record.id)}>Xóa</a>
+            <a className="action-link" onClick={() => showConfirm(record.id)}>Xóa</a>
           </Space>
         );
       },
