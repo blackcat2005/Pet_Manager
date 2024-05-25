@@ -1,6 +1,7 @@
 const { 
     createPet,
     getPetList,
+    allPet,
     getPetById,
     deletePet,
     updatePet
@@ -23,12 +24,13 @@ const {
  } = require("../controllers/food_items.controller")
 
 const router = require("express").Router();
-const verifyAdmin = require("../middleware/verifyAdmin");
+const verifyStaff = require("../middleware/verifyStaff");
 const verifyToken = require("../middleware/verifyToken");
 
 router.use(verifyToken);
 router.route("/:user_id/add-pet").post(createPet);
 router.route("/pet-list").get(getPetList);
+router.route("/all-pet").get(verifyStaff, allPet);
 router.route("/:pet_id").get(getPetById).put(updatePet).delete(deletePet);
 
 router.route("/:pet_id/add-plan").post(createPlan);

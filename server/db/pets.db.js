@@ -29,6 +29,13 @@ const getPetListByUser_idDb = async (user_id) => {
   return pets
 }
 
+const getAllPetdb = async () => {
+  const { rows: pets } = await pool.query(
+    'SELECT * FROM pets',
+  )
+  return pets
+}
+
 const getPetByIdDb = async (pet_id) => {
   const { rows: pet } = await pool.query(
     'SELECT pets.* FROM pets WHERE pets.pet_id = $1',
@@ -209,6 +216,7 @@ module.exports = {
   createPetDb,
   getPetListByUser_idDb,
   getPetByIdDb,
+  getAllPetdb,
   updatePetDb,
   deletePetDb,
   getServicePet,

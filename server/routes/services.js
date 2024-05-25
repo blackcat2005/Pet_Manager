@@ -1,10 +1,15 @@
 const {
   createAppointment,
-  getAllAppointmentbyUser_ID,
+  getAllAppointmentbyUserSession,
   getAppointmentbyID,
   deleteAppointment,
   updateAppointment,
   updateAppointmentStatus,
+
+  createMedicalRecord,
+  getMedicalRecordsByAppointmentId,
+  getMedicalRecordsbyPetId,
+  updateMedicalRecord
 } = require('../controllers/servicesAppointment.controller')
 const {
   createBeauty,
@@ -35,13 +40,19 @@ const verifyToken = require('../middleware/verifyToken')
 router.use(verifyToken)
 // Appointment
 router.route('/CreateAppointment').post(createAppointment)
-router.route('/getAllAppointmentbyUser_ID').get(getAllAppointmentbyUser_ID)
+router.route('/getAllAppointmentbyUserSession').get(getAllAppointmentbyUserSession)
 router.route('/getAllAppointmentbyID').get(verifyStaff, getAppointmentbyID)
 router.route('/deleteAppointment').delete(deleteAppointment)
 router.route('/updateAppointment').put(updateAppointment)
 router.route('/updateStatus').put(verifyStaff, updateAppointmentStatus)
 
-router.use(verifyToken)
+//Medical Records
+router.route('/CreateMedicalRecord').post(createMedicalRecord)
+router.route('/getMedicalRecordsbyAppointmentId').get(getMedicalRecordsByAppointmentId)
+router.route('/getMedicalRecordsbyPetId').get(getMedicalRecordsbyPetId)
+router.route('/updateMedicalRecord').put(updateMedicalRecord)
+
+// Storage
 router.route('/CreateStorageService').post(createStorageService)
 router.route('/getAllStorageService').get(verifyStaff, getAllStorageService)
 router.route('/getStorageServicebyID').get(verifyStaff, getStorageServicebyID)
@@ -52,6 +63,7 @@ router
   .route('/updateStorageServiceStatus')
   .put(verifyStaff, updateStorageServiceStatus)
 
+// Beauty
 router.route('/createBeauty').post(createBeauty)
 router.route('/getAllBeautybyUser_ID').get(getAllBeautybyUser_ID)
 router.route('/getBeautybyID').get(verifyStaff, getBeautybyID)

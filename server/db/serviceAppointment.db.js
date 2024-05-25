@@ -1,5 +1,15 @@
 const pool = require('../config')
 
+const createTimeSlotdb = async ({ time }) => {
+  const { rows: time_slot } = await pool.query(
+    `INSERT INTO time_slot(time) 
+          VALUES($1) 
+          returning id, time`,
+    [time],
+  )
+  return time_slot
+}
+
 const createAppointmentdb = async ({ date, note, time_slot }) => {
   const { rows: appointment } = await pool.query(
     `INSERT INTO appointments(date, note, time_slot) 
@@ -35,7 +45,7 @@ const getAppointmentsByDateAndTimeSlotdb = async (date, time_slot) => {
   return appointments
 }
 
-const getAllAppointmentbyUser_IDdb = async (user_id, isAdmin) => {
+const getAllAppointmentbyUserSessiondb = async (user_id, isAdmin) => {
   let queryString = `
     SELECT appointments.*, appointment_orders.*
     FROM appointments
@@ -196,13 +206,234 @@ const updateAppointmentStatusdb = async ({ id, status }) => {
   }
 }
 
+const getPetIdFromAppointmentdb = async (appointment_id) => {
+  const query = `SELECT appointment_orders.pet_id
+    FROM appointment_orders
+    JOIN appointments ON appointments.id = appointment_orders.service_id
+    WHERE appointments.id = $1
+    `
+  const { rows } = await pool.query(query, [appointment_id])
+  if (rows.length > 0) {
+    return rows[0].pet_id
+  } else {
+    return null
+  }
+}
+
+const createMedicalRecorddb = async ({ neutered, symptoms, diagnostic }) => {
+  const insertMedicalRecordQuery = `
+    INSERT INTO medical_records (neutered, symptoms, diagnostic, created_at)
+    VALUES ($1, $2, $3, NOW())
+    RETURNING id, neutered, symptoms, diagnostic, created_at
+  `
+  const { rows } = await pool.query(insertMedicalRecordQuery, [
+    neutered,
+    symptoms,
+    diagnostic,
+  ])
+  return rows[0]
+}
+
+const updatePetWithMedicalRecordIddb = async (medicalRecordId, pet_id) => {
+  try {
+    // Bắt đầu transaction
+    await pool.query('BEGIN')
+
+    // Lấy pet_id từ bảng appointment_orders
+    const getPetIdQuery = `
+      SELECT pet_id
+      FROM appointment_orders
+      WHERE pet_id = $1
+    `
+    const { rows: petRows } = await pool.query(getPetIdQuery, [pet_id])
+
+    if (petRows.length === 0) {
+      throw new ErrorHandler(404, 'Pet not found for the given appointment')
+    }
+
+    const petId = petRows[0].pet_id
+
+    // Cập nhật medical_record_id trong bảng pets
+    const updatePetQuery = `
+      UPDATE pets
+      SET medical_record_id = $1
+      WHERE pet_id = $2
+    `
+    await pool.query(updatePetQuery, [medicalRecordId, petId])
+
+    // Commit transaction nếu mọi thứ suôn sẻ
+    await pool.query('COMMIT')
+
+    return { message: 'Pet medical record successfully updated' }
+  } catch (error) {
+    // Rollback transaction nếu có lỗi
+    await pool.query('ROLLBACK')
+    console.error('Error in updatePetWithMedicalRecordId:', error)
+    throw new ErrorHandler(500, 'Internal server error')
+  }
+}
+
+const updateAppointmentWithMedicalRecordIddb = async (
+  medicalRecordId,
+  appointment_id,
+) => {
+  try {
+    const updateAppointmentQuery = `
+      UPDATE appointments
+      SET medical_record_id = $1
+      WHERE id = $2
+    `
+    await pool.query(updateAppointmentQuery, [medicalRecordId, appointment_id])
+
+    return { message: 'Appointment medical record successfully updated' }
+  } catch (error) {
+    console.error('Error in updateAppointmentWithMedicalRecordId:', error)
+    throw new ErrorHandler(500, 'Internal server error')
+  }
+}
+
+const createPrescriptiondb = async ({
+  medicine,
+  dosage,
+  note,
+  medical_record_id,
+}) => {
+  const query = `
+    INSERT INTO prescription_item (medicine, dosage, note, medical_record_id)
+    VALUES ($1, $2, $3, $4)
+    RETURNING *
+  `
+  const values = [medicine, dosage, note, medical_record_id]
+  try {
+    const { rows } = await pool.query(query, values)
+    return rows[0]
+  } catch (error) {
+    throw new Error('Database insertion error')
+  }
+}
+
+const getMedicalRecordsByAppointmentIdDb = async (appointment_id) => {
+  try {
+    const query = `
+      SELECT *
+      FROM medical_records
+      WHERE id IN (SELECT medical_record_id FROM appointments WHERE id = $1);
+      `
+    const { rows } = await pool.query(query, [appointment_id])
+    // console.log(rows)
+    return rows
+  } catch (error) {
+    throw new Error(
+      'Error in getAllMedicalRecordsByAppointmentIdDb: ' + error.message,
+    )
+  }
+}
+
+const getMedicalRecordsbyPetIdDb = async (pet_id) => {
+  try {
+    const query = `
+      SELECT *
+      FROM medical_records
+      WHERE id IN (SELECT medical_record_id FROM pets WHERE pet_id = $1);
+      `
+    const { rows } = await pool.query(query, [pet_id])
+    console.log(rows)
+    return rows
+  } catch (error) {
+    throw new Error('Error in getMedicalRecordsbyPetIdDb: ' + error.message)
+  }
+}
+
+const updateMedicalRecordDb = async ({
+  medical_record_id,
+  neutered,
+  symptoms,
+  diagnostic,
+}) => {
+  const query = `
+    UPDATE medical_records
+    SET neutered = $1, symptoms = $2, diagnostic = $3
+    WHERE id = $4
+    RETURNING *
+  `
+  const values = [neutered, symptoms, diagnostic, medical_record_id]
+  console.log(values)
+  try {
+    const { rows } = await pool.query(query, values)
+    return rows[0]
+  } catch (error) {
+    throw new Error('Database update error')
+  }
+}
+
+const updatePrescriptiondb = async (newPrescriptions) => {
+  try {
+    const medical_record_id =
+      newPrescriptions.length > 0 ? newPrescriptions[0].medical_record_id : null
+    const selectQuery = `
+      SELECT *
+      FROM prescription_item
+      WHERE medical_record_id = $1
+    `
+    const selectValues = [medical_record_id]
+    const { rows: pre_items } = await pool.query(selectQuery, selectValues)
+    const preItemIds = pre_items.map((item) => item.id)
+    console.log('preItemIds:', preItemIds)
+    let index = 0
+    for (let id of preItemIds) {
+      const prescription = pre_items.find((item) => item.id === id)
+      if (prescription) {
+        const { medicine, dosage, note } = newPrescriptions[index]
+        const query = `
+              UPDATE prescription_item
+              SET medicine = $1, dosage = $2, note = $3
+              WHERE id = $4
+              RETURNING *
+          `
+        const updateValues = [medicine, dosage, note, id]
+        try {
+          await pool.query(query, updateValues)
+          console.log(`updateValues`, updateValues)
+          index++
+        } catch (error) {
+          console.error(
+            `Error updating prescription item with ID ${id}: ${error}`,
+          )
+          throw new Error('Database update error')
+        }
+      } else {
+        console.error(
+          `Prescription item with ID ${id} not found in newPrescriptions`,
+        )
+      }
+    }
+    return 'Prescription items updated successfully'
+  } catch (error) {
+    console.error(`Error updating prescriptions: ${error}`)
+    throw new Error('Database update error')
+  }
+}
+
 module.exports = {
+  createTimeSlotdb,
+
   createAppointmentdb,
   createAppointmentOrderdb,
   getAppointmentsByDateAndTimeSlotdb,
-  getAllAppointmentbyUser_IDdb,
+  getAllAppointmentbyUserSessiondb,
   getAppointmentbyIDdb,
   deleteAppointmentdb,
   updateAppointmentdb,
   updateAppointmentStatusdb,
+
+  getPetIdFromAppointmentdb,
+  createMedicalRecorddb,
+  updatePetWithMedicalRecordIddb,
+  updateAppointmentWithMedicalRecordIddb,
+  createPrescriptiondb,
+
+  getMedicalRecordsByAppointmentIdDb,
+  getMedicalRecordsbyPetIdDb,
+  updateMedicalRecordDb,
+  updatePrescriptiondb,
 }

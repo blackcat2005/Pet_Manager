@@ -2,6 +2,7 @@ const {
   createPetDb,
   getPetListByUser_idDb,
   getPetByIdDb,
+  getAllPetdb,
   updatePetDb,
   deletePetDb,
   getServicePet,
@@ -24,6 +25,16 @@ class PetService {
       throw new ErrorHandler(error.statusCode, error.message)
     }
   }
+
+  getAllPet = async () => {
+    try {
+      const pets = await getAllPetdb()
+      return pets
+    } catch (error) {
+      throw new ErrorHandler(error.statusCode, error.message)
+    }
+  }
+
   getPetById = async (pet_id) => {
     try {
       const pet = await getPetByIdDb(pet_id)

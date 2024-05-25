@@ -70,7 +70,6 @@ CREATE TABLE "medical_records" (
 	"neutered" boolean NOT NULL,
 	"symptoms" varchar(255) NOT NULL,
 	"diagnostic" varchar(255) NOT NULL,
-	"prescription_id" int NOT NULL,
 	"created_at" TIMESTAMPTZ,
 	PRIMARY KEY("id")
 );
