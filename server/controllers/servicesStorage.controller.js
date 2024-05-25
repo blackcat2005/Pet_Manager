@@ -13,7 +13,11 @@ const createStorageService = async (req, res) => {
       return res.status(404).json({ message: 'User not found' })
     }
 
-    if (+user_id === req.user.user_id || req.user.roles.includes('admin')) {
+    if (
+      +user_id === req.user.user_id ||
+      req.user.roles.includes('admin') ||
+      req.user.roles.includes('staff')
+    ) {
       const room = await roomService.getRoombyID({ room_id })
       if (!room) {
         return res.status(404).json({ message: 'Room not found' })
@@ -65,7 +69,7 @@ const getAllStorageService = async (req, res) => {
   if (!user) {
     throw new ErrorHandler(404, 'User not found')
   }
-  if (req.user.roles.includes('admin')) {
+  if (req.user.roles.includes('admin') || req.user.roles.includes('staff')) {
     const AllStorageService = await serviceStorage.getAllStorageService()
     res.status(201).json({
       status: 'success',
@@ -84,7 +88,7 @@ const getStorageServicebyID = async (req, res) => {
   if (!user) {
     throw new ErrorHandler(404, 'User not found')
   }
-  if (req.user.roles.includes('admin')) {
+  if (req.user.roles.includes('admin') || req.user.roles.includes('staff')) {
     const { service_id } = req.body
     const StorageServicebyID = await serviceStorage.getStorageServicebyID({
       service_id,
@@ -120,7 +124,7 @@ const deleteStorageService = async (req, res) => {
   if (!user) {
     throw new ErrorHandler(404, 'User not found')
   }
-  if (req.user.roles.includes('admin')) {
+  if (req.user.roles.includes('admin') || req.user.roles.includes('staff')) {
     const storage = await serviceStorage.getStorageServicebyID({ service_id })
     const room_id = storage[0].room_id
     const room = await roomService.getRoombyID({ room_id })
@@ -149,7 +153,11 @@ const updateStorageService = async (req, res) => {
   if (!user) {
     throw new ErrorHandler(404, 'User not found')
   }
-  if (+user_id === req.user.user_id || req.user.roles.includes('admin')) {
+  if (
+    +user_id === req.user.user_id ||
+    req.user.roles.includes('admin') ||
+    req.user.roles.includes('staff')
+  ) {
     const storage = await serviceStorage.getStorageServicebyID({ service_id })
     const old_room_id = storage.room_id
     console.log(old_room_id)

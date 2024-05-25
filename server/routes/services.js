@@ -29,7 +29,7 @@ const {
   allPrice,
 } = require('../controllers/servicePrice.controller')
 const router = require('express').Router()
-const verifyStaff = require('../middleware/verifyAdmin')
+const verifyStaff = require('../middleware/verifyStaff')
 const verifyToken = require('../middleware/verifyToken')
 
 router.use(verifyToken)
