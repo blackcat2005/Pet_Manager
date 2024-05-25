@@ -36,9 +36,17 @@ const deleteResetTokenDb = async (curDate) => {
   return true
 }
 
+const activityLogin = async (type_user) => {
+  await pool.query(`insert into public."log_login" (type_user) values($1)`, [
+    type_user,
+  ])
+  return true
+}
+
 module.exports = {
   isValidTokenDb,
   createResetTokenDb,
   setTokenStatusDb,
   deleteResetTokenDb,
+  activityLogin,
 }

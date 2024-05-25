@@ -2,7 +2,7 @@ const petService = require('../services/pets.service')
 const userService = require('../services/users.service')
 const { ErrorHandler } = require('../helpers/error')
 const serviceAppointment = require('../services/servicesAppointment.service')
-
+const timeSlotService = require('../services/time_slot.service')
 // Appointment
 const createAppointment = async (req, res) => {
   const { date, note, time_slot, pet_id } = req.body
@@ -20,7 +20,7 @@ const createAppointment = async (req, res) => {
       throw new ErrorHandler(400, 'The appointment date cannot be in the past.')
     }
     // Kiểm tra time_slot trong bảng time_slot
-    const timeSlot = await serviceAppointment.getTimeSlotById(time_slot)
+    const timeSlot = await timeSlotService.getTimeSlotApointment(time_slot)
     if (!timeSlot) {
       throw new ErrorHandler(404, 'Time slot not found')
     }

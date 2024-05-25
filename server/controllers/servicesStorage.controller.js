@@ -5,16 +5,8 @@ const roomService = require('../services/room.service')
 
 const createStorageService = async (req, res) => {
   try {
-    const {
-      room_id,
-      date_start,
-      date_end,
-      note,
-      pet_id,
-      total,
-      create_at,
-      user_id,
-    } = req.body
+    const { room_id, date_start, date_end, note, pet_id, total, user_id } =
+      req.body
     const user = await userService.getUserById(user_id)
 
     if (!user) {
@@ -41,7 +33,6 @@ const createStorageService = async (req, res) => {
           service_id: storageService.id,
           user_id,
           pet_id,
-          create_at,
           total,
         })
 

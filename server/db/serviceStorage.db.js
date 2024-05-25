@@ -28,14 +28,13 @@ const createStorage_Orderdb = async ({
   service_id,
   user_id,
   pet_id,
-  create_at,
   total,
 }) => {
   const { rows: StorageOrder } = await pool.query(
-    `INSERT INTO "storage_orders"("service_id","user_id","pet_id","create_at","total") 
-          VALUES($1, $2, $3, $4,$5) 
+    `INSERT INTO "storage_orders"("service_id","user_id","pet_id","total") 
+          VALUES($1, $2, $3, $4) 
           returning "id", "service_id","user_id","pet_id","create_at","total"`,
-    [service_id, user_id, pet_id, create_at, total],
+    [service_id, user_id, pet_id, total],
   )
   return StorageOrder[0]
 }

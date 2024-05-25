@@ -4,7 +4,7 @@ const serviceBeauty = require('../services/serviceBeauty.service')
 const time_slotService = require('../services/time_slot.service')
 
 const createBeauty = async (req, res) => {
-  const { date, note, time_slot, create_at, pet_id, total } = req.body
+  const { date, note, time_slot, pet_id, total } = req.body
   const { user_id } = req.user
   const user = await userService.getUserById(user_id)
   if (!user) {
@@ -18,7 +18,7 @@ const createBeauty = async (req, res) => {
       throw new ErrorHandler(400, 'The beauty date cannot be in the past.')
     }
     // Kiểm tra time_slot trong bảng time_slot
-    const timeSlot = await time_slotService.getTime_SlotbyID({ id: time_slot })
+    const timeSlot = await time_slotService.getTime_SlotbyID(time_slot)
     if (!timeSlot) {
       throw new ErrorHandler(404, 'Time slot not found')
     }
@@ -37,7 +37,7 @@ const createBeauty = async (req, res) => {
 
     const beauty = await serviceBeauty.createBeauty({
       status: 'created',
-      date,
+      date: beautyTime,
       note,
       time_slot,
     })
@@ -46,7 +46,6 @@ const createBeauty = async (req, res) => {
       service_id,
       user_id,
       pet_id,
-      create_at,
       total,
     })
 

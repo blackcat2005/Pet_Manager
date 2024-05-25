@@ -2,6 +2,7 @@ const pool = require('../config')
 const { ErrorHandler } = require('../helpers/error')
 
 const createBeautydb = async ({ status, date, time_slot, note }) => {
+  console.log(date)
   const { rows: beauty } = await pool.query(
     `INSERT INTO beauty(status, date, note, time_slot) 
         VALUES($1, $2, $3, $4) 
@@ -11,18 +12,12 @@ const createBeautydb = async ({ status, date, time_slot, note }) => {
   return beauty[0]
 }
 
-const createBeautyOrderdb = async ({
-  service_id,
-  user_id,
-  pet_id,
-  create_at,
-  total,
-}) => {
+const createBeautyOrderdb = async ({ service_id, user_id, pet_id, total }) => {
   const { rows: beauty_order } = await pool.query(
-    `INSERT INTO "beauty_orders"("service_id", "user_id","pet_id","create_at","total") 
+    `INSERT INTO "beauty_orders"("service_id", "user_id","pet_id","total") 
         VALUES($1, $2, $3, $4, $5) 
         returning "id", "service_id", "user_id", "pet_id", "total", "create_at"`,
-    [service_id, user_id, pet_id, create_at, total],
+    [service_id, user_id, pet_id, total],
   )
   return beauty_order[0]
 }
