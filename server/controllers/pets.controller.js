@@ -42,6 +42,13 @@ const getPetList = async (req, res) => {
   return res.status(200).json(pets)
 }
 
+const allPet = async (req, res) => {
+
+  const pets = await petService.getAllPet()
+
+  return res.status(200).json(pets)
+}
+
 const getPetById = async (req, res) => {
   const { user_id } = req.user
   const { pet_id } = req.params
@@ -132,6 +139,7 @@ const servicePet = async (req, res) => {
 module.exports = {
   createPet,
   getPetList,
+  allPet,
   getPetById,
   updatePet,
   deletePet,
