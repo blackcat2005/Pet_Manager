@@ -1,6 +1,41 @@
 const petService = require('../services/pets.service')
 const userService = require('../services/users.service')
 const { ErrorHandler } = require('../helpers/error')
+
+const createPetByStaff = async (req, res) => {
+  const {
+    fullname,
+    species,
+    age,
+    weight,
+    sex,
+    health,
+    describe,
+    avatar,
+    user_id,
+  } = req.body
+  const user = await userService.getUserById(user_id)
+  if (!user) {
+    throw new ErrorHandler(404, 'User not found')
+  }
+  const pet = await petService.createPet({
+    fullname,
+    species,
+    age,
+    weight,
+    sex,
+    health,
+    describe,
+    avatar,
+    user_id,
+  })
+
+  res.status(201).json({
+    status: 'success',
+    pet,
+  })
+}
+
 const createPet = async (req, res) => {
   const { fullname, species, age, weight, sex, health, describe, avatar } =
     req.body
@@ -43,7 +78,6 @@ const getPetList = async (req, res) => {
 }
 
 const allPet = async (req, res) => {
-
   const pets = await petService.getAllPet()
 
   return res.status(200).json(pets)
@@ -137,6 +171,7 @@ const servicePet = async (req, res) => {
 }
 
 module.exports = {
+  createPetByStaff,
   createPet,
   getPetList,
   allPet,
