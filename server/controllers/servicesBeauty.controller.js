@@ -10,7 +10,11 @@ const createBeauty = async (req, res) => {
   if (!user) {
     throw new ErrorHandler(404, 'User not found')
   }
-  if (+user_id === req.user.user_id || req.user.roles.include('admin')) {
+  if (
+    +user_id === req.user.user_id ||
+    req.user.roles.include('admin') ||
+    req.user.roles.include('staff')
+  ) {
     const currentDate = new Date()
     const beautyDate = new Date(date)
     // Kiểm tra nếu date nhỏ hơn hôm nay
@@ -63,7 +67,7 @@ const getAllBeautybyUser_ID = async (req, res) => {
   const { user_id, roles } = req.user
 
   const user = await userService.getUserById(user_id)
-  const isAdmin = roles.includes('admin')
+  const isAdmin = roles.includes('admin') || roles.includes('staff')
   if (!user) {
     throw new ErrorHandler(404, 'User not found')
   }
@@ -89,7 +93,11 @@ const getBeautybyID = async (req, res) => {
   if (!user) {
     throw new ErrorHandler(404, 'User not found')
   }
-  if (+user_id === req.user.user_id || req.user.roles.includes('admin')) {
+  if (
+    +user_id === req.user.user_id ||
+    req.user.roles.includes('admin') ||
+    req.user.roles.includes('staff')
+  ) {
     const { id } = req.body
     const beautyById = await serviceBeauty.getBeautybyID({ id })
     res.status(200).json({
@@ -108,7 +116,11 @@ const deleteBeauty = async (req, res) => {
   if (!user) {
     throw new ErrorHandler(404, 'User not found')
   }
-  if (+user_id === req.user.user_id || req.user.roles.includes('admin')) {
+  if (
+    +user_id === req.user.user_id ||
+    req.user.roles.includes('admin') ||
+    req.user.roles.includes('staff')
+  ) {
     const delete_beauty = await serviceBeauty.deleteBeauty(id)
     res.status(200).json({
       status: 'success',
@@ -126,7 +138,11 @@ const updateBeauty = async (req, res) => {
   if (!user) {
     throw new ErrorHandler(404, 'User not found')
   }
-  if (+user_id === req.user.user_id || req.user.roles.includes('admin')) {
+  if (
+    +user_id === req.user.user_id ||
+    req.user.roles.includes('admin') ||
+    req.user.roles.includes('staff')
+  ) {
     const update_beauty = await serviceBeauty.updateBeauty({
       id,
       date,
