@@ -361,11 +361,11 @@ const updatePrescriptiondb = async (newPrescriptions) => {
     const { rows: pre_items } = await pool.query(selectQuery, selectValues);
     const preItemIds = pre_items.map(item => item.id);
     console.log("preItemIds:", preItemIds);
-    
+    let index = 0;
     for (let id of preItemIds) {
       const prescription = pre_items.find(item => item.id === id);
       if (prescription) {
-        const { medicine, dosage, note } = prescription;
+        const { medicine, dosage, note } = newPrescriptions[index];
         const query = `
               UPDATE prescription_item
               SET medicine = $1, dosage = $2, note = $3
@@ -375,7 +375,8 @@ const updatePrescriptiondb = async (newPrescriptions) => {
         const updateValues = [medicine, dosage, note, id];
         try {
           await pool.query(query, updateValues);
-          console.log(`prescription`, prescription);
+          console.log(`updateValues`, updateValues);
+          index++
         } catch (error) {
           console.error(`Error updating prescription item with ID ${id}: ${error}`);
           throw new Error('Database update error');
