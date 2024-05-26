@@ -9,7 +9,7 @@ const {
   createMedicalRecord,
   getMedicalRecordsByAppointmentId,
   getMedicalRecordsbyPetId,
-  updateMedicalRecord
+  updateMedicalRecord,
 } = require('../controllers/servicesAppointment.controller')
 const {
   createBeauty,
@@ -27,6 +27,7 @@ const {
   deleteStorageService,
   updateStorageService,
   updateStorageServiceStatus,
+  getAllRoom,
 } = require('../controllers/servicesStorage.controller')
 const { servicePet } = require('../controllers/pets.controller')
 const {
@@ -40,7 +41,9 @@ const verifyToken = require('../middleware/verifyToken')
 router.use(verifyToken)
 // Appointment
 router.route('/CreateAppointment').post(createAppointment)
-router.route('/getAllAppointmentbyUserSession').get(getAllAppointmentbyUserSession)
+router
+  .route('/getAllAppointmentbyUserSession')
+  .get(getAllAppointmentbyUserSession)
 router.route('/getAllAppointmentbyID').get(getAppointmentbyID)
 router.route('/deleteAppointment').delete(deleteAppointment)
 router.route('/updateAppointment').put(updateAppointment)
@@ -48,7 +51,9 @@ router.route('/updateStatus').put(verifyStaff, updateAppointmentStatus)
 
 //Medical Records
 router.route('/CreateMedicalRecord').post(createMedicalRecord)
-router.route('/getMedicalRecordsbyAppointmentId').get(getMedicalRecordsByAppointmentId)
+router
+  .route('/getMedicalRecordsbyAppointmentId')
+  .get(getMedicalRecordsByAppointmentId)
 router.route('/getMedicalRecordsbyPetId').get(getMedicalRecordsbyPetId)
 router.route('/updateMedicalRecord').put(updateMedicalRecord)
 
@@ -62,6 +67,7 @@ router.route('/updateStorageService').put(verifyStaff, updateStorageService)
 router
   .route('/updateStorageServiceStatus')
   .put(verifyStaff, updateStorageServiceStatus)
+router.route('/allRoom').get(getAllRoom)
 
 // Beauty
 router.route('/createBeauty').post(createBeauty)
