@@ -15,6 +15,7 @@ const {
   updateAppointmentWithMedicalRecordIddb,
   createPrescriptiondb,
 
+  getPrescriptionsByMedicalRecordIdDb,
   getMedicalRecordsByAppointmentIdDb,
   getMedicalRecordsbyPetIdDb,
   updateMedicalRecordDb,
@@ -51,10 +52,10 @@ class ServiceAppointment {
     }
   }
 
-  getAllAppointmentbyUserSession = async (user_id, isAdmin) => {
+  getAllAppointmentbyUserSession = async (user_id, isAdminStaff) => {
     try {
       // console.log(user_id)
-      return await getAllAppointmentbyUserSessiondb(user_id, isAdmin)
+      return await getAllAppointmentbyUserSessiondb(user_id, isAdminStaff)
     } catch (error) {
       console.log(error)
       throw new ErrorHandler(
@@ -64,10 +65,10 @@ class ServiceAppointment {
     }
   }
 
-  getAppointmentbyID = async (id) => {
+  getAppointmentbyID = async (appointment_id) => {
     try {
       // console.log(user_id)
-      return await getAppointmentbyIDdb(id)
+      return await getAppointmentbyIDdb(appointment_id)
     } catch (error) {
       console.log(error)
       throw new ErrorHandler(error.statusCode, 'getAppointmentbyID False')
@@ -158,6 +159,13 @@ class ServiceAppointment {
       return await getMedicalRecordsByAppointmentIdDb(appointment_id);
     } catch (error) {
       throw new Error('Error in getMedicalRecordsByAppointmentIdDb service: ' + error.message);
+    }
+  };
+  getPrescriptionsByMedicalRecordId = async (medical_recordId) => {
+    try {
+      return await getPrescriptionsByMedicalRecordIdDb(medical_recordId);
+    } catch (error) {
+      throw new Error('Error in getPrescriptionsByMedicalRecordId service: ' + error.message);
     }
   };
   getMedicalRecordsbyPetId = async (pet_id) => {
