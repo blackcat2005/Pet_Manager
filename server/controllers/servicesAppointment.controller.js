@@ -77,14 +77,15 @@ const getAllAppointmentbyUserSession = async (req, res) => {
   const { user_id, roles } = req.user
 
   const user = await userService.getUserById(user_id)
-  const isAdmin = roles.includes('admin')
+  const isAdminStaff = roles.includes('admin') || roles.includes('staff');
+
   if (!user) {
     throw new ErrorHandler(404, 'User not found')
   }
-  if (+user_id === req.user.user_id || isAdmin) {
+  if (+user_id === req.user.user_id || isAdminStaff) {
     const allAppointment = await serviceAppointment.getAllAppointmentbyUserSession(
       user_id,
-      isAdmin,
+      isAdminStaff,
     )
     res.status(201).json({
       status: 'success',
@@ -97,21 +98,37 @@ const getAllAppointmentbyUserSession = async (req, res) => {
 }
 
 const getAppointmentbyID = async (req, res) => {
-  const { user_id } = req.user
+  const { user_id } = req.user;
 
-  const user = await userService.getUserById(user_id)
-  if (!user) {
-    throw new ErrorHandler(404, 'User not found')
-  }
-  if (+user_id === req.user.user_id || req.user.roles.includes('admin') || req.user.roles.include('staff')) {
-    const { id } = req.body
-    const appointmentById = await serviceAppointment.getAppointmentbyID(id)
-    res.status(200).json({
-      status: 'success',
-      appointmentById,
-    })
-  } else {
-    throw new ErrorHandler(401, 'Unauthorized')
+  try {
+    const user = await userService.getUserById(user_id);
+    if (!user) {
+      return res.status(404).json({ status: 'error', message: 'User not found' });
+    }
+
+    const { appointment_id } = req.query;
+
+    if (!appointment_id) {
+      return res.status(400).json({ status: 'error', message: 'Missing appointment_id query parameter' });
+    }
+
+    const appointmentById = await serviceAppointment.getAppointmentbyID(appointment_id);
+    if (!appointmentById) {
+      return res.status(404).json({ status: 'error', message: 'Appointment not found' });
+    }
+
+    const hasAccess = req.user.roles.includes('admin') || req.user.roles.includes('staff') || appointmentById.user_id === +user_id;
+
+    if (hasAccess) {
+      return res.status(200).json({
+        status: 'success',
+        appointmentById,
+      });
+    } else {
+      return res.status(401).json({ status: 'error', message: 'Unauthorized' });
+    }
+  } catch (error) {
+    return res.status(500).json({ status: 'error', message: error.message });
   }
 }
 
@@ -306,7 +323,7 @@ const createMedicalRecord = async (req, res) => {
 };
 
 const getMedicalRecordsByAppointmentId = async (req, res) => {
-  const { appointment_id } = req.body;
+  const { appointment_id } = req.query;
   const { user_id } = req.user;
 
   const user = await userService.getUserById(user_id);
@@ -317,7 +334,10 @@ const getMedicalRecordsByAppointmentId = async (req, res) => {
   if (+user_id === req.user.user_id || req.user.roles.include('admin') || req.user.roles.include('staff')) {
     try {
       const medicalRecords = await serviceAppointment.getMedicalRecordsByAppointmentId(appointment_id);
-      res.status(200).json({ status: 'success', medicalRecords });
+      let medical_recordId = medicalRecords.id;
+      // console.log(medical_recordId)
+      const prescriptions = await serviceAppointment.getPrescriptionsByMedicalRecordId(medical_recordId);
+      res.status(200).json({ status: 'success', medicalRecords, prescriptions });
     } catch (error) {
       res.status(500).json({ status: 'error', message: error.message });
     }
@@ -325,7 +345,7 @@ const getMedicalRecordsByAppointmentId = async (req, res) => {
 };
 
 const getMedicalRecordsbyPetId = async (req, res) => {
-  const { pet_id } = req.body;
+  const { pet_id } = req.query;
   const { user_id } = req.user;
 
   const user = await userService.getUserById(user_id);
@@ -336,7 +356,10 @@ const getMedicalRecordsbyPetId = async (req, res) => {
   if (+user_id === req.user.user_id || req.user.roles.include('admin') || req.user.roles.include('staff')) {
     try {
       const medicalRecords = await serviceAppointment.getMedicalRecordsbyPetId(pet_id);
-      res.status(200).json({ status: 'success', medicalRecords });
+      let medical_recordId = medicalRecords.id;
+      // console.log(medical_recordId)
+      const prescriptions = await serviceAppointment.getPrescriptionsByMedicalRecordId(medical_recordId);
+      res.status(200).json({ status: 'success', medicalRecords, prescriptions });
     } catch (error) {
       res.status(500).json({ status: 'error', message: error.message });
     }
