@@ -45,7 +45,7 @@ const getAppointmentsByDateAndTimeSlotdb = async (date, time_slot) => {
   return appointments
 }
 
-const getAllAppointmentbyUserSessiondb = async (user_id, isAdmin) => {
+const getAllAppointmentbyUserSessiondb = async (user_id, isAdminStaff) => {
   let queryString = `
     SELECT appointments.*, appointment_orders.*
     FROM appointments
@@ -53,7 +53,7 @@ const getAllAppointmentbyUserSessiondb = async (user_id, isAdmin) => {
   `
   const queryParams = []
 
-  if (!isAdmin) {
+  if (!isAdminStaff) {
     queryString += ' WHERE appointment_orders.user_id = $1'
     queryParams.push(user_id)
   }

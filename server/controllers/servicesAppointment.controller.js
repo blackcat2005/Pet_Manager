@@ -77,14 +77,15 @@ const getAllAppointmentbyUserSession = async (req, res) => {
   const { user_id, roles } = req.user
 
   const user = await userService.getUserById(user_id)
-  const isAdmin = roles.includes('admin')
+  const isAdminStaff = roles.includes('admin') || roles.includes('staff');
+
   if (!user) {
     throw new ErrorHandler(404, 'User not found')
   }
-  if (+user_id === req.user.user_id || isAdmin) {
+  if (+user_id === req.user.user_id || isAdminStaff) {
     const allAppointment = await serviceAppointment.getAllAppointmentbyUserSession(
       user_id,
-      isAdmin,
+      isAdminStaff,
     )
     res.status(201).json({
       status: 'success',

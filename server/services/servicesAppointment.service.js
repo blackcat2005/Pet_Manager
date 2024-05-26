@@ -51,10 +51,10 @@ class ServiceAppointment {
     }
   }
 
-  getAllAppointmentbyUserSession = async (user_id, isAdmin) => {
+  getAllAppointmentbyUserSession = async (user_id, isAdminStaff) => {
     try {
       // console.log(user_id)
-      return await getAllAppointmentbyUserSessiondb(user_id, isAdmin)
+      return await getAllAppointmentbyUserSessiondb(user_id, isAdminStaff)
     } catch (error) {
       console.log(error)
       throw new ErrorHandler(
