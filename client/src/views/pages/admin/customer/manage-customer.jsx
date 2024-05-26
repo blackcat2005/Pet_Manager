@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Form, Spin, InputNumber, Popconfirm, Table, Typography } from 'antd';
+import { Button, Form, Spin, InputNumber, Popconfirm, Table, Typography, Space } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined, LoadingOutlined } from '@ant-design/icons'
 import './manage-customer.scss';
 import ModalCustomer from "./modal-add-edit"
@@ -171,7 +171,11 @@ const ManageCustomer = () => {
     return (
         <>
             <div className="manage-customer__container">
-                <h1>Quản lý khách hàng</h1>
+                <Space style={{ width: '100%', justifyContent: 'center' }}>
+                    <Typography.Title level={1}>Quản lý khách hàng</Typography.Title>
+                    <br /><br />
+                </Space>
+
 
                 <div className="manage-customer__content">
                     <Button onClick={handleCreate} type="primary" style={{ marginBottom: 16, width: "100px" }} >
