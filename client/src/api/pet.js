@@ -18,7 +18,7 @@ const pet = {
   },
   createPet: (user_id, body) => {
     const url = `/pets/${user_id}/add-pet`
-    return API.get(url, body)
+    return API.post(url, body)
   },
   createPetByStaff: (body) => {
     const url = '/pets/add-pet'

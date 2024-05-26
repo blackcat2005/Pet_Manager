@@ -4,7 +4,7 @@ import useAuth from "hooks/useAuth";
 const PetContext = createContext();
 
 export const PetProvider = ({ children }) => {
-  const [pets, setPets] = useState([]);
+  const [customerPets, setCustomerPets] = useState([]);
   const [allPets, setAllPets] = useState([]);
   const { userData } = useAuth()
 
@@ -13,7 +13,7 @@ export const PetProvider = ({ children }) => {
   useEffect(() => {
     if (userData && userData.roles === 'customer') {
       pet.getPetList().then((response) => {
-        setPets(response.data);
+        setCustomerPets(response.data);
       }).catch((error) => {
         console.error('Error fetching customer pet list:', error);
       });
@@ -32,7 +32,7 @@ export const PetProvider = ({ children }) => {
 
   return (
     <PetContext.Provider
-      value={{ pets, setPets, allPets, setAllPets }}
+      value={{ customerPets, setCustomerPets, allPets, setAllPets }}
     >
       {children}
     </PetContext.Provider>

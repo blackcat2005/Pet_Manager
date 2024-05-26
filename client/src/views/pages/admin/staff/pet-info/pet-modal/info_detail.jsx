@@ -43,7 +43,7 @@ const InfoModal = ({ visible, onCancel, selectedPet }) => {
                             <hr />
                             <div className='m-10 flex flex-row gap-20'>
                                 <div className='mim-w-[200px]' style={{ flex: '0 0 150px', textAlign: 'center', marginRight: '20px' }}>
-                                <Avatar src={ selectedPet?.avatar ||'/image.png'} size={150} style={{ marginRight: 24 }} />
+                                <Avatar src={ selectedPet?.avatar ||'/avatarpet.jpg'} size={150} style={{ marginRight: 24 }} />
                                 </div>
                                 <div className='flex flex-row justify-around w-full'>
                                     <div className='pet-info-detail text-xl flex flex-col gap-14' style={{ flex: 1, paddingRight: 20 }}>

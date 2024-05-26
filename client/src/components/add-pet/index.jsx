@@ -8,20 +8,35 @@ import { toast } from 'react-toastify'
 const AddPetModal = ({ visible, onCancel }) => {
   
   const { userData } = useAuth()
-  const {allPets, setAllPets} = usePet()
+  const {allPets, setAllPets, customerPets, setCustomerPets} = usePet()
 
   const handleSubmit = (values) => {
-    pet.createPetByStaff(values)
-      .then((res) => {
-        toast.success("Thêm thú cưng thành công");
-        const newPets = [...allPets, res.data.pet]; 
-        setAllPets(newPets); 
-        onCancel();
-      })
-      .catch(error => {
-        console.error("Thêm thú cưng thất bại:", error);
-        toast.error("Thêm thú cưng thất bại");
-      });
+    if(userData && ( userData.roles === 'staff' ||  userData.roles === 'admin')) {
+      pet
+        .createPetByStaff(values)
+        .then((res) => {
+          toast.success('Thêm thú cưng thành công')
+          const newPets = [...allPets, res.data.pet]
+          setAllPets(newPets)
+          onCancel()
+        })
+        .catch((error) => {
+          console.error('Thêm thú cưng thất bại:', error)
+          toast.error('Thêm thú cưng thất bại')
+        })
+    }
+    if(userData && userData.roles === 'customer'){
+      pet
+        .createPet(userData.user_id, values)
+        .then((res) => {
+          toast.success('Thêm thú cưng thành công')
+          const newPets = [...customerPets, res.data.pet]
+          setCustomerPets(newPets)
+          onCancel()
+        })
+      console.log(values);
+    }
+    
   }
   
   return (
@@ -58,7 +73,7 @@ const AddPetModal = ({ visible, onCancel }) => {
               autoComplete="off"
               className="flex flex-col"
             >
-              {userData && (userData.roles === 'staff' || 'admin') && (
+              {userData && (userData.roles === 'staff' || userData.roles === 'admin') && (
                 <Form.Item
                   label="ID người dùng"
                   name="user_id"
