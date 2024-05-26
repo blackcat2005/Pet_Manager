@@ -16,7 +16,7 @@ export const GuestRoute = () => {
   const { authData, userData } = useAuth()
 
   if (authData) {
-    <Navigate to={takePath(userData.roles)} />
+    userData && <Navigate to={takePath(userData.roles)} />
   }
 
   return <Outlet />

@@ -38,7 +38,9 @@ const Header = () => {
 }
 
 const HomePart1 = () => {
+    
     const navigate = useNavigate();
+
     const handleLogin = () => {
         navigate('/login');
     }

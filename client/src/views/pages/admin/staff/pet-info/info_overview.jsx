@@ -3,7 +3,10 @@ import { Table, Button, Space, Typography, Select, message, Input, Form, Modal }
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import InfoModal from './pet-modal/info_detail';
 import UpdateModal from './pet-modal/info_update';
-
+import AddPetModal from 'components/add-pet';
+import usePet from 'hooks/usePet';
+import pet from 'api/pet';
+import { toast } from 'react-toastify';
 const { Option } = Select;
 const { confirm } = Modal;
 
@@ -12,26 +15,21 @@ const PetInfoOverview = () => {
     const [sortedData, setSortedData] = useState([]);
     const [searchName, setSearchName] = useState('');
     const [visibleInfoModal, setVisibleInfoModal] = useState(false);
+    const [visibleAddPetModal, setVisibleAddPetModal] = useState(false);
     const [visibleUpdateModal, setVisibleUpdateModal] = useState(false);
     const [selectedPet, setSelectedPet] = useState(null);
 
-    const [pets, setPets] = useState([
-        // { id: '1', name: 'Mimi', types: 'Mèo', age: '2', gender: 'Cái', weight: '5kg', customerId: 'C123', health: 'Tốt', description: 'Thú cưng khỏe mạnh', imgUrl: require('../../assets/image/anhh4.jpg') },
-        // { id: '2', name: 'Buddy', types: 'Chó', age: '4', gender: 'Đực', weight: '15kg', customerId: 'C456', health: 'Khỏe', description: 'Thú cưng rất khỏe mạnh', imgUrl: require('../../assets/image/anhh10.jpg') },
-        // { id: '3', name: 'Jack', types: 'Thỏ', age: '1', gender: 'Đực', weight: '2kg', customerId: 'C789', health: 'Yếu', description: 'Cần chăm sóc đặc biệt', imgUrl: require('../../assets/image/anhh7.jpg') },
-        // { id: '4', name: 'Lucy', types: 'Mèo', age: '3', gender: 'Cái', weight: '4kg', customerId: 'C012', health: 'Tốt', description: 'Thú cưng khỏe mạnh', imgUrl: require('../../assets/image/anhh6.jpg') },
-        // { id: '5', name: 'Max', types: 'Chó', age: '5', gender: 'Đực', weight: '20kg', customerId: 'C345', health: 'Tốt', description: 'Thú cưng khỏe mạnh', imgUrl: require('../../assets/image/anhh5.jpg') }
-    ]);
+    const { allPets: pets, setAllPets } = usePet()
 
     const columns = [
-        { title: 'ID', dataIndex: 'id', key: 'id' },
-        { title: 'Tên thú cưng', dataIndex: 'name', key: 'name' },
-        { title: 'Chủng loại', dataIndex: 'types', key: 'types' },
+        { title: 'ID', dataIndex: 'pet_id', key: 'pet_id' },
+        { title: 'Tên thú cưng', dataIndex: 'fullname', key: 'fullname' },
+        { title: 'Chủng loại', dataIndex: 'species', key: 'species' },
         { title: 'Tuổi', dataIndex: 'age', key: 'age' },
-        { title: 'Giới tính', dataIndex: 'gender', key: 'gender' },
+        { title: 'Giới tính', dataIndex: 'sex', key: 'sex' },
         { title: 'Cân nặng', dataIndex: 'weight', key: 'weight' },
-        { title: 'ID khách hàng', dataIndex: 'customerId', key: 'customerId' },
-        { title: 'x', dataIndex: 'x', key: 'x' },
+        { title: 'ID khách hàng', dataIndex: 'user_id', key: 'user_id' },
+        // { title: 'x', dataIndex: 'x', key: 'x' },
         {
             title: 'Action',
             key: 'action',
@@ -39,7 +37,7 @@ const PetInfoOverview = () => {
                 <Space size="middle">
                     <a onClick={() => showDetails(record)}>Xem chi tiết</a>
                     <a onClick={() => updateInfos(record)}>Cập nhật</a>
-                    <a onClick={() => showConfirm(record.id)}>Xóa</a>
+                    <a onClick={() => showConfirm(record.pet_id)}>Xóa</a>
                 </Space>
             ),
         },
@@ -57,14 +55,27 @@ const PetInfoOverview = () => {
 
     const handleCancel = () => {
         setVisibleInfoModal(false);
+        setVisibleAddPetModal(false)
         setVisibleUpdateModal(false);
     };
+    const handleAddPet = () => {
+        setVisibleAddPetModal(true)
+    }
 
-    const handleDelete = (id) => {
-        const newPets = pets.filter(item => item.id !== id);
-        setPets(newPets);
-        setSortedData(newPets);
-        message.success('Xóa thú cưng thành công!');
+    const handleDelete = (pet_id) => {
+        pet.deletePet(pet_id)
+            .then(() => {
+                toast.success('Xóa thú cưng thành công!');
+                const newPets = pets.filter(item => item.pet_id !== pet_id);
+                setAllPets(newPets);
+                setSortedData(newPets);
+
+            })
+            .catch(error => {
+                console.error("xóa thú cưng thất bại:", error);
+            });
+
+        
     };
 
     const handleSearchChange = (e) => {
@@ -72,7 +83,7 @@ const PetInfoOverview = () => {
         setSearchName(value);
 
         const filteredData = pets.filter(pet => {
-            return pet.name.toLowerCase().includes(value);
+            return pet.fullname.toLowerCase().includes(value);
         });
         setSortedData(filteredData);
     };
@@ -102,7 +113,7 @@ const PetInfoOverview = () => {
         setSortOrder({ field, order });
     };
 
-    const showConfirm = (id) => {
+    const showConfirm = (pet_id) => {
         confirm({
             title: 'Bạn có chắc muốn xóa thú cưng?',
             icon: <ExclamationCircleOutlined />,
@@ -111,7 +122,7 @@ const PetInfoOverview = () => {
             okType: 'danger',
             cancelText: 'No',
             onOk() {
-                handleDelete(id);
+                handleDelete(pet_id);
             },
             onCancel() {
                 console.log('Cancel');
@@ -125,7 +136,8 @@ const PetInfoOverview = () => {
                 <Typography.Title level={1}>Danh sách thú cưng</Typography.Title>
                 <br /><br />
             </Space>
-            <Space style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, marginLeft: 50, width: '100%' }}>
+
+            <Space style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, width: '100%' }}>
                 <Form layout="inline" style={{ border: '1px solid #d9d9d9', padding: '10px', borderRadius: '4px' }}>
                     <Form.Item label="Tên thú cưng">
                         <Input placeholder="Please enter" style={{ width: 200 }}
@@ -135,15 +147,17 @@ const PetInfoOverview = () => {
                     </Form.Item>
                     <Button type="primary" onClick={handleSearchChange} style={{ marginLeft: 8, marginRight: 10 }}>Tìm kiếm</Button>
                 </Form>
+                <Space>
+                    <Select placeholder="Sắp xếp theo" style={{ width: 180 }} onChange={handleSortChange}>
+                        <Option value="fullname-ascend">Tên (A-Z)</Option>
+                        <Option value="fullname-descend">Tên (Z-A)</Option>
+                        <Option value="pet_id-ascend">Id thú cưng</Option>
+                    </Select>
+                    <Button type="primary" onClick={handleAddPet} icon={<PlusOutlined />} style={{ margin: '0 15px' }}>Thêm thú cưng</Button>
+                </Space>
+
             </Space>
-            <Space style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 16, width: '100%' }}>
-                <Select placeholder="Sắp xếp theo" style={{ width: 180 }} onChange={handleSortChange}>
-                    <Option value="name-ascend">Tên (A-Z)</Option>
-                    <Option value="name-descend">Tên (Z-A)</Option>
-                </Select>
-                <Button type="primary" icon={<PlusOutlined />} style={{ margin: '0 15px' }}>Add New</Button>
-            </Space>
-            <Table columns={columns} dataSource={sortedData} pagination={{ pageSize: 5 }} />
+            {pets && <Table columns={columns} dataSource={sortedData} pagination={30} />}
 
             <InfoModal
                 visible={visibleInfoModal}
@@ -155,7 +169,12 @@ const PetInfoOverview = () => {
                 visible={visibleUpdateModal}
                 onCancel={handleCancel}
                 selectedPet={selectedPet}
-                key={selectedPet ? selectedPet.id : 'default'}
+                key={selectedPet ? selectedPet.pet_id : '1'}
+                setSelectedPet={setSelectedPet}
+            />
+            <AddPetModal
+                visible={visibleAddPetModal}
+                onCancel={handleCancel}
             />
         </div>
     );

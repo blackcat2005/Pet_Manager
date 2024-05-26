@@ -413,7 +413,6 @@ const updatePrescriptiondb = async (newPrescriptions) => {
     throw new Error('Database update error')
   }
 }
-
 module.exports = {
   createTimeSlotdb,
 

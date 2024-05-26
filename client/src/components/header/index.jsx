@@ -53,7 +53,7 @@ const HeaderRender = () => {
           }}
         >
           <div className="header-wrapper__logo">
-            <img src="./logo.png" alt="logo" />
+            <img className='rounded-sm' src="/logo2.jpg" alt="logo" />
           </div>
 
           <div className="header-wrapper__right-side">

@@ -5,16 +5,34 @@ const PetContext = createContext();
 
 export const PetProvider = ({ children }) => {
   const [pets, setPets] = useState([]);
-  const {isLoggedIn} = useAuth()
+  const [allPets, setAllPets] = useState([]);
+  const { userData } = useAuth()
+
+
+
   useEffect(() => {
-    pet.getPetList().then((response) => {
+    if (userData && userData.roles === 'customer') {
+      pet.getPetList().then((response) => {
         setPets(response.data);
-    });
-  }, [isLoggedIn]);
+      }).catch((error) => {
+        console.error('Error fetching customer pet list:', error);
+      });
+    }
+  }, [userData]);
+  
+  useEffect(() => {
+    if (userData && (userData.roles === 'staff' || userData.roles === 'admin')) {
+      pet.getAllPet().then((response) => {
+        setAllPets(response.data);
+      }).catch((error) => {
+        console.error('Error fetching all pets:', error);
+      });
+    }
+  }, [userData]);
 
   return (
     <PetContext.Provider
-      value={{ pets, setPets}}
+      value={{ pets, setPets, allPets, setAllPets }}
     >
       {children}
     </PetContext.Provider>

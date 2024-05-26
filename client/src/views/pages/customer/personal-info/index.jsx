@@ -28,32 +28,31 @@ const formItemLayout = {
 
 const PersonalInfo = () => {
   const { userData, updateUserData } = useAuth()
-  const [isSending, setIsSending] = useState(false);
+  const [isSending, setIsSending] = useState(false)
 
-  const handleChangePassword = async() => {
-    setIsSending(true);
+  const handleChangePassword = async () => {
+    setIsSending(true)
     const email = userData.email
     auth
       .forgotPassword({ email })
       .then((data) => {
-        if (data.data.status === "OK") {
-          setIsSending(false);
-          toast.success("Email has been sent successfully.");
+        if (data.data.status === 'OK') {
+          setIsSending(false)
+          toast.success('Email has been sent successfully.')
         }
       })
       .catch((error) => {
-        console.log(error);
-        setIsSending(false);
-        toast.error("An error occured. Please try again.");
-      });
-    
-  };
+        console.log(error)
+        setIsSending(false)
+        toast.error('An error occured. Please try again.')
+      })
+  }
 
   const handleSubmit = (values) => {
     updateUserData(values)
-    toast.success("Cập nhật thành công")
+    console.log(values);
+    toast.success('Cập nhật thành công')
   }
-
 
   return (
     <div className="personal-info-wrapper">
@@ -128,11 +127,12 @@ const PersonalInfo = () => {
             <Input />
           </Form.Item>
 
-          <Form.Item
-            label="Mật khẩu"
-            name="password"
-          >
-            <Button disabled={isSending} type="primary" onClick={handleChangePassword}>
+          <Form.Item label="Mật khẩu" name="password">
+            <Button
+              disabled={isSending}
+              type="primary"
+              onClick={handleChangePassword}
+            >
               Thay đổi mật khẩu
             </Button>
           </Form.Item>
@@ -175,7 +175,7 @@ const PersonalInfo = () => {
               span: 16,
             }}
           >
-            <Button  type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit">
               Submit
             </Button>
           </Form.Item>
