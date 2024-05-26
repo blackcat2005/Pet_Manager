@@ -1,9 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Card, Avatar, Table, Button, Typography, Divider, Input, Select } from 'antd';
-import pet from 'api/pet';
-
-const { Meta } = Card;
-const { Option } = Select;
+import React, { useState, useEffect } from 'react'
+import {
+  Modal,
+  Card,
+  Avatar,
+  Table,
+  Button,
+  Typography,
+  Divider,
+  Input,
+  Select,
+} from 'antd'
+import pet from 'api/pet'
+import { formatDateIsoString } from 'helpers/formartdate'
+const { Meta } = Card
+const { Option } = Select
 
 const EditableField = ({
   value,
@@ -28,79 +38,96 @@ const EditableField = ({
     >
       {value}
     </div>
-  );
-
-function formatDate(isoString) {
-  const date = new Date(isoString);
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
-}
+  )
 
 const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
-  const [isEditing, setIsEditing] = useState({});
-  const [editableFields, setEditableFields] = useState({});
-  const [initialFields, setInitialFields] = useState({});
-  const [data, setData] = useState([]);
-  const [initialData, setInitialData] = useState([]);
-  const [editingKey, setEditingKey] = useState('');
-  const [editingColumn, setEditingColumn] = useState('');
-  const [plan, setPlan] = useState({});
-  const [food, setFood] = useState([]);
+  const [isEditing, setIsEditing] = useState({})
+  const [editableFields, setEditableFields] = useState({})
+  const [initialFields, setInitialFields] = useState({})
+  const [data, setData] = useState([])
+  const [initialData, setInitialData] = useState([])
+  const [editingKey, setEditingKey] = useState('')
+  const [editingColumn, setEditingColumn] = useState('')
+  const [plan, setPlan] = useState({})
+  const [food, setFood] = useState([])
 
   useEffect(() => {
     if (selectedPet && selectedPet.pet_id) {
-      pet.getDietFood(selectedPet.pet_id).then((res) => {
-        setFood(res.data);
-        console.log(food);
-        const petData = res.data.map((item, index) => ({
-          ...item,
-          key: index, // Add unique key for each row
-        }));
-        setData(petData);
-        setInitialData(petData);
-      });
+      pet
+        .getDietFood(selectedPet.pet_id)
+        .then((res) => {
+          if (res.data && res.data.length > 0) {
+            setFood(res.data)
+            const petData = res.data.map((item, index) => ({
+              ...item,
+              key: index + 1,
+            }))
+            setData(petData)
+            setInitialData(petData)
+          }
+        })
+        .catch(() => {
+          setData([])
+          setInitialData([])
+          setInitialFields({})
+          setEditableFields({})
+          setInitialData({})
+        })
 
-      pet.getDietPlan(selectedPet.pet_id).then((res) => {
-        setPlan(res.data[0]);
-        const fields = {
-          dietName: res.data[0]?.description || 'Giảm cân',
-          applicationTime:
-            `${formatDate(res.data[0]?.date_start)} - ${formatDate(res.data[0]?.date_end)}` ||
-            '12/01/2024 - 12/03/2024',
-        };
-        setEditableFields(fields);
-        setInitialFields(fields);
-      });
+      pet
+        .getDietPlan(selectedPet.pet_id)
+        .then((res) => {
+          if (res.data && res.data.length > 0) {
+            setPlan(res.data[0])
+            const fields = {
+              dietName: res.data[0]?.description,
+              applicationTime: `${formatDateIsoString(res.data[0]?.date_start)} - ${formatDateIsoString(res.data[0]?.date_end)}`,
+            }
+            setEditableFields(fields)
+            setInitialFields(fields)
+          } else {
+            setPlan({})
+            const fields = {
+              dietName: 'không có dữ liệu',
+              applicationTime: 'không có dữ liệu',
+            }
+            setEditableFields(fields)
+            setInitialFields(fields)
+          }
+        })
+        .catch(() => {
+          setInitialFields({})
+          setEditableFields({})
+          setInitialData({})
+        })
     }
-  }, [selectedPet]);
+  }, [selectedPet])
 
-  const handleDoubleClick = (field) => setIsEditing({ [field]: true });
+  const handleDoubleClick = (field) => setIsEditing({ [field]: true })
   const handleChange = (field, value) =>
-    setEditableFields({ ...editableFields, [field]: value });
-  const handleBlur = (field) => setIsEditing({ [field]: false });
-  const handleKeyDown = (field, e) => e.key === 'Enter' && handleBlur(field);
+    setEditableFields({ ...editableFields, [field]: value })
+  const handleBlur = (field) => setIsEditing({ [field]: false })
+  const handleKeyDown = (field, e) => e.key === 'Enter' && handleBlur(field)
 
   const isEditingCell = (record, column) =>
-    record.key === editingKey && column === editingColumn;
+    record.key === editingKey && column === editingColumn
   const editCell = (record, column) => {
-    setEditingKey(record.key);
-    setEditingColumn(column);
-  };
+    setEditingKey(record.key)
+    setEditingColumn(column)
+  }
   const saveCell = () => {
-    setEditingKey('');
-    setEditingColumn('');
-  };
+    setEditingKey('')
+    setEditingColumn('')
+  }
 
   const handleCellChange = (e, key, column) => {
-    const newData = [...data];
-    const index = newData.findIndex((item) => key === item.key);
+    const newData = [...data]
+    const index = newData.findIndex((item) => key === item.key)
     if (index > -1) {
-      newData[index][column] = e.target.value;
-      setData(newData);
+      newData[index][column] = e.target.value
+      setData(newData)
     }
-  };
+  }
 
   const columns = [
     { title: 'STT', dataIndex: 'key', key: 'key', width: '10%' },
@@ -122,14 +149,16 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
       ) : (
         <div onDoubleClick={() => editCell(record, col.dataIndex)}>{text}</div>
       ),
-  }));
+  }))
 
   const handleSave = () => {
-    setInitialFields(editableFields);
-    setInitialData(data);
-    onSave && onSave(editableFields, data);
-    onCancel();
-  };
+    console.log('Editable Fields:', editableFields)
+    console.log('Table Data:', data)
+    setInitialFields(editableFields)
+    setInitialData(data)
+    onSave && onSave(editableFields, data)
+    onCancel()
+  }
 
   return (
     <Modal
@@ -156,7 +185,9 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
             />
             <Card style={{ flex: 1 }}>
               <Meta
-                title={<p className="uppercase text-xl font-bold">{plan.name}</p>}
+                title={
+                  <p className="uppercase text-xl font-bold">{plan?.name}</p>
+                }
                 description={
                   <div className="Diet-title">
                     <p>
@@ -165,7 +196,9 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
                         value={editableFields['dietName']}
                         isEditing={isEditing['dietName']}
                         onDoubleClick={() => handleDoubleClick('dietName')}
-                        onChange={(e) => handleChange('dietName', e.target.value)}
+                        onChange={(e) =>
+                          handleChange('dietName', e.target.value)
+                        }
                         onBlur={() => handleBlur('dietName')}
                         onKeyDown={(e) => handleKeyDown('dietName', e)}
                       />
@@ -178,7 +211,9 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
                         onDoubleClick={() =>
                           handleDoubleClick('applicationTime')
                         }
-                        onChange={(e) => handleChange('applicationTime', e.target.value)}
+                        onChange={(e) =>
+                          handleChange('applicationTime', e.target.value)
+                        }
                         onBlur={() => handleBlur('applicationTime')}
                         onKeyDown={(e) => handleKeyDown('applicationTime', e)}
                       />
@@ -190,7 +225,7 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
           </div>
         )}
         <Select
-          defaultValue={food[0].time}
+          defaultValue={food && food[0]?.time}
           style={{ width: 200, marginBottom: 16 }}
         >
           <Option value="breakfast">Bữa sáng</Option>
@@ -215,7 +250,7 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
         </div>
       </div>
     </Modal>
-  );
-};
+  )
+}
 
-export default DietPlanModal;
+export default DietPlanModal

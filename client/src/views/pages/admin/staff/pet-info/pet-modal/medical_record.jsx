@@ -10,6 +10,7 @@ import {
   Input,
 } from 'antd'
 import service from 'api/service'
+import { formatDateIsoString } from 'helpers/formartdate'
 const { Meta } = Card
 const { Title } = Typography
 
@@ -47,26 +48,31 @@ const MedicalRecordModal = ({ visible, onCancel, selectedPet, onSave }) => {
   useEffect(() => {
     const params = { pet_id: selectedPet.pet_id }
     service.getMedicalRecordsbyPetId(params).then((res) => {
-    //   console.log(res)
       setMedicalRecords(res.data.medicalRecords)
       setPrescriptions(res.data.prescriptions)
 
       if (res.data.medicalRecords) {
         const fields = {
-          date: res.data.medicalRecords.created_at || 'xx/yy/zz',
-          symptoms: res.data.medicalRecords.symptoms || 'default',
-          diagnostic: res.data.medicalRecords.diagnostic || 'default',
-          medicalHistory: res.data.medicalRecords.medicalHistory || 'default',
+          date: formatDateIsoString(res.data.medicalRecords.created_at ) ,
+          symptoms: res.data.medicalRecords.symptoms ,
+          diagnostic: res.data.medicalRecords.diagnostic,
+          medicalHistory: res.data.medicalRecords.medicalHistory || 'không có',
         }
         setEditableFields(fields)
         setInitialFields(fields)
-        const petData = res.data.prescriptions.map((item, index) => ({
+        const petData = res.data.prescriptions.map((item, index ) => ({
           ...item,
-          key: index, // Ensure each item has a unique key
+          key: index + 1,
         }))
         setData(petData)
         setInitialData(petData)
+
       }
+    }).catch(() => {
+      setInitialData({})
+      setData([])
+      setEditableFields({})
+
     })
   }, [selectedPet])
 
@@ -153,6 +159,8 @@ const MedicalRecordModal = ({ visible, onCancel, selectedPet, onSave }) => {
   const handleSave = () => {
     setInitialFields(editableFields)
     setInitialData(data)
+    console.log("Editable Fields:", editableFields)
+    console.log("Data:", data)
     onSave && onSave(editableFields, data)
     onCancel()
   }
