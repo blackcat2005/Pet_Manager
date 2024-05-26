@@ -41,7 +41,7 @@ router.use(verifyToken)
 // Appointment
 router.route('/CreateAppointment').post(createAppointment)
 router.route('/getAllAppointmentbyUserSession').get(getAllAppointmentbyUserSession)
-router.route('/getAllAppointmentbyID').get(verifyStaff, getAppointmentbyID)
+router.route('/getAllAppointmentbyID').get(getAppointmentbyID)
 router.route('/deleteAppointment').delete(deleteAppointment)
 router.route('/updateAppointment').put(updateAppointment)
 router.route('/updateStatus').put(verifyStaff, updateAppointmentStatus)

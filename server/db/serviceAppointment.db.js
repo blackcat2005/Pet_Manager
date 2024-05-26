@@ -67,13 +67,13 @@ const getAllAppointmentbyUserSessiondb = async (user_id, isAdminStaff) => {
   }
 }
 
-const getAppointmentbyIDdb = async (id) => {
+const getAppointmentbyIDdb = async (appointment_id) => {
   const { rows: appointmentById } = await pool.query(
     `SELECT appointments.*, appointment_orders.*
     FROM appointments
     INNER JOIN appointment_orders ON appointments.id = appointment_orders.service_id
     WHERE appointments.id = $1`,
-    [id],
+    [appointment_id],
   )
   if (appointmentById.length === 0) {
     return { message: 'No appointment found with the specified ID' }
@@ -321,10 +321,27 @@ const getMedicalRecordsByAppointmentIdDb = async (appointment_id) => {
       `
     const { rows } = await pool.query(query, [appointment_id])
     // console.log(rows)
-    return rows
+    return rows[0]
   } catch (error) {
     throw new Error(
       'Error in getAllMedicalRecordsByAppointmentIdDb: ' + error.message,
+    )
+  }
+}
+
+const getPrescriptionsByMedicalRecordIdDb = async (medical_recordId) => {
+  try {
+    const query = `
+      SELECT *
+      FROM prescription_item
+      WHERE medical_record_id = $1;
+      `
+    const { rows } = await pool.query(query, [medical_recordId])
+    // console.log(rows)
+    return rows
+  } catch (error) {
+    throw new Error(
+      'Error in getPrescriptionsByMedicalRecordIdDb: ' + error.message,
     )
   }
 }
@@ -337,8 +354,8 @@ const getMedicalRecordsbyPetIdDb = async (pet_id) => {
       WHERE id IN (SELECT medical_record_id FROM pets WHERE pet_id = $1);
       `
     const { rows } = await pool.query(query, [pet_id])
-    console.log(rows)
-    return rows
+    // console.log(rows)
+    return rows[0]
   } catch (error) {
     throw new Error('Error in getMedicalRecordsbyPetIdDb: ' + error.message)
   }
@@ -432,6 +449,7 @@ module.exports = {
   updateAppointmentWithMedicalRecordIddb,
   createPrescriptiondb,
 
+  getPrescriptionsByMedicalRecordIdDb,
   getMedicalRecordsByAppointmentIdDb,
   getMedicalRecordsbyPetIdDb,
   updateMedicalRecordDb,
