@@ -17,15 +17,15 @@ function SidebarButton({ iconSrc, label, active, onClick }) {
   );
 }
 
-export default function PetSider({ activeButton, onButtonClick }) {
+export default function PetSider({ activeButton, onButtonClick, selectedPet }) {
   return (
     <div className="flex flex-col w-3/12 max-md:ml-0 max-md:w-full border-r-2">
       <div className="flex flex-col mt-10 max-md:mt-10">
         <img
           loading="lazy"
-          src="https://cdn.builder.io/api/v1/image/assets/TEMP/cd79723c8231100c01b4694d223e1936d2043bc2b315efd44d4747aef775d7f4?apiKey=f19a917c094b4f6fa8172f34eb76d09c&"
+          src={selectedPet?.avatar || '/avatarpet.jpg'}
           alt="Pet profile"
-          className="ml-6 max-w-full border-white border-solid aspect-[0.99] border-[10px] w-[156px] max-md:ml-2.5"
+          className="ml-6 max-w-full border-white border-solid aspect-[0.99] rounded-full border-[10px] w-[156px] max-md:ml-2.5"
         />
         <div className="flex flex-col mt-8 w-full bg-white shadow-sm">
           <SidebarButton

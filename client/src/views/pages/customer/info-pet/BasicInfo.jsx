@@ -1,26 +1,27 @@
-import React, { useState, useEffect } from 'react';
-import pet from 'api/pet';
-import { useParams } from "react-router-dom";
+import React, { useState, useEffect } from 'react'
+import { Button } from 'antd'
+import pet from 'api/pet'
+import { toast } from 'react-toastify'
+import usePet from 'hooks/usePet'
 
-// Hàm để lấy nhãn dựa trên tên trường
 function getLabel(key) {
   switch (key) {
     case 'fullname':
-      return 'Tên';
+      return 'Tên'
     case 'sex':
-      return 'Giới tính';
+      return 'Giới tính'
     case 'species':
-      return 'Loài';
+      return 'Loài'
     case 'age':
-      return 'Tuổi';
+      return 'Tuổi'
     case 'weight':
-      return 'Cân nặng';
+      return 'Cân nặng'
     case 'health':
-      return 'Tình trạng sức khỏe';
+      return 'Tình trạng sức khỏe'
     case 'describe':
-      return 'Mô tả';
+      return 'Mô tả'
     default:
-      return '';
+      return ''
   }
 }
 
@@ -28,7 +29,7 @@ function FormField({ label, value, name, onChange }) {
   return (
     <div className="flex flex-col pb-6 text-sm leading-5">
       <div className="text-black text-opacity-80">{label}</div>
-      <div className="flex flex-col justify-center mt-2 whitespace-nowrap bg-white rounded-sm border border-solid border-zinc-300 text-black text-opacity-30">
+      <div className="flex flex-col justify-center text-black mt-2 whitespace-nowrap bg-white rounded-sm border border-solid border-zinc-300 text-opacity-80">
         <input
           name={name}
           value={value}
@@ -37,11 +38,11 @@ function FormField({ label, value, name, onChange }) {
         />
       </div>
     </div>
-  );
+  )
 }
 
-export default function BasicInfo() {
-  const { slug } = useParams();
+export default function BasicInfo({selectedPet, setSelectedPet}) {
+  const { customerPets, setCustomerPets } = usePet()
   const [petInfo, setPetInfo] = useState({
     fullname: '',
     sex: '',
@@ -50,35 +51,56 @@ export default function BasicInfo() {
     weight: '',
     health: '',
     describe: '',
-  });
+  })
 
   useEffect(() => {
-    const fetchPetInfo = async () => {
-      try {
-        const res = await pet.getPetInfo(slug);
-        const { fullname, sex, species, age, weight, health, describe } = res.data;
-        setPetInfo({ fullname, sex, species, age, weight, health, describe });
-      } catch (error) {
-        console.error("Error fetching pet info:", error);
-      }
-    };
-    fetchPetInfo();
-  }, [slug]);
+    const { fullname, sex, species, age, weight, health, describe } =
+      selectedPet
+    setPetInfo({ fullname, sex, species, age, weight, health, describe })
+  }, [selectedPet])
 
   const handleChange = (event) => {
-    const { name, value } = event.target;
-    if (["fullname", "sex", "species", "age", "weight", "health", "describe"].includes(name)) {
-      setPetInfo(prevState => ({
+    const { name, value } = event.target
+    if (
+      [
+        'fullname',
+        'sex',
+        'species',
+        'age',
+        'weight',
+        'health',
+        'describe',
+      ].includes(name)
+    ) {
+      setPetInfo((prevState) => ({
         ...prevState,
         [name]: value,
-      }));
+      }))
     }
-  };
+  }
 
   const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log(petInfo); // Ghi log dữ liệu petInfo sau khi submit
-  };
+    event.preventDefault()
+    setPetInfo(petInfo)
+    const updateData = { ...selectedPet, ...petInfo }
+    pet
+      .updatePetInfo(selectedPet.pet_id, updateData)
+      .then((res) => {
+        toast.success('Cập nhật thành công')
+        const updatedPets = customerPets.map((pet) =>
+          pet.pet_id === selectedPet.pet_id
+            ? { ...pet, ...updateData }
+            : pet,
+        )
+        setSelectedPet(updateData)
+        setCustomerPets(updatedPets)
+      })
+      .catch((error) => {
+        console.log(error)
+        toast.error(error.message)
+      })
+    console.log(updateData)
+  }
 
   return (
     <div className="flex flex-col max-md:mt-10 max-md:max-w-full">
@@ -90,45 +112,44 @@ export default function BasicInfo() {
           <div className="flex gap-5 max-md:flex-col max-md:gap-0">
             <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
               <div className="flex flex-col grow self-stretch text-sm leading-5 max-md:mt-10">
-                {Object.entries(petInfo).slice(0, 4).map(([key, value]) => (
-                  <FormField
-                    key={key}
-                    label={getLabel(key)} // Lấy nhãn từ hàm getLabel
-                    value={value}
-                    name={key}
-                    onChange={handleChange}
-                  />
-                ))}
+                {Object.entries(petInfo)
+                  .slice(0, 4)
+                  .map(([key, value]) => (
+                    <FormField
+                      key={key}
+                      label={getLabel(key)} // Lấy nhãn từ hàm getLabel
+                      value={value}
+                      name={key}
+                      onChange={handleChange}
+                    />
+                  ))}
               </div>
             </div>
             <div className="flex flex-col ml-5 w-6/12 max-md:ml-0 max-md:w-full">
               <div className="flex flex-col self-stretch max-md:mt-10">
-                {Object.entries(petInfo).slice(4).map(([key, value]) => (
-                  <FormField
-                    key={key}
-                    label={getLabel(key)} // Lấy nhãn từ hàm getLabel
-                    value={value}
-                    name={key}
-                    onChange={handleChange}
-                  />
-                ))}
-                <button type="submit" className="flex gap-2 justify-center self-start px-4 py-1 bg-sky-500 rounded-sm border border-sky-500 border-solid shadow-sm">
-                  <div className="flex justify-center items-center my-auto w-3.5 h-3.5 bg-white bg-opacity-0">
-                    <img
-                      src="https://cdn.builder.io/api/v1/image/assets/TEMP/f62e3da3d899ab0910ed104ad5b97380a4ef9c1816746d613b35722e4ba666d2?apiKey=f19a917c094b4f6fa8172f34eb76d09c&"
-                      alt=""
-                      className="w-3.5 aspect-square"
+                {Object.entries(petInfo)
+                  .slice(4)
+                  .map(([key, value]) => (
+                    <FormField
+                      key={key}
+                      label={getLabel(key)} // Lấy nhãn từ hàm getLabel
+                      value={value}
+                      name={key}
+                      onChange={handleChange}
                     />
-                  </div>
-                  <span className="text-sm leading-5 text-center text-white">Lưu thay đổi</span>
-                </button>
+                  ))}
+                <Button
+                  htmlType="submit"
+                  style={{ maxWidth: '200px' }}
+                  type="primary"
+                >
+                  Lưu thay đổi
+                </Button>
               </div>
             </div>
           </div>
         </form>
       </div>
     </div>
-  );
+  )
 }
-
-

@@ -19,7 +19,6 @@ export const RoleProtectedRoute = ({
 }) => {
   const { authData, userData } = useAuth()
   const { state } = useLocation()
-  // console.log(userData);
 
   const location = useLocation()
 

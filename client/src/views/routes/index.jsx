@@ -100,7 +100,7 @@ function AllRoutes() {
             path="/pet/basic-info/:slug"
             element={<MainLayout component={PetInfo} />}
           />
-
+          
           <Route
             path="/service-register"
             element={<MainLayout component={ServiceRegisterPet} />}
@@ -124,6 +124,7 @@ function AllRoutes() {
             path="/staff/customer-manage"
             element={<MainLayout component={ManageCustomer} />}
           />
+          
         </Route>
 
         <Route element={<RoleProtectedRoute roles={['admin']} />}>
@@ -154,10 +155,8 @@ function AllRoutes() {
         </Route>
 
         <Route element={<RoleProtectedRoute roles={['staff', 'admin']} />}>
-          <Route
-            path="/personal-info"
-            element={<MainLayout component={PersonalInfo} />}
-          />
+          
+          
         </Route>
 
         <Route
@@ -165,6 +164,10 @@ function AllRoutes() {
             <RoleProtectedRoute roles={['staff', 'customer', 'admin']} />
           }
         >
+          <Route
+            path="/personal-info"
+            element={<MainLayout component={PersonalInfo} />}
+          />
           <Route
             path="/cleaning-info"
             element={<MainLayout component={CleaningInfo} />}

@@ -8,7 +8,34 @@ const pet = {
     const url = `/pets/${pet_id}`
     return API.get(url, params)
   },
-  
+  getAllPet: () => {
+    const url = '/pets/all-pet'
+    return API.get(url)
+  },
+  getDietPlan: (pet_id) => {
+    const url = `/pets/${pet_id}/plan`
+    return API.get(url)
+  },
+  getDietFood: (pet_id) => {
+    const url = `/pets/${pet_id}/plan/food-item`
+    return API.get(url)
+  },
+  updatePetInfo: (pet_id, body) => {
+    const url = `/pets/${pet_id}`
+    return API.put(url, body)
+  },
+  createPet: (user_id, body) => {
+    const url = `/pets/${user_id}/add-pet`
+    return API.post(url, body)
+  },
+  createPetByStaff: (body) => {
+    const url = '/pets/add-pet'
+    return API.post(url, body)
+  },
+  deletePet: (pet_id) => {
+    const url = `/pets/${pet_id}`
+    return API.delete(url)
+  },
 }
 
 export default pet
