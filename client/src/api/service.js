@@ -1,9 +1,9 @@
 import API from './axios.config'
 
 const service = {
-  getMedicalRecordsbyPetId: (pet_id) => {
+  getMedicalRecordsbyPetId: (params) => {
     const url = '/services/getMedicalRecordsbyPetId'
-    return API.get(url, pet_id)
+    return API.get(url, { params })
   },
  
 }
