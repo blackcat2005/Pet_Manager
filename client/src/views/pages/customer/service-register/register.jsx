@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { DatePicker } from 'antd';
 import {
     Button,
@@ -10,20 +10,91 @@ import {
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
+const convertDate = (dateString) => {
+    console.log(dateString);
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    // const formattedDate = `${day}/${month}/${year}`;
+    const formattedDate = `${year}/${month}/${day}`;
+    return formattedDate;
+}
+
 
 export const Register = (props) => {
     const { form, stepCurrent, setStepCurrent, formItemLayout,
-        serviceCurrent, setServiceCurrent, dataRegister, setDataRegister } = props;
+        serviceCurrent, setServiceCurrent, dataRegister, setDataRegister,
+        customerPets, serviceAppointment, serviceBeauty, serviceStorage } = props;
+
+    const [price, setPrice] = useState(0);
+    const [valueTimeType, setValueTimeType] = useState('');
 
     const onFinishRegister = (values) => {
+        let formData = {};
+        if (serviceCurrent === 'service_02') {
+            let date_start = convertDate(values.date[0].$d);
+            let date_end = convertDate(values.date[1].$d);
+            formData = {
+                ...values,
+                valueTimeType,
+                status: "created",
+                date_start,
+                date_end,
+                total: price
+            };
+        } else {
+            let date = convertDate(values.date.$d);
+            formData = {
+                ...values,
+                valueTimeType,
+                status: "created",
+                date,
+                total: price
+            };
+        }
+
         setStepCurrent(stepCurrent + 1);
-        setDataRegister(values)
+        setDataRegister(formData)
         form.resetFields();
     };
 
     const handleSelect = (value) => {
+        setPrice(0);
         setServiceCurrent(value);
     }
+
+    const formatCurrencyVND = (value) => {
+        return new Intl.NumberFormat('vi-VN', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(value) + ' VNĐ';
+    };
+
+
+    const handlePrice = (value, object) => {
+        setValueTimeType(object.children);
+        let serviceSelected = [];
+
+        switch (serviceCurrent) {
+            case 'service_01':
+                serviceSelected = serviceAppointment;
+                break;
+            case 'service_02':
+                serviceSelected = serviceStorage;
+                break;
+            case 'service_03':
+                serviceSelected = serviceBeauty;
+                break;
+            default:
+                serviceSelected = [];
+        }
+        const selected = serviceSelected.find(item => item.id === value);
+        if (selected) {
+            setPrice(selected.price);
+        }
+    };
+
     return (
         <div className="service-register__content__form-register">
             <Form
@@ -33,6 +104,9 @@ export const Register = (props) => {
                 onFinish={onFinishRegister}
                 style={{ maxWidth: 700, margin: '0 auto' }}
                 scrollToFirstError
+                initialValues={{
+                    service: 'service_01',
+                }}
             >
                 <Form.Item
                     name="service"
@@ -41,20 +115,28 @@ export const Register = (props) => {
                 >
                     <Select placeholder="Lựa chọn dịch vụ"
                         onChange={(e) => handleSelect(e)}
+                        defaultValue={'service_01'}
                     >
                         <Option value="service_01">Dịch vụ khám chữa bệnh</Option>
                         <Option value="service_02">Dịch vụ lưu trữ</Option>
                         <Option value="service_03">Dịch vụ vệ sinh</Option>
                     </Select>
                 </Form.Item>
+
                 <Form.Item
-                    name="name_pet"
+                    name="pet_id"
                     label="Tên thú cưng"
                     rules={[{ required: true, message: 'Please select name pet!' }]}
                 >
                     <Select placeholder="Lựa chọn tên thú cưng">
-                        <Option value="name-01">Pet 1</Option>
-                        <Option value="name-02">Pet 2</Option>
+                        {
+                            customerPets && customerPets.length > 0 &&
+                            customerPets.map((item, index) => {
+                                return (
+                                    <Option key={index} value={item.pet_id}>{item.fullname}</Option>
+                                )
+                            })
+                        }
                     </Select>
                 </Form.Item>
 
@@ -91,7 +173,7 @@ export const Register = (props) => {
                     serviceCurrent !== 'service_02' ? null :
                         <Form.Item
                             label="Chọn loại phòng"
-                            name="room"
+                            name="room_id"
                             rules={[
                                 {
                                     required: true,
@@ -99,10 +181,27 @@ export const Register = (props) => {
                                 },
                             ]}
                         >
-                            <Input />
+                            <Select
+                                placeholder="Lựa chọn loại phòng"
+                                style={{ width: 200 }}
+                                onChange={handlePrice}
+                            >
+                                {
+                                    serviceStorage && serviceStorage.length > 0 &&
+                                    serviceStorage.map((item, index) => {
+                                        return (
+                                            <Option
+                                                key={index}
+                                                value={item.id}
+                                                disabled={(item.max_slot - item.current_slot) <= 0}>
+                                                {item.type}
+                                            </Option>
+                                        )
+                                    })
+                                }
+                            </Select>
                         </Form.Item>
                 }
-
 
                 <Form.Item
                     name="date"
@@ -121,35 +220,40 @@ export const Register = (props) => {
                 {
                     serviceCurrent === 'service_02' ? null :
                         <Form.Item
-                            name="shifts"
+                            name="time_slot"
                             label="Ca thực hiện"
-                            // tooltip="What do you want others to call you?"
                             rules={[{ required: true, message: 'Please input!' }]}
                         >
-                            <Select placeholder="Lựa chọn ca">
-                                <Option value="shifts-01">Ca 1</Option>
-                                <Option value="shifts-02">Ca 2</Option>
+                            <Select
+                                placeholder="Lựa chọn ca"
+                                style={{ width: 150 }}
+                                onChange={handlePrice}
+                            >
+                                {
+                                    serviceCurrent === 'service_01' &&
+                                    serviceAppointment && serviceAppointment.length > 0 &&
+                                    serviceAppointment.map((item, index) => {
+                                        return (
+                                            <Option key={index} value={item.id}>{item.time}</Option>
+                                        )
+                                    })
+                                }
+                                ||
+                                {
+                                    serviceCurrent === 'service_03' &&
+                                    serviceBeauty && serviceBeauty.length > 0 &&
+                                    serviceBeauty.map((item, index) => {
+                                        return (
+                                            <Option key={index} value={item.id}>{item.time}</Option>
+                                        )
+                                    })
+                                }
                             </Select>
                         </Form.Item>
                 }
 
-                {
-                    serviceCurrent !== 'service_01' ? null :
-                        <Form.Item
-                            name="checkbox"
-                            valuePropName="checked"
-                            wrapperCol={{
-                                offset: 6,
-                                span: 16,
-                            }}
-                        >
-                            <Checkbox >Đã phẫu thuật triệt sản</Checkbox>
-                        </Form.Item>
-                }
-
-
                 <Form.Item
-                    name="description"
+                    name="note"
                     label={serviceCurrent === 'service_01' ? "Mô tả triệu chứng" : "Lời nhắn"}
                     rules={[{ required: false, message: 'Please input description' }]}
                 >
@@ -157,10 +261,10 @@ export const Register = (props) => {
                 </Form.Item>
 
                 <Form.Item
-                    // name="total"
+                    name="total"
                     label="Thành tiền"
                 >
-                    400.000đ
+                    {formatCurrencyVND(price)}
                 </Form.Item>
 
                 <Form.Item
@@ -170,7 +274,7 @@ export const Register = (props) => {
                     }}
                 >
                     <Button type="primary" htmlType="submit">
-                        Submit
+                        Đăng ký
                     </Button>
                 </Form.Item>
             </Form>

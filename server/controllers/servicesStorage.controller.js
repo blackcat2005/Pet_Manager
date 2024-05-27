@@ -5,8 +5,9 @@ const roomService = require('../services/room.service')
 
 const createStorageService = async (req, res) => {
   try {
-    const { room_id, date_start, date_end, note, pet_id, total, user_id } =
-      req.body
+    const { room_id, date_start, date_end, note, pet_id, total } = req.body
+    const { user_id } = req.user
+
     const user = await userService.getUserById(user_id)
 
     if (!user) {
@@ -58,6 +59,7 @@ const createStorageService = async (req, res) => {
       return res.status(401).json({ message: 'Unauthorized' })
     }
   } catch (error) {
+    console.log("error>>>", error);
     return res.status(500).json({ message: error.message })
   }
 }

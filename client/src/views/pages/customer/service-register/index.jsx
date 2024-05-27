@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Steps } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Steps, Space, Typography } from 'antd';
 import './index.scss';
 import {
     Form,
@@ -7,37 +7,43 @@ import {
 import { Payment } from './payment';
 import { Register } from './register';
 import { Ticket } from './ticket';
+import usePet from 'hooks/usePet';
+import useService from 'hooks/useService';
+
+const formItemLayout = {
+    labelCol: {
+        xs: {
+            span: 24,
+        },
+        sm: {
+            span: 6,
+        },
+    },
+    wrapperCol: {
+        xs: {
+            span: 24,
+        },
+        sm: {
+            span: 14,
+        },
+    },
+}
 
 const ServiceRegisterPet = () => {
     const [formRegister, formPayment] = Form.useForm();
-
+    const { allPets, setAllPets, customerPets, setCustomerPets } = usePet()
+    const { serviceAppointment, serviceBeauty, serviceStorage, } = useService()
     const [stepCurrent, setStepCurrent] = useState(0);
     const [serviceCurrent, setServiceCurrent] = useState('service_01');
-
     const [dataRegister, setDataRegister] = useState({});
-
-    const formItemLayout = {
-        labelCol: {
-            xs: {
-                span: 24,
-            },
-            sm: {
-                span: 6,
-            },
-        },
-        wrapperCol: {
-            xs: {
-                span: 24,
-            },
-            sm: {
-                span: 14,
-            },
-        },
-    }
+    const [idOrder, setIdOrder] = useState('');
 
     return (
         <div className="service-register__container">
-            <h1>Service Register</h1>
+            <Space style={{ width: '100%', justifyContent: 'center' }}>
+                <Typography.Title level={1}>Đăng ký dịch vụ</Typography.Title>
+                <br /><br />
+            </Space>
 
             <div className="service-register__content">
                 <div className="service-register__content__step">
@@ -68,6 +74,10 @@ const ServiceRegisterPet = () => {
                             setServiceCurrent={setServiceCurrent}
                             dataRegister={dataRegister}
                             setDataRegister={setDataRegister}
+                            customerPets={customerPets}
+                            serviceAppointment={serviceAppointment}
+                            serviceBeauty={serviceBeauty}
+                            serviceStorage={serviceStorage}
                         />
                     )
                     ||
@@ -78,6 +88,10 @@ const ServiceRegisterPet = () => {
                             stepCurrent={stepCurrent}
                             setStepCurrent={setStepCurrent}
                             formItemLayout={formItemLayout}
+                            dataRegister={dataRegister}
+                            serviceCurrent={serviceCurrent}
+                            idOrder={idOrder}
+                            setIdOrder={setIdOrder}
                         />
                     )
                     ||
@@ -91,6 +105,7 @@ const ServiceRegisterPet = () => {
                             setServiceCurrent={setServiceCurrent}
                             dataRegister={dataRegister}
                             setDataRegister={setDataRegister}
+                            idOrder={idOrder}
                         />
                     )
                 }
