@@ -4,9 +4,9 @@ const user = {
     const url = '/users/profile'
     return API.get(url)
   },
-  updateUserInfo: (user_id, params) => {
+  updateUserInfo: (user_id, body) => {
     const url = `/users/${user_id}`
-    return API.put(url, params)
+    return API.put(url, body)
   },
   logout: () => {
     localStorage.clear();

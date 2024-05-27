@@ -11,7 +11,9 @@ import {
   Select,
 } from 'antd'
 import pet from 'api/pet'
-import { formatDateIsoString } from 'helpers/formartdate'
+import diet from 'api/diet'
+import { formatDateIsoString, formatDateToYYYYMMDD } from 'helpers/formartdate'
+import { toast } from 'react-toastify'
 const { Meta } = Card
 const { Option } = Select
 
@@ -53,7 +55,7 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
 
   useEffect(() => {
     if (selectedPet && selectedPet.pet_id) {
-      pet
+      diet
         .getDietFood(selectedPet.pet_id)
         .then((res) => {
           if (res.data && res.data.length > 0) {
@@ -64,6 +66,8 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
             }))
             setData(petData)
             setInitialData(petData)
+          } else {
+            setData([])
           }
         })
         .catch(() => {
@@ -74,13 +78,16 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
           setInitialData({})
         })
 
-      pet
+      diet
         .getDietPlan(selectedPet.pet_id)
         .then((res) => {
           if (res.data && res.data.length > 0) {
             setPlan(res.data[0])
             const fields = {
-              dietName: res.data[0]?.description,
+              dietName: res.data[0]?.name,
+              dietDescription: res.data[0]?.description,
+              date_start: `${formatDateIsoString(res.data[0]?.date_start)}`,
+              date_end: `${formatDateIsoString(res.data[0]?.date_end)}`,
               applicationTime: `${formatDateIsoString(res.data[0]?.date_start)} - ${formatDateIsoString(res.data[0]?.date_end)}`,
             }
             setEditableFields(fields)
@@ -133,8 +140,8 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
     { title: 'STT', dataIndex: 'key', key: 'key', width: '10%' },
     { title: 'Tên thực phẩm', dataIndex: 'name', key: 'name', width: '20%' },
     { title: 'Mô tả', dataIndex: 'description', key: 'description' },
-    { title: 'Đơn vị tính', dataIndex: 'unit', key: 'unit', width: '15%' },
     { title: 'Số lượng', dataIndex: 'amount', key: 'amount', width: '15%' },
+    { title: 'Đơn vị tính', dataIndex: 'unit', key: 'unit', width: '15%' },
   ].map((col) => ({
     ...col,
     render: (text, record) =>
@@ -152,12 +159,39 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
   }))
 
   const handleSave = () => {
-    console.log('Editable Fields:', editableFields)
-    console.log('Table Data:', data)
+    const dietPlanNe = {
+      name: editableFields.dietName,
+      description: editableFields.dietDescription,
+      date_start: formatDateToYYYYMMDD(editableFields.date_start),
+      date_end: formatDateToYYYYMMDD(editableFields.date_end),
+    }
+
+    diet.updateDietPlan(selectedPet.pet_id, dietPlanNe).then((res) => {
+      console.log(res)
+      toast.success('cập nhật plan thành công')
+    })
+    // console.log('Editable Fields:', dietPlanNe)
+    // console.log('Table Data:', data)
+    data.map((row) => {
+      const foodNe = {
+        name: row.name,
+        amount: row.amount,
+        unit: row.unit,
+        description: row.description,
+        time: row.time,
+      }
+      diet
+        .updateDietFood(selectedPet.pet_id, row.food_id, foodNe)
+        .then((res) => {
+          console.log(res)
+          toast.success('cập nhật food thành công')
+        })
+    })
+
     setInitialFields(editableFields)
     setInitialData(data)
     onSave && onSave(editableFields, data)
-    onCancel()
+    // onCancel()
   }
 
   return (
@@ -186,36 +220,58 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
             <Card style={{ flex: 1 }}>
               <Meta
                 title={
-                  <p className="uppercase text-xl font-bold">{plan?.name}</p>
+                  <p className="uppercase text-xl font-bold">
+                    <EditableField
+                      value={editableFields['dietName']}
+                      isEditing={isEditing['dietName']}
+                      onDoubleClick={() => handleDoubleClick('dietName')}
+                      onChange={(e) => handleChange('dietName', e.target.value)}
+                      onBlur={() => handleBlur('dietName')}
+                      onKeyDown={(e) => handleKeyDown('dietName', e)}
+                    />
+                  </p>
                 }
                 description={
                   <div className="Diet-title">
                     <p>
                       <strong className="w-[250px] ">Chế độ ăn:</strong>
                       <EditableField
-                        value={editableFields['dietName']}
-                        isEditing={isEditing['dietName']}
-                        onDoubleClick={() => handleDoubleClick('dietName')}
-                        onChange={(e) =>
-                          handleChange('dietName', e.target.value)
+                        value={editableFields['dietDescription']}
+                        isEditing={isEditing['dietDescription']}
+                        onDoubleClick={() =>
+                          handleDoubleClick('dietDescription')
                         }
-                        onBlur={() => handleBlur('dietName')}
-                        onKeyDown={(e) => handleKeyDown('dietName', e)}
+                        onChange={(e) =>
+                          handleChange('dietDescription', e.target.value)
+                        }
+                        onBlur={() => handleBlur('dietDescription')}
+                        onKeyDown={(e) => handleKeyDown('dietDescription', e)}
                       />
                     </p>
-                    <p>
-                      <strong className="w-[250px]">Thời gian áp dụng:</strong>
+                    <p className="">
+                      <strong className="w-[250px] flex flex-row gap-3">
+                        Thời gian áp dụng:
+                      </strong>
                       <EditableField
-                        value={editableFields.applicationTime}
-                        isEditing={isEditing['applicationTime']}
-                        onDoubleClick={() =>
-                          handleDoubleClick('applicationTime')
-                        }
+                        value={editableFields.date_start}
+                        isEditing={isEditing['date_start']}
+                        onDoubleClick={() => handleDoubleClick('date_start')}
                         onChange={(e) =>
-                          handleChange('applicationTime', e.target.value)
+                          handleChange('date_start', e.target.value)
                         }
-                        onBlur={() => handleBlur('applicationTime')}
-                        onKeyDown={(e) => handleKeyDown('applicationTime', e)}
+                        onBlur={() => handleBlur('date_start')}
+                        onKeyDown={(e) => handleKeyDown('date_start', e)}
+                      />
+                      <span>-</span>
+                      <EditableField
+                        value={editableFields.date_end}
+                        isEditing={isEditing['date_end']}
+                        onDoubleClick={() => handleDoubleClick('date_end')}
+                        onChange={(e) =>
+                          handleChange('date_end', e.target.value)
+                        }
+                        onBlur={() => handleBlur('date_end')}
+                        onKeyDown={(e) => handleKeyDown('date_end', e)}
                       />
                     </p>
                   </div>

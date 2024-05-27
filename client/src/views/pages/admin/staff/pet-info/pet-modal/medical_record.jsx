@@ -11,6 +11,7 @@ import {
 } from 'antd'
 import service from 'api/service'
 import { formatDateIsoString } from 'helpers/formartdate'
+import { toast } from 'react-toastify'
 const { Meta } = Card
 const { Title } = Typography
 
@@ -47,33 +48,37 @@ const MedicalRecordModal = ({ visible, onCancel, selectedPet, onSave }) => {
 
   useEffect(() => {
     const params = { pet_id: selectedPet.pet_id }
-    service.getMedicalRecordsbyPetId(params).then((res) => {
-      setMedicalRecords(res.data.medicalRecords)
-      setPrescriptions(res.data.prescriptions)
+    service
+      .getMedicalRecordsbyPetId(params)
+      .then((res) => {
+        setMedicalRecords(res.data.medicalRecords)
+        setPrescriptions(res.data.prescriptions)
 
-      if (res.data.medicalRecords) {
-        const fields = {
-          date: formatDateIsoString(res.data.medicalRecords.created_at ) ,
-          symptoms: res.data.medicalRecords.symptoms ,
-          diagnostic: res.data.medicalRecords.diagnostic,
-          medicalHistory: res.data.medicalRecords.medicalHistory || 'không có',
+        if (res.data.medicalRecords) {
+          const fields = {
+            date: formatDateIsoString(res.data.medicalRecords.created_at),
+            symptoms: res.data.medicalRecords.symptoms,
+            neutered: res.data.medicalRecords.neutered,
+            diagnostic: res.data.medicalRecords.diagnostic,
+            medicalHistory:
+              res.data.medicalRecords.medicalHistory || 'không có',
+            id: res.data.medicalRecords.id,
+          }
+          setEditableFields(fields)
+          setInitialFields(fields)
+          const petData = res.data.prescriptions.map((item, index) => ({
+            ...item,
+            key: index + 1,
+          }))
+          setData(petData)
+          setInitialData(petData)
         }
-        setEditableFields(fields)
-        setInitialFields(fields)
-        const petData = res.data.prescriptions.map((item, index ) => ({
-          ...item,
-          key: index + 1,
-        }))
-        setData(petData)
-        setInitialData(petData)
-
-      }
-    }).catch(() => {
-      setInitialData({})
-      setData([])
-      setEditableFields({})
-
-    })
+      })
+      .catch(() => {
+        setInitialData({})
+        setData([])
+        setEditableFields({})
+      })
   }, [selectedPet])
 
   const handleDoubleClick = (field) => setIsEditing({ [field]: true })
@@ -159,10 +164,23 @@ const MedicalRecordModal = ({ visible, onCancel, selectedPet, onSave }) => {
   const handleSave = () => {
     setInitialFields(editableFields)
     setInitialData(data)
-    console.log("Editable Fields:", editableFields)
-    console.log("Data:", data)
+    // console.log("Editable Fields:", editableFields)
+    // console.log("Data:", data)
+    const medicalDataNe = {
+      medical_record_id: editableFields.id,
+      neutered: editableFields.neutered,
+      symptoms: editableFields.symptoms,
+      diagnostic: editableFields.diagnostic,
+      prescriptions: data,
+    }
+    service.updateMedicalRecordsbyPetId(medicalDataNe).then((res) => {
+      console.log(res), toast.success('Cập nhật thành công')
+    })
+
+    // console.log('datane', medicalDataNe)
+
     onSave && onSave(editableFields, data)
-    onCancel()
+    // onCancel()
   }
 
   return (
