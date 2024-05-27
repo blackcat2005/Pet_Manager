@@ -258,6 +258,15 @@ const updateStorageServiceStatus = async (req, res) => {
   }
 }
 
+const getAllRoom = async (req, res) => {
+  try {
+    const rooms = await roomService.allRoom()
+    return res.status(200).json({ status: 'success', rooms })
+  } catch (error) {
+    return res.status(500).json({ status: 'error', message: error.message })
+  }
+}
+
 module.exports = {
   createStorageService,
   getAllStorageService,
@@ -266,4 +275,5 @@ module.exports = {
   deleteStorageService,
   updateStorageService,
   updateStorageServiceStatus,
+  getAllRoom,
 }
