@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { UserProvider } from 'context/UserContext'
 import { PetProvider } from 'context/PetContext'
 import { ToastContainer } from 'react-toastify'
+import { ServiceProvider } from 'context/ServiceContext'
 import { GlobalHistory } from 'components/globalhistory'
 import 'react-toastify/dist/ReactToastify.css'
 const App = () => {
@@ -20,12 +21,14 @@ const App = () => {
   return (
     <>
       <UserProvider>
-        <PetProvider>
-          <BrowserRouter>
-            <GlobalHistory />
-            <AllRoutes />
-          </BrowserRouter>
-        </PetProvider>
+        <ServiceProvider>
+          <PetProvider>
+            <BrowserRouter>
+              <GlobalHistory />
+              <AllRoutes />
+            </BrowserRouter>
+          </PetProvider>
+        </ServiceProvider>
       </UserProvider>
 
       <ToastContainer

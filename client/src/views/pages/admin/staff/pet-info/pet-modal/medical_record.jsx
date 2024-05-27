@@ -10,6 +10,7 @@ import {
   Input,
 } from 'antd'
 import service from 'api/service'
+import { PlusOutlined } from '@ant-design/icons'
 import { formatDateIsoString } from 'helpers/formartdate'
 import { toast } from 'react-toastify'
 const { Meta } = Card
@@ -45,8 +46,10 @@ const MedicalRecordModal = ({ visible, onCancel, selectedPet, onSave }) => {
   const [editingColumn, setEditingColumn] = useState('')
   const [medicalRecords, setMedicalRecords] = useState([])
   const [prescriptions, setPrescriptions] = useState([])
+  const [error, setError] = useState(false)
 
   useEffect(() => {
+    setError(false)
     const params = { pet_id: selectedPet.pet_id }
     service
       .getMedicalRecordsbyPetId(params)
@@ -75,11 +78,41 @@ const MedicalRecordModal = ({ visible, onCancel, selectedPet, onSave }) => {
         }
       })
       .catch(() => {
+        setError(true)
         setInitialData({})
         setData([])
         setEditableFields({})
       })
   }, [selectedPet])
+
+  if (error) {
+    return (
+      <Modal
+        style={{ top: 0 }}
+        title={
+          <span style={{ fontSize: '24px', fontWeight: 'bold' }}>
+            HỒ SƠ BỆNH ÁN
+          </span>
+        }
+        visible={visible}
+        onCancel={onCancel}
+        footer={null}
+        width={1000}
+      >
+        <Divider />
+        <div className="flex flex-col justify-between min-h-[60vh]">
+          <div>
+            <Button icon={<PlusOutlined />} type="primary">
+              Thêm hồ sơ{' '}
+            </Button>
+          </div>
+          <div className="flex justify-center items-center flex-1 text-red-500 text-xl w-full">
+            Thú cưng hiện không có hồ sơ bệnh án
+          </div>
+        </div>
+      </Modal>
+    )
+  }
 
   const handleDoubleClick = (field) => setIsEditing({ [field]: true })
   const handleChange = (field, value) =>
@@ -164,8 +197,6 @@ const MedicalRecordModal = ({ visible, onCancel, selectedPet, onSave }) => {
   const handleSave = () => {
     setInitialFields(editableFields)
     setInitialData(data)
-    // console.log("Editable Fields:", editableFields)
-    // console.log("Data:", data)
     const medicalDataNe = {
       medical_record_id: editableFields.id,
       neutered: editableFields.neutered,
@@ -176,11 +207,7 @@ const MedicalRecordModal = ({ visible, onCancel, selectedPet, onSave }) => {
     service.updateMedicalRecordsbyPetId(medicalDataNe).then((res) => {
       console.log(res), toast.success('Cập nhật thành công')
     })
-
-    // console.log('datane', medicalDataNe)
-
     onSave && onSave(editableFields, data)
-    // onCancel()
   }
 
   return (

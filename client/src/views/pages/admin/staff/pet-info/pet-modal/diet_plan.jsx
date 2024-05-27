@@ -10,6 +10,8 @@ import {
   Input,
   Select,
 } from 'antd'
+import { PlusOutlined } from '@ant-design/icons'
+
 import pet from 'api/pet'
 import diet from 'api/diet'
 import { formatDateIsoString, formatDateToYYYYMMDD } from 'helpers/formartdate'
@@ -52,14 +54,17 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
   const [editingColumn, setEditingColumn] = useState('')
   const [plan, setPlan] = useState({})
   const [food, setFood] = useState([])
+  const [error, setError] = useState(false)
+
 
   useEffect(() => {
+    setError(false)
     if (selectedPet && selectedPet.pet_id) {
       diet
         .getDietFood(selectedPet.pet_id)
         .then((res) => {
+          setFood(res.data)
           if (res.data && res.data.length > 0) {
-            setFood(res.data)
             const petData = res.data.map((item, index) => ({
               ...item,
               key: index + 1,
@@ -93,6 +98,7 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
             setEditableFields(fields)
             setInitialFields(fields)
           } else {
+            setError(true)
             setPlan({})
             const fields = {
               dietName: 'không có dữ liệu',
@@ -103,12 +109,44 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
           }
         })
         .catch(() => {
+          setError(true)
           setInitialFields({})
           setEditableFields({})
           setInitialData({})
         })
     }
   }, [selectedPet])
+
+  
+  if (error) {
+    return (
+      <Modal
+        style={{ top: 0 }}
+        title={
+          <span style={{ fontSize: '24px', fontWeight: 'bold' }}>
+            HỒ SƠ BỆNH ÁN
+          </span>
+        }
+        visible={visible}
+        onCancel={onCancel}
+        footer={null}
+        width={1000}
+      >
+        <Divider />
+        <div className="flex flex-col justify-between min-h-[60vh]">
+          <div>
+            <Button icon={<PlusOutlined />} type="primary">
+              Thêm kế hoạch ăn uống{' '}
+            </Button>
+          </div>
+          <div className="flex justify-center items-center flex-1 text-red-500 text-xl w-full">
+            Thú cưng hiện không có chế độ ăn nào
+          </div>
+        </div>
+      </Modal>
+    )
+  }
+
 
   const handleDoubleClick = (field) => setIsEditing({ [field]: true })
   const handleChange = (field, value) =>
@@ -168,7 +206,7 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
 
     diet.updateDietPlan(selectedPet.pet_id, dietPlanNe).then((res) => {
       console.log(res)
-      toast.success('cập nhật plan thành công')
+      toast.success('cập nhật thành công')
     })
     // console.log('Editable Fields:', dietPlanNe)
     // console.log('Table Data:', data)
@@ -184,7 +222,6 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
         .updateDietFood(selectedPet.pet_id, row.food_id, foodNe)
         .then((res) => {
           console.log(res)
-          toast.success('cập nhật food thành công')
         })
     })
 

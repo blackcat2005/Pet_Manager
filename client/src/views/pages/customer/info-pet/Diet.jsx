@@ -1,38 +1,106 @@
-import * as React from "react";
-import 'tailwindcss/tailwind.css';
+import * as React from 'react'
+import 'tailwindcss/tailwind.css'
+import { useEffect, useState } from 'react'
+import { Spin } from 'antd'
+import diet from 'api/diet'
+import { formatDateIsoString } from 'helpers/formartdate'
+import { LoadingOutlined } from '@ant-design/icons'
+import { useParams } from 'react-router-dom'
 
-function DietPlan() {
+const formatTime = (data) => {
+  switch (data) {
+    case 'breakfast':
+      return "Bữa sáng"
+    case 'lunch':
+      return "Bữa trưa"
+    case 'dinner':
+      return "Bữa tối"
+    default:
+      break;
+  }
+}
+
+function DietPlan({ selectedPet }) {
+  const [plan, setPlan] = useState({})
+  const [food, setFood] = useState({})
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+  const { slug } = useParams()
+
+
+  useEffect(() => {
+    const fetchDietData = async () => {
+      try {
+        const [foodRes, planRes] = await Promise.all([
+          diet.getDietFood(slug),
+          diet.getDietPlan(slug)
+        ]);
+
+        if (foodRes.data && foodRes.data.length > 0) {
+          setFood(foodRes.data[0])
+        }
+        if (planRes.data && planRes.data.length > 0) {
+          setPlan(planRes.data[0])
+        }
+
+        if (!(foodRes.data && foodRes.data.length > 0) && !(planRes.data && planRes.data.length > 0)) {
+          setError(true);
+        }
+      } catch (error) {
+        setError(true);
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchDietData();
+  }, [slug])
+
+  // console.log(plan, food)
+
   const dietPlan = {
-    name: "Chế độ ăn",
-    type: "Giảm cân",
-    duration: "12/01/2024 - 12/03/2024",
+    name: plan.name,
+    description: plan.description,
+    duration: `${formatDateIsoString(plan.date_start)} - ${formatDateIsoString(plan.date_end)}`,
     meals: [
       {
-        name: "Bữa sáng",
+        name: formatTime(food.time),
         items: [
-          { name: "Cơm", description: "Ngày 3 bữa", unit: "Bát", quantity: 3 },
-          { name: "Cơm", description: "Sáng 2 viên, tối 2 viên sau ăn", unit: "Viên", quantity: 30 },
-          { name: "Rau", description: "Sáng 2 viên, tối 2 viên sau ăn", unit: "Viên", quantity: 30 },
-        ],
-      },
-      {
-        name: "Bữa trưa",
-        items: [
-          { name: "Cơm", description: "Ngày 3 bữa", unit: "Bát", quantity: 3 },
-          { name: "Cơm", description: "Sáng 2 viên, tối 2 viên sau ăn", unit: "Viên", quantity: 30 },
-          { name: "Rau", description: "Sáng 2 viên, tối 2 viên sau ăn", unit: "Viên", quantity: 30 },
-        ],
-      },
-      {
-        name: "Bữa tối",
-        items: [
-          { name: "Cơm", description: "Ngày 3 bữa", unit: "Bát", quantity: 3 },
-          { name: "Cơm", description: "Sáng 2 viên, tối 2 viên sau ăn", unit: "Viên", quantity: 30 },
-          { name: "Rau", description: "Sáng 2 viên, tối 2 viên sau ăn", unit: "Viên", quantity: 30 },
+          {
+            name: food.name,
+            description: food.name,
+            unit: food.unit,
+            amount: food.amount,
+          },
         ],
       },
     ],
-  };
+  }
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center">
+        <Spin
+          indicator={<LoadingOutlined style={{ fontSize: 30 }} spin />}
+          style={{
+            height: '60vh',
+            alignItems: 'center',
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        />
+      </div>
+    )
+  }
+
+  if (error || !(plan.name && food.name)) {
+    return (
+      <div className="flex justify-center items-center text-red-500 text-xl">
+        Thú cưng hiện không có chế độ ăn
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col px-5 max-w-[746px]">
@@ -43,10 +111,10 @@ function DietPlan() {
         <div className="flex flex-col p-6 w-full max-md:px-5 max-md:max-w-full">
           <div className="flex gap-7 flex-row ">
             <p className="w-[130px] text-base font-medium leading-6 text-black text-opacity-80">
-              {dietPlan.name}
+              Chế độ ăn
             </p>
             <p className="text-sm leading-5 text-black text-opacity-80">
-              {dietPlan.type}
+              {dietPlan.description}
             </p>
           </div>
           <div className="flex gap-7 items-center mt-2 ">
@@ -60,41 +128,60 @@ function DietPlan() {
         </div>
       </section>
       <div className="overflow-y-auto max-h-[300px] scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
-      {dietPlan.meals.map((meal, index) => (
-        <React.Fragment key={index}>
-          <h2 className="mt-7 w-full text-base font-medium leading-6 text-black text-opacity-80 max-md:max-w-full">
-            {meal.name}
-          </h2>
-          <div className="">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">STT</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên thực phẩm</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mô tả</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Đơn vị tính</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số lượng</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {meal.items.map((item, itemIndex) => (
-                  <tr key={itemIndex}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{itemIndex + 1}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.description}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.unit}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.quantity}</td>
+        {dietPlan.meals.map((meal, index) => (
+          <React.Fragment key={index}>
+            <h2 className="mt-7 w-full text-base font-medium leading-6 text-black text-opacity-80 max-md:max-w-full">
+              {meal.name}
+            </h2>
+            <div className="">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      STT
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Tên thực phẩm
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Mô tả
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Đơn vị tính
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Số lượng
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </React.Fragment>
-      ))}
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {meal.items.map((item, itemIndex) => (
+                    <tr key={itemIndex}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {itemIndex + 1}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {item.name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {item.description}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {item.unit}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {item.amount}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </React.Fragment>
+        ))}
       </div>
-      
     </div>
-  );
+  )
 }
 
-export default DietPlan;
+export default DietPlan

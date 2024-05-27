@@ -54,9 +54,12 @@ export default function BasicInfo({selectedPet, setSelectedPet}) {
   })
 
   useEffect(() => {
-    const { fullname, sex, species, age, weight, health, describe } =
+    if(selectedPet){
+      const { fullname, sex, species, age, weight, health, describe } =
       selectedPet
     setPetInfo({ fullname, sex, species, age, weight, health, describe })
+    }
+    
   }, [selectedPet])
 
   const handleChange = (event) => {

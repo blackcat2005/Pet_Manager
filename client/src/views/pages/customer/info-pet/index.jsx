@@ -14,6 +14,7 @@ const PetList = () => {
   const [visibleAddPetModal, setVisibleAddPetModal] = useState(false)
   const { customerPets, setCustomerPets } = usePet()
   const [petList, setPetList] = useState([])
+  // console.log(customerPets);
 
   const onCancel = () => {
     setVisibleAddPetModal(false)

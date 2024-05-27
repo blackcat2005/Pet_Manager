@@ -11,7 +11,7 @@ export default function PetHeader(props) {
                 <div>Thông tin chi tiết thú cưng</div>
             </div>
             <div className="mt-3.5 text-xl font-medium leading-7 text-black text-opacity-80">
-                Thông tin chi tiết của {props.petname || "thú cưng"}
+                Thông tin chi tiết của {props.petName || "thú cưng"}
             </div>
         </header>
     )

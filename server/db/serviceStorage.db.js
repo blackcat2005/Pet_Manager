@@ -13,13 +13,13 @@ const createStorageServicedb = async ({
   date_end,
   note,
 }) => {
-  const formattedDateStart = formatDateToISO(date_start)
-  const formattedDateEnd = formatDateToISO(date_end)
+  // const formattedDateStart = formatDateToISO(date_start)
+  // const formattedDateEnd = formatDateToISO(date_end)
   const { rows: StorageService } = await pool.query(
-    `INSERT INTO "storage" ("status ","room_id", "date_start", "date_end", "note") 
+    `INSERT INTO "storage" ("status","room_id", "date_start", "date_end", "note") 
        VALUES ($1, $2, $3, $4, $5) 
-       RETURNING "id", "status ", "room_id", "date_start", "date_end", "note"`,
-    [status, room_id, formattedDateStart, formattedDateEnd, note],
+       RETURNING "id", "status", "room_id", "date_start", "date_end", "note"`,
+    [status, room_id, date_start, date_end, note],
   )
   return StorageService[0]
 }
@@ -169,7 +169,7 @@ const updateStorageServiceStatusdb = async ({ id, status }) => {
 
     const updateStatusQuery = `
       UPDATE storage
-      SET "status " = $1
+      SET "status" = $1
       WHERE id = $2
     `
     await pool.query(updateStatusQuery, [status, id])

@@ -9,7 +9,10 @@ const service = {
     const url = '/services/appointment/updateMedicalRecord'
     return API.put(url,  body)
   },
-  
+  getAllServiceByUserId: () => {
+    const url = '/services/detailPet'
+    return API.get(url)
+  }
 }
 
 export default service
