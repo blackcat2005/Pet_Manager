@@ -67,18 +67,33 @@ const getAllAppointmentbyUserSessiondb = async (user_id, isAdminStaff) => {
   }
 }
 
-const getAllAppointmentbyPetIdDb = async (pet_id) => {
-  const { rows: appointmentByPetId } = await pool.query(
-    `SELECT appointments.*, appointment_orders.*
-    FROM appointments
-    INNER JOIN appointment_orders ON appointments.id = appointment_orders.service_id
-    WHERE appointment_orders.pet_id = $1`,
-    [pet_id],
-  )
-  if (appointmentByPetId.length === 0) {
-    return { message: 'No appointment found with the specified ID' }
+const getAllAppointmentbyPetIdDb = async (pet_id, user_id, isAdminStaff) => {
+  let query;
+  let params;
+
+  if (isAdminStaff) {
+    query = `
+      SELECT appointments.*, appointment_orders.*
+      FROM appointments
+      INNER JOIN appointment_orders ON appointments.id = appointment_orders.service_id
+      WHERE appointment_orders.pet_id = $1`;
+    params = [pet_id];
+  } else {
+    query = `
+      SELECT appointments.*, appointment_orders.*
+      FROM appointments
+      INNER JOIN appointment_orders ON appointments.id = appointment_orders.service_id
+      WHERE appointment_orders.pet_id = $1 AND appointment_orders.user_id = $2`;
+    params = [pet_id, user_id];
   }
-  return appointmentByPetId
+
+  const { rows: appointmentByPetId } = await pool.query(query, params);
+
+  if (appointmentByPetId.length === 0) {
+    return { message: 'No appointment found with the specified pet_id/user_id' };
+  }
+
+  return appointmentByPetId;
 }
 
 const getAppointmentbyIDdb = async (appointment_id) => {
