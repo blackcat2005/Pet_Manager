@@ -4,6 +4,7 @@ const {
   createAppointmentOrderdb,
   getAppointmentsByDateAndTimeSlotdb,
   getAllAppointmentbyUserSessiondb,
+  getAllAppointmentbyPetIdDb,
   getAppointmentbyIDdb,
   deleteAppointmentdb,
   updateAppointmentdb,
@@ -61,6 +62,19 @@ class ServiceAppointment {
       throw new ErrorHandler(
         error.statusCode,
         'getAllAppointmentbyUserSession False',
+      )
+    }
+  }
+
+  getAllAppointmentbyPetId = async (pet_id) => {
+    try {
+      // console.log(user_id)
+      return await getAllAppointmentbyPetIdDb(pet_id)
+    } catch (error) {
+      console.log(error)
+      throw new ErrorHandler(
+        error.statusCode,
+        'getAllAppointmentbyPetIdDb False',
       )
     }
   }

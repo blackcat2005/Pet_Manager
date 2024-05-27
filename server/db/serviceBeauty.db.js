@@ -15,7 +15,7 @@ const createBeautydb = async ({ status, date, time_slot, note }) => {
 const createBeautyOrderdb = async ({ service_id, user_id, pet_id, total }) => {
   const { rows: beauty_order } = await pool.query(
     `INSERT INTO "beauty_orders"("service_id", "user_id","pet_id","total") 
-        VALUES($1, $2, $3, $4, $5) 
+        VALUES($1, $2, $3, $4) 
         returning "id", "service_id", "user_id", "pet_id", "total", "create_at"`,
     [service_id, user_id, pet_id, total],
   )

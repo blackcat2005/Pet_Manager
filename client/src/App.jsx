@@ -4,9 +4,9 @@ import { BrowserRouter } from 'react-router-dom'
 import { UserProvider } from 'context/UserContext'
 import { PetProvider } from 'context/PetContext'
 import { ToastContainer } from 'react-toastify'
-import { ServiceProvider } from 'context/ServiceContext'
 import { GlobalHistory } from 'components/globalhistory'
 import 'react-toastify/dist/ReactToastify.css'
+import { ServiceProvider } from 'context/ServiceContext'
 const App = () => {
   useEffect(() => {
     // Setup local storage

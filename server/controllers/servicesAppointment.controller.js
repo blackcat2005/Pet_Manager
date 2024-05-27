@@ -97,6 +97,29 @@ const getAllAppointmentbyUserSession = async (req, res) => {
   }
 }
 
+const getAllAppointmentbyPetId = async (req, res) => {
+  const { user_id, roles } = req.user
+  const{ pet_id } = req.query
+  const user = await userService.getUserById(user_id)
+  const isAdminStaff = roles.includes('admin') || roles.includes('staff');
+  // const pet = await petService.getPetById(pet_id)
+  if (!user) {
+    throw new ErrorHandler(404, 'User not found')
+  }
+  if (+user_id === req.user.user_id || isAdminStaff) {
+    const allAppointment = await serviceAppointment.getAllAppointmentbyPetId(
+      pet_id
+    )
+    res.status(201).json({
+      status: 'success',
+      allAppointment,
+    })
+    console.log(user_id)
+  } else {
+    throw new ErrorHandler(401, 'Unauthorized')
+  }
+}
+
 const getAppointmentbyID = async (req, res) => {
   const { user_id } = req.user;
 
@@ -405,6 +428,7 @@ const updateMedicalRecord = async (req, res) => {
 module.exports = {
   createAppointment,
   getAllAppointmentbyUserSession,
+  getAllAppointmentbyPetId,
   getAppointmentbyID,
   deleteAppointment,
   updateAppointment,

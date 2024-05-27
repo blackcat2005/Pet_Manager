@@ -1,29 +1,22 @@
 import { Button } from 'antd';
 import React, { useEffect, useState } from 'react';
+import usePet from 'hooks/usePet';
 
 export const Ticket = (props) => {
-    const { setStepCurrent, serviceCurrent, setServiceCurrent, dataRegister, setDataRegister } = props;
-    const convertDate = (dateString) => {
-        const date = new Date(dateString);
-        const day = date.getDate();
-        const month = date.getMonth() + 1;
-        const year = date.getFullYear();
+    const { setStepCurrent, serviceCurrent, setServiceCurrent, dataRegister, setDataRegister, idOrder } = props;
 
-        const formattedDate = `${day}/${month}/${year}`;
-        return formattedDate;
-    }
+    const [petInfo, setPetInfo] = useState({
+        fullname: '',
+        sex: '',
+        age: '',
+        weight: '',
+    });
 
-    const [dateStart, setDateStart] = useState('');
-    const [dateEnd, setDateEnd] = useState('');
+    const { customerPets } = usePet();
 
     useEffect(() => {
-        if (serviceCurrent === 'service_02') {
-            setDateStart(convertDate(dataRegister.date[0].$d));
-            setDateEnd(convertDate(dataRegister.date[1].$d));
-        } else {
-            setDateStart(convertDate(convertDate(dataRegister.date.$d)));
-            setDateEnd('')
-        }
+        const infor = customerPets.find((item) => item.pet_id === dataRegister.pet_id);
+        setPetInfo(infor)
     }, [])
 
     const handleRegister = () => {
@@ -43,15 +36,15 @@ export const Ticket = (props) => {
                         ||
                         (serviceCurrent === "service_03" && <>Phiếu dịch vụ vệ sinh làm đẹp</>)
                     }
-                    <span>#ABCD</span>
+                    <span>#{idOrder}</span>
                 </div>
                 <div className='card-body__content'>
                     <div className='card-body__content__left'>
                         <div>Thông tin thú cưng</div>
-                        <div>Họ và tên: Bin</div>
-                        <div>Giới tính: Đực</div>
-                        <div>Tuổi: 3 tuổi</div>
-                        <div>Cân nặng: 10kg</div>
+                        <div>Tên: {petInfo.fullname}</div>
+                        <div>Giới tính: {petInfo.sex}</div>
+                        <div>Tuổi: {petInfo.age} tuổi</div>
+                        <div>Cân nặng: {petInfo.weight} kg</div>
                     </div>
                     <div className='card-body__content__right'>
                         <div style={{ visibility: "hidden" }}> 1</div>
@@ -59,14 +52,14 @@ export const Ticket = (props) => {
                         {
                             serviceCurrent === "service_02" ?
                                 <>
-                                    <div>Loại phòng: VIP</div>
-                                    <div>Ngày bắt đầu: {dateStart}</div>
-                                    <div>Ngày kết thúc: {dateEnd}</div>
+                                    <div>Loại phòng: {dataRegister.valueTimeType}</div>
+                                    <div>Ngày bắt đầu: {dataRegister.date_start}</div>
+                                    <div>Ngày kết thúc: {dataRegister.date_end}</div>
                                 </>
                                 :
                                 <>
-                                    <div>Ngày khám: {dateStart}</div>
-                                    <div>Ca khám: Ca 1</div>
+                                    <div>Ngày khám: {dataRegister.date}</div>
+                                    <div>Ca khám: {dataRegister.valueTimeType}</div>
                                     <div style={{ visibility: "hidden" }}> 1</div>
                                 </>
                         }

@@ -1,12 +1,15 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import pet from "api/pet";
-import useAuth from "hooks/useAuth";
 import service from "api/service";
+import useAuth from "hooks/useAuth";
 const ServiceContext = createContext();
 
 export const ServiceProvider = ({ children }) => {
   const [customerServices, setCustomerServices] = useState([]);
   const [allServices, setAllServices] = useState([]);
+  const [serviceAppointment, setServiceAppointment] = useState([]);
+  const [serviceBeauty, setServiceBeauty] = useState([]);
+  const [serviceStorage, setServiceStorage] = useState([]);
+
   const { userData } = useAuth()
 
   useEffect(() => {
@@ -18,21 +21,26 @@ export const ServiceProvider = ({ children }) => {
         console.error('Error fetching customer pet list:', error);
       });
     }
+
+
+    service.getTimePrice().then((response) => {
+      setServiceAppointment(response.data.appointment)
+      setServiceBeauty(response.data.beauty)
+      setServiceStorage(response.data.storage)
+    }).catch((error) => {
+      console.error('Error fetching time price list:', error);
+    });
   }, [userData]);
-  
-  // useEffect(() => {
-  //   if (userData && (userData.roles === 'staff' || userData.roles === 'admin')) {
-  //     pet.getAllPet().then((response) => {
-  //       setAllPets(response.data);
-  //     }).catch((error) => {
-  //       console.error('Error fetching all pets:', error);
-  //     });
-  //   }
-  // }, [userData]);
+
 
   return (
     <ServiceContext.Provider
-      value={{ customerServices, setCustomerServices, allServices, setAllServices }}
+      value={{
+        customerServices, setCustomerServices,
+        serviceAppointment, setServiceAppointment,
+        serviceBeauty, setServiceBeauty,
+        serviceStorage, setServiceStorage,
+      }}
     >
       {children}
     </ServiceContext.Provider>
@@ -40,3 +48,4 @@ export const ServiceProvider = ({ children }) => {
 };
 
 export default ServiceContext;
+

@@ -19,7 +19,7 @@ export const PetProvider = ({ children }) => {
       });
     }
   }, [userData]);
-  
+
   useEffect(() => {
     if (userData && (userData.roles === 'staff' || userData.roles === 'admin')) {
       pet.getAllPet().then((response) => {
