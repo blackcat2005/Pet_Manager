@@ -1,17 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { DatePicker } from 'antd';
 import {
     Button,
     Form,
     Input,
 } from 'antd';
+import service from 'api/service';
 
 export const Payment = (props) => {
-    const { form, stepCurrent, setStepCurrent, formItemLayout } = props;
+    const { form, stepCurrent, setStepCurrent, formItemLayout, dataRegister, serviceCurrent, idOrder, setIdOrder } = props;
+    const onFinishPayment = async (values) => {
+        try {
+            let req = {};
+            switch (serviceCurrent) {
+                case 'service_01':
+                    req = await service.createAppointment(dataRegister);
+                    setIdOrder(req.data?.appointment_order?.id);
+                    break;
+                case 'service_02':
+                    req = await service.createStorage(dataRegister);
+                    setIdOrder(req.data?.storageOrder?.id);
+                    break;
+                case 'service_03':
+                    req = await service.createBeauty(dataRegister);
+                    setIdOrder(req.data?.beauty_order?.id);
+                    break;
+                default:
+                    req = {};
+                    break;
+            }
 
-    const onFinishPayment = (values) => {
-        setStepCurrent(stepCurrent + 1);
-        form.resetFields();
+            if (req && req.status === 201) {
+                console.log(req);
+                setStepCurrent(stepCurrent + 1);
+                form.resetFields();
+            }
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     return (
@@ -97,7 +123,7 @@ export const Payment = (props) => {
                     }}
                 >
                     <Button type="primary" htmlType="submit">
-                        Submit
+                        Thanh toán
                     </Button>
                 </Form.Item>
             </Form>

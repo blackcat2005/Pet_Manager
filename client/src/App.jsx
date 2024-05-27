@@ -6,6 +6,7 @@ import { PetProvider } from 'context/PetContext'
 import { ToastContainer } from 'react-toastify'
 import { GlobalHistory } from 'components/globalhistory'
 import 'react-toastify/dist/ReactToastify.css'
+import { ServiceProvider } from 'context/ServiceContext'
 const App = () => {
   useEffect(() => {
     // Setup local storage
@@ -20,12 +21,14 @@ const App = () => {
   return (
     <>
       <UserProvider>
-        <PetProvider>
-          <BrowserRouter>
-            <GlobalHistory />
-            <AllRoutes />
-          </BrowserRouter>
-        </PetProvider>
+        <ServiceProvider>
+          <PetProvider>
+            <BrowserRouter>
+              <GlobalHistory />
+              <AllRoutes />
+            </BrowserRouter>
+          </PetProvider>
+        </ServiceProvider>
       </UserProvider>
 
       <ToastContainer
