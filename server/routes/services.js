@@ -1,6 +1,7 @@
 const {
   createAppointment,
   getAllAppointmentbyUserSession,
+  getAllAppointmentbyPetId,
   getAppointmentbyID,
   deleteAppointment,
   updateAppointment,
@@ -41,6 +42,7 @@ router.use(verifyToken)
 // Appointment
 router.route('/CreateAppointment').post(createAppointment)
 router.route('/getAllAppointmentbyUserSession').get(getAllAppointmentbyUserSession)
+router.route('/getAllAppointmentbyPetId').get(getAllAppointmentbyPetId)
 router.route('/getAllAppointmentbyID').get(getAppointmentbyID)
 router.route('/deleteAppointment').delete(deleteAppointment)
 router.route('/updateAppointment').put(updateAppointment)
