@@ -1,25 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Modal, Form, Input, Radio } from 'antd';
-import auth from 'api/auth';
+import staff from 'api/staff';
 import { toast } from 'react-toastify';
 import user from 'api/user';
 
-const ModalCustomer = (props) => {
+const ModalStaff = (props) => {
     const { form, isModalOpen, handleOk, handleCancel,
         action, dataModal, fetchData } = props;
 
     const onFinish = async (values) => {
         try {
             if (action === "CREATE") {
-                const res = await auth.register(values);
-
-                if (res && res.status === 200) {
-                    toast.success("Thêm khách hàng thành công!");
+                const res = await staff.createStaff(values);
+                console.log(res);
+                if (res && res.status === 201) {
+                    toast.success("Thêm nhân viên thành công!");
                     fetchData();
                     handleOk();
                 }
             } else if (action === "UPDATE") {
-                const res = await user.updateUserInfo(values.user_id, {
+                const res = await staff.updateStaffInfo(values.user_id, {
                     fullname: values.fullname,
                     email: values.email,
                     username: values.username,
@@ -30,7 +30,7 @@ const ModalCustomer = (props) => {
                 })
 
                 if (res && res.status === 201) {
-                    toast.success(`Chỉnh sửa thông tin khách hàng ${values.user_id} thành công!`);
+                    toast.success(`Chỉnh sửa thông tin nhân viên ${values.user_id} thành công!`);
                     fetchData();
                     handleOk();
                 }
@@ -38,8 +38,6 @@ const ModalCustomer = (props) => {
         } catch (error) {
             toast.error(error.response.data.message);
         }
-
-
     };
 
     const formItemLayout = {
@@ -71,7 +69,7 @@ const ModalCustomer = (props) => {
     return (
         <>
             <Modal
-                title={action === "CREATE" ? "Thêm mới khách hàng" : "Cập nhật thông tin khách hàng"}
+                title={action === "CREATE" ? "Thêm mới nhân viên" : "Cập nhật thông tin nhân viên"}
                 open={isModalOpen}
                 onOk={handleOk}
                 onCancel={handleCancel}
@@ -114,7 +112,7 @@ const ModalCustomer = (props) => {
                     <Form.Item
                         name="fullname"
                         label="Họ và tên"
-                        rules={[{ required: true, message: 'Hãy nhập họ và tên khách hàng!' }]}
+                        rules={[{ required: true, message: 'Hãy nhập họ và tên nhân viên!' }]}
                     >
                         <Input />
                     </Form.Item>
@@ -262,4 +260,4 @@ const ModalCustomer = (props) => {
     );
 }
 
-export default ModalCustomer;
+export default ModalStaff;

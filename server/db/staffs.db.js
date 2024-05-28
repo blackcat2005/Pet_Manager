@@ -2,7 +2,8 @@ const pool = require('../config')
 
 const getAllStaffsDb = async () => {
   const { rows: staffs } = await pool.query(
-    "Select * from public.users u where u.roles='{staff}'",
+    `Select * from public.users u where u.roles=$1
+    `, ['staff'],
   )
 
   return staffs

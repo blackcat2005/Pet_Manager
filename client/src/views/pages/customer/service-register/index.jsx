@@ -41,7 +41,7 @@ const ServiceRegisterPet = () => {
     return (
         <div className="service-register__container">
             <Space style={{ width: '100%', justifyContent: 'center' }}>
-                <Typography.Title level={1}>Đăng ký dịch vụ</Typography.Title>
+                <Typography.Title level={2}>Đăng ký dịch vụ</Typography.Title>
                 <br /><br />
             </Space>
 

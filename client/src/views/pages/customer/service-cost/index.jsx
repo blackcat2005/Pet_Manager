@@ -95,7 +95,7 @@ const ServiceCost = () => {
   return (
     <div className='service-cost'>
       <Space style={{ width: '100%', justifyContent: 'center' }}>
-        <Typography.Title level={1}>Bảng giá dịch vụ</Typography.Title>
+        <Typography.Title level={2}>Bảng giá dịch vụ</Typography.Title>
         <br /><br />
       </Space>
       <Tabs defaultActiveKey="1" items={items} onChange={onChangeTabs} />

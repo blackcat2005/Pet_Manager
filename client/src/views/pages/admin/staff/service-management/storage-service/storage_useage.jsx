@@ -103,7 +103,7 @@ const StorageServiceUsage = () => {
         newData.splice(index, 1, updatedItem);
         setData(newData);
         setEditingKey('');
-  
+
         const updatePayload = {
           service_id: updatedItem.id,
           room_id: updatedItem.room_id,
@@ -130,7 +130,7 @@ const StorageServiceUsage = () => {
       console.log('Validate Failed:', errInfo);
     }
   };
-  
+
 
   const handleDelete = async (id) => {
     try {
@@ -149,14 +149,14 @@ const StorageServiceUsage = () => {
     service.getAllStorageService()
       .then(response => {
         const filteredData = response.data.AllStorageService.filter(service => {
-        return service.order_pet_id && service.order_pet_id.toString().toLowerCase().includes(value);
-      }).map(item => ({
-        ...item,
-        pet_id: item.order_pet_id,
-        user_id: item.order_user_id,
-        total: item.order_total
-      }));
-      setData(filteredData);
+          return service.order_pet_id && service.order_pet_id.toString().toLowerCase().includes(value);
+        }).map(item => ({
+          ...item,
+          pet_id: item.order_pet_id,
+          user_id: item.order_user_id,
+          total: item.order_total
+        }));
+        setData(filteredData);
       })
       .catch(error => {
         console.error('Failed to fetch storage services:', error);
@@ -214,15 +214,18 @@ const StorageServiceUsage = () => {
     { title: 'Room ID', dataIndex: 'room_id', key: 'room_id', editable: true },
     { title: 'Pet ID', dataIndex: 'pet_id', key: 'pet_id', editable: true },
     { title: 'User ID', dataIndex: 'user_id', key: 'user_id', editable: true },
-    { title: 'Ngày bắt đầu', dataIndex: 'date_start', key: 'date_start', editable: true, inputType: 'date', 
-      render: (text) => moment(text).format('YYYY-MM-DD') 
+    {
+      title: 'Ngày bắt đầu', dataIndex: 'date_start', key: 'date_start', editable: true, inputType: 'date',
+      render: (text) => moment(text).format('YYYY-MM-DD')
     },
-    { title: 'Ngày kết thúc', dataIndex: 'date_end', key: 'date_end', editable: true, inputType: 'date', 
-      render: (text) => moment(text).format('YYYY-MM-DD') 
+    {
+      title: 'Ngày kết thúc', dataIndex: 'date_end', key: 'date_end', editable: true, inputType: 'date',
+      render: (text) => moment(text).format('YYYY-MM-DD')
     },
     { title: 'Ghi chú', dataIndex: 'note', key: 'note', editable: true },
     { title: 'Giá dịch vụ', dataIndex: 'total', key: 'total', editable: true },
-    { title: 'Trạng thái', dataIndex: 'status', key: 'status', editable: true, inputType: 'select',
+    {
+      title: 'Trạng thái', dataIndex: 'status', key: 'status', editable: true, inputType: 'select',
       render: (status) => (
         <span className={'status-tag ' + status}>
           {status}
@@ -237,7 +240,7 @@ const StorageServiceUsage = () => {
         return editable ? (
           <span>
             <a
-              onClick={async () => {await handleSave(record.id)}}
+              onClick={async () => { await handleSave(record.id) }}
               style={{
                 marginRight: 8,
               }}
@@ -293,10 +296,10 @@ const StorageServiceUsage = () => {
       <Row style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography.Title level={3} style={{ marginBottom: 0 }}>Search Table</Typography.Title>
         <Space>
-        <Select placeholder="Sắp xếp theo" style={{ width: 200 }} onChange={handleSortChange}>
-          <Option value="date_start-ascend">Ngày bắt đầu (Tăng dần)</Option>
-          <Option value="date_start-descend">Ngày bắt đầu (Giảm dần)</Option>
-        </Select>
+          <Select placeholder="Sắp xếp theo" style={{ width: 200 }} onChange={handleSortChange}>
+            <Option value="date_start-ascend">Ngày bắt đầu (Tăng dần)</Option>
+            <Option value="date_start-descend">Ngày bắt đầu (Giảm dần)</Option>
+          </Select>
           <Button type="primary" icon={<PlusOutlined />} onClick={addNewRow}>Thêm mới</Button>
         </Space>
       </Row>
