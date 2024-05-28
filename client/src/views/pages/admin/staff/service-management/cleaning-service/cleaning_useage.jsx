@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Typography, Select, message, Input, Form, Row, Popconfirm, Modal } from 'antd';
+import { Table, Button, Space, Typography, Select, message, Input, Form, Row, Popconfirm, Modal, DatePicker } from 'antd';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import '../../index.css';
+import beautyService from 'api/service/beauty-service';
+import moment from 'moment';
 
 const { Option } = Select;
 
@@ -15,14 +17,18 @@ const EditableCell = ({
   children,
   ...restProps
 }) => {
-  const inputNode = inputType === 'number' ? <Input /> : (inputType === 'select' ? (
-    <Select>
-      <Option value="Created">Created</Option>
-      <Option value="Processing">Processing</Option>
-      <Option value="Completed">Completed</Option>
-      <Option value="Canceled">Canceled</Option>
-    </Select>
-  ) : <Input />);
+  const inputNode = inputType === 'number' ? <Input /> : (
+    inputType === 'select' ? (
+      <Select>
+        <Option value="created">created</Option>
+        <Option value="processing">processing</Option>
+        <Option value="completed">completed</Option>
+        <Option value="canceled">canceled</Option>
+      </Select>
+    ) : (
+      inputType === 'date' ? <DatePicker format="YYYY-MM-DD" /> : <Input />
+    )
+  );
   return (
     <td {...restProps}>
       {editing ? (
@@ -43,86 +49,106 @@ const EditableCell = ({
   );
 };
 
-const CleaningServiceUsage = () => {
+const BeautyServiceUsage = () => {
   const [form] = Form.useForm();
   const [data, setData] = useState([]);
   const [editingKey, setEditingKey] = useState('');
-
-  const [services, setServices] = useState([
-    { id: 'TradeCode 99', petName: 'Mèo', description: '3', performer: '1h', price: '100k', registrationDate: '2023-05-01', status: 'Created' },
-    { id: 'TradeCode 98', petName: 'Chó', description: '3', performer: '1h', price: '200k', registrationDate: '2023-05-02', status: 'Processing' },
-    { id: 'TradeCode 97', petName: 'Bò', description: '3', performer: '1h', price: '200k', registrationDate: '2023-05-03', status: 'Completed' },
-    { id: 'TradeCode 96', petName: 'Cá', description: '3', performer: '1h', price: '200k', registrationDate: '2023-05-04', status: 'Canceled' },
-    { id: 'TradeCode 95', petName: 'Chó', description: '3', performer: '1h', price: '200k', registrationDate: '2023-05-05', status: 'Created' },
-    { id: 'TradeCode 94', petName: 'Lợn', description: '3', performer: '1h', price: '200k', registrationDate: '2023-05-06', status: 'Processing' },
-  ]);
+  const [mode, setMode] = useState('create');
 
   useEffect(() => {
-    setData(services);
-  }, [services]);
+    beautyService.getAllBeautyService()
+      .then(response => {
+        setData(response.data.allBeauty);
+      })
+      .catch(error => {
+        message.error('Lỗi khi tải danh sách dịch vụ');
+      });
+  }, []);
 
   const isEditing = (record) => record.id === editingKey;
 
   const edit = (record) => {
     form.setFieldsValue({
-      id: '',
-      petName: '',
-      description: '',
-      performer: '',
-      price: '',
-      registrationDate: '',
-      status: '',
       ...record,
+      date: moment(record.date),
     });
     setEditingKey(record.id);
+    setMode('update');
   };
 
   const cancel = () => {
     setEditingKey('');
+    setData(prevData => prevData.filter(item => item.id !== editingKey));
   };
 
-  const save = async (id) => {
-    try {
-      const row = await form.validateFields();
-      const newData = [...data];
+  const handleSave = async (id) => {
+  try {
+    const row = await form.validateFields();
+    const newData = [...data];
+
+    if (mode === 'update') {
       const index = newData.findIndex((item) => id === item.id);
-      if (index > -1) {
-        const item = newData[index];
-        newData.splice(index, 1, { ...item, ...row });
-        setData(newData);
-        setEditingKey('');
-        setServices(newData);
-        message.success('Cập nhật dịch vụ thành công!');
-      } else {
-        newData.push(row);
-        setData(newData);
-        setEditingKey('');
-      }
-    } catch (errInfo) {
-      console.log('Validate Failed:', errInfo);
-    }
-  };
+      const item = newData[index];
+      const updatedItem = { ...item, ...row, id: item.id };
+      newData.splice(index, 1, updatedItem);
+      setData(newData);
+      setEditingKey('');
 
-  const handleDelete = (id) => {
-    const newServices = services.filter(item => item.id !== id);
-    setServices(newServices);
-    setData(newServices);
-    message.success('Xóa dịch vụ thành công!');
+      console.log('Updating record:', updatedItem); 
+      await beautyService.updateBeautyService(updatedItem);
+      console.log(updatedItem.service_id);
+      await beautyService.updateBeautyStatus({ id: updatedItem.service_id, status: updatedItem.status });
+      message.success('Cập nhật dịch vụ thành công!');
+    } else if (mode === 'create') {
+      const payload = {
+        ...row,
+        date: moment(row.date.toString()).format('YYYY-MM-DD'),
+      };
+      console.log("rowww: ", row);
+      const response = await beautyService.createBeautyService(payload);
+      const newItem = {
+        user_id: row.user_id,
+        ...response.data,
+        status: 'created',
+        id: response.data.id,
+      };
+      setData((prev) => [...prev, newItem]);
+      setEditingKey('');
+      message.success('Thêm dịch vụ thành công!');
+    }
+  } catch (errInfo) {
+    console.log('Validate Failed:', errInfo); 
+  }
+};
+
+  const handleDelete = async (id) => {
+    try {
+      console.log('Deleting record with ID:', id);
+      await beautyService.deleteBeautyService({ id });
+      const newServices = data.filter(item => item.id !== id);
+      setData(newServices);
+      message.success('Xóa dịch vụ thành công!');
+    } catch (error) {
+      console.error('Error deleting record:', error);
+      message.error('Lỗi khi xóa dịch vụ');
+    }
   };
 
   const handleSearchChange = (e) => {
     const value = e.target.value.toLowerCase();
-    const filteredData = services.filter(service => {
-      return service.petName.toLowerCase().includes(value);
+    console.log('Search value:', value);
+    const filteredData = data.filter(service => {
+      return service.pet_id && service.pet_id.toString().toLowerCase().includes(value);
     });
     setData(filteredData);
   };
 
   const handleSortChange = (value) => {
     const [field, order] = value.split('-');
-    const sorted = [...services].sort((a, b) => {
-      if (a[field] < b[field]) return order === 'ascend' ? -1 : 1;
-      if (a[field] > b[field]) return order === 'ascend' ? 1 : -1;
+    console.log('Sort field and order:', field, order);
+    const sorted = [...data].sort((a, b) => {
+      if (moment(a[field]).isBefore(moment(b[field]))) return order === 'ascend' ? -1 : 1;
+      if (moment(a[field]).isAfter(moment(b[field]))) return order === 'ascend' ? 1 : -1;
       return 0;
     });
     setData(sorted);
@@ -130,16 +156,19 @@ const CleaningServiceUsage = () => {
 
   const addNewRow = () => {
     const newRow = {
-      id: `TradeCode ${data.length + 1}`,
-      petName: '',
-      description: '',
-      performer: '',
-      price: '',
-      registrationDate: '',
-      status: 'Created',
+      id: '',
+      pet_id: '',
+      user_id: '',
+      date: '',
+      note: '',
+      status: 'created',
+      time_slot: 1,
+      total: 100,
     };
-    setData([newRow,...data ]);
+    console.log('Adding new row:', newRow);
+    setData([newRow, ...data]);
     setEditingKey(newRow.id);
+    setMode('create');
     form.setFieldsValue(newRow);
   };
 
@@ -155,24 +184,32 @@ const CleaningServiceUsage = () => {
         handleDelete(id);
       },
       onCancel() {
-        console.log('Cancel');
+        console.log('Cancel delete');
       },
     });
   };
 
   const columns = [
-    { title: 'ID dịch vụ', dataIndex: 'id', key: 'id', editable: false },
-    { title: 'Tên thú cưng', dataIndex: 'petName', key: 'petName', editable: true },
-    { title: 'Mô tả', dataIndex: 'description', key: 'description', editable: true },
-    { title: 'Ca thực hiện', dataIndex: 'performer', key: 'performer', editable: true },
-    { title: 'Giá tiền', dataIndex: 'price', key: 'price', editable: true },
-    { title: 'Ngày đăng ký', dataIndex: 'registrationDate', key: 'registrationDate', editable: true },
-    { title: 'Trạng thái', dataIndex: 'status', key: 'status', editable: true, inputType: 'select', 
+    { title: 'ID', dataIndex: 'service_id', key: 'id', editable: false },
+    { title: 'Pet ID', dataIndex: 'pet_id', key: 'pet_id', editable: true },
+    { title: 'User ID', dataIndex: 'user_id', key: 'user_id', editable: true },
+    { title: 'Ngày dịch vụ', dataIndex: 'date', key: 'date', editable: true, inputType: 'date', 
+      render: (text) => moment(text.toString()).format('YYYY-MM-DD') 
+    },
+    { title: 'Ghi chú', dataIndex: 'note', key: 'note', editable: true },
+    { title: 'Thời gian', dataIndex: 'time_slot', key: 'time_slot', editable: true },
+    { title: 'Giá dịch vụ', dataIndex: 'total', key: 'total', editable: true },
+    { 
+      title: 'Trạng thái', 
+      dataIndex: 'status', 
+      key: 'status', 
+      editable: true, 
+      inputType: 'select', 
       render: (status) => (
-        <span className={`status-tag ${status.toLowerCase()}`}>
+        <span className={'status-tag ' + status}>
           {status}
         </span>
-      ), 
+      ),
     },
     {
       title: 'Action',
@@ -182,20 +219,20 @@ const CleaningServiceUsage = () => {
         return editable ? (
           <span>
             <a
-              onClick={() => save(record.id)}
+              onClick={async () => {await handleSave(record.id)}}
               style={{
                 marginRight: 8,
               }}
             >
-              Save
+              Lưu
             </a>
-            <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-              <a >Cancel</a>
+            <Popconfirm title="Bạn có chắc muốn hủy?" onConfirm={cancel}>
+              <a>Hủy</a>
             </Popconfirm>
           </span>
         ) : (
           <Space size="middle">
-            <a className="action-link" disabled={editingKey !== ''} onClick={() => edit(record)} >
+            <a className="action-link" disabled={editingKey !== ''} onClick={() => edit(record)}>
               Cập nhật
             </a>
             <a className="action-link" onClick={() => showConfirm(record.id)}>Xóa</a>
@@ -223,11 +260,11 @@ const CleaningServiceUsage = () => {
 
   return (
     <div>
-      <Typography.Title level={2} style={{ textAlign: 'center' }}>Sử dụng dịch vụ</Typography.Title>
+      <Typography.Title level={2} style={{ textAlign: 'center' }}>Sử dụng dịch vụ vệ sinh</Typography.Title>
       <Space style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, marginLeft: 50, width: '100%' }}>
         <Form layout="inline" style={{ border: '1px solid #d9d9d9', padding: '10px', borderRadius: '4px' }}>
-          <Form.Item label="Tên thú cưng">
-            <Input placeholder="Please enter" style={{ width: 200 }} 
+          <Form.Item label="ID thú cưng">
+            <Input placeholder="Nhập id" style={{ width: 200 }} 
               onChange={handleSearchChange} 
               onPressEnter={handleSearchChange}
             />
@@ -239,14 +276,10 @@ const CleaningServiceUsage = () => {
         <Typography.Title level={3} style={{ marginBottom: 0 }}>Search Table</Typography.Title>
         <Space>
           <Select placeholder="Sắp xếp theo" style={{ width: 200 }} onChange={handleSortChange}>
-            <Option value="petName-ascend">Tên thú cưng (A-Z)</Option>
-            <Option value="petName-descend">Tên thú cưng (Z-A)</Option>
-            <Option value="registrationDate-ascend">Ngày đăng ký (Tăng dần)</Option>
-            <Option value="registrationDate-descend">Ngày đăng ký (Giảm dần)</Option>
-            <Option value="price-ascend">Giá tiền (Tăng dần)</Option>
-            <Option value="price-descend">Giá tiền (Giảm dần)</Option>
+            <Option value="date-ascend">Ngày dịch vụ (Tăng dần)</Option>
+            <Option value="date-descend">Ngày dịch vụ (Giảm dần)</Option>
           </Select>
-          <Button type="primary" icon={<PlusOutlined />} onClick={addNewRow}>Thêm mói</Button>
+          <Button type="primary" icon={<PlusOutlined />} onClick={addNewRow}>Thêm mới</Button>
         </Space>
       </Row>
       <Form form={form} component={false}>
@@ -260,11 +293,11 @@ const CleaningServiceUsage = () => {
           dataSource={data}
           columns={mergedColumns}
           rowClassName="editable-row"
-          pagination={{ pageSize: 5 }}
+          pagination={{ pageSize: 10 }}
         />
       </Form>
     </div>
   );
 };
 
-export default CleaningServiceUsage;
+export default BeautyServiceUsage;

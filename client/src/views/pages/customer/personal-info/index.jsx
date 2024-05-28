@@ -50,7 +50,7 @@ const PersonalInfo = () => {
 
   const handleSubmit = (values) => {
     updateUserData(values)
-    console.log(values);
+    console.log(values)
     toast.success('Cập nhật thành công')
   }
 
