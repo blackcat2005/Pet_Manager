@@ -19,7 +19,7 @@ function ServiceHistory() {
         const detailPetResponse = await ServiceHistoryAPI.getDetailPet();
         console.log("Detail Pet Services:", detailPetResponse.data);
 
-        const allServices = detailPetResponse.data.flatMap(pet => 
+        const allServices = detailPetResponse.data.flatMap(pet =>
           pet.services.map(service => ({
             ...service,
             pet_name: pet.pet_name,
@@ -83,7 +83,7 @@ function ServiceHistory() {
     const fetchFilteredServices = async () => {
       try {
         const detailPetResponse = await ServiceHistoryAPI.getDetailPet();
-        const allServices = detailPetResponse.data.flatMap(pet => 
+        const allServices = detailPetResponse.data.flatMap(pet =>
           pet.services.map(service => ({
             ...service,
             pet_name: pet.pet_name,
@@ -182,11 +182,11 @@ function ServiceHistory() {
     { title: 'ID dịch vụ', dataIndex: 'order_id', key: 'order_id' },
     { title: 'Tên thú cưng', dataIndex: 'pet_name', key: 'pet_name' },
     { title: 'Loại dịch vụ', dataIndex: 'service_type', key: 'service_type' },
-    { 
-      title: 'Ngày đăng ký', 
-      dataIndex: 'service_date', 
+    {
+      title: 'Ngày đăng ký',
+      dataIndex: 'service_date',
       key: 'service_date',
-      render: (text) => moment(text).format('YYYY-MM-DD') 
+      render: (text) => moment(text).format('YYYY-MM-DD')
     },
     { title: 'Tổng cộng', dataIndex: 'total', key: 'total' },
     { title: 'Trạng thái', dataIndex: 'status', key: 'status', render: getStatusIcon },
@@ -195,7 +195,7 @@ function ServiceHistory() {
   return (
     <div style={{ width: '100%', overflow: 'hidden' }}>
       <Space style={{ padding: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography.Title level={1}>Lịch sử đăng ký</Typography.Title>
+        <Typography.Title level={2}>Lịch sử đăng ký</Typography.Title>
         <Space>
           <Select value={sortType} onChange={handleStatusFilter} style={{ width: 120 }} placeholder="Lọc">
             <Option value="all">all</Option>

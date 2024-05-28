@@ -117,7 +117,7 @@ const ManageCustomer = () => {
             dataIndex: 'city',
         },
         {
-            title: 'Đất nước',
+            title: 'Quốc tịch',
             dataIndex: 'country',
         },
         {
@@ -172,7 +172,7 @@ const ManageCustomer = () => {
         <>
             <div className="manage-customer__container">
                 <Space style={{ width: '100%', justifyContent: 'center' }}>
-                    <Typography.Title level={1}>Quản lý khách hàng</Typography.Title>
+                    <Typography.Title level={2}>Quản lý khách hàng</Typography.Title>
                     <br /><br />
                 </Space>
 

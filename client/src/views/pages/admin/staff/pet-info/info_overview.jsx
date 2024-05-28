@@ -142,7 +142,7 @@ const PetInfoOverview = () => {
   return (
     <div>
       <Space style={{ width: '100%', justifyContent: 'center' }}>
-        <Typography.Title level={1}>Danh sách thú cưng</Typography.Title>
+        <Typography.Title level={2}>Danh sách thú cưng</Typography.Title>
         <br />
         <br />
       </Space>

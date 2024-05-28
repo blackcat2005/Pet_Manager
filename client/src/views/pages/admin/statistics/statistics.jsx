@@ -181,7 +181,7 @@ const Statistics = () => {
         <ConfigProvider locale={viVN}>
             <div className='statistics'>
                 <Space style={{ width: '100%', justifyContent: 'center' }}>
-                    <Typography.Title level={1}>Thống kê báo cáo</Typography.Title>
+                    <Typography.Title level={2}>Thống kê báo cáo</Typography.Title>
                     <br /><br />
                 </Space>
 
