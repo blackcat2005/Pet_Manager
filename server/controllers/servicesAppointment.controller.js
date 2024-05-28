@@ -108,7 +108,7 @@ const getAllAppointmentbyPetId = async (req, res) => {
   }
   if (+user_id === req.user.user_id || isAdminStaff) {
     const allAppointment = await serviceAppointment.getAllAppointmentbyPetId(
-      pet_id
+      pet_id, user_id, isAdminStaff
     )
     res.status(201).json({
       status: 'success',

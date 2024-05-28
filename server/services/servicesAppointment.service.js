@@ -66,10 +66,10 @@ class ServiceAppointment {
     }
   }
 
-  getAllAppointmentbyPetId = async (pet_id) => {
+  getAllAppointmentbyPetId = async (pet_id, user_id, isAdminStaff) => {
     try {
       // console.log(user_id)
-      return await getAllAppointmentbyPetIdDb(pet_id)
+      return await getAllAppointmentbyPetIdDb(pet_id, user_id, isAdminStaff)
     } catch (error) {
       console.log(error)
       throw new ErrorHandler(

@@ -47,45 +47,91 @@ const getAppointmentsByDateAndTimeSlotdb = async (date, time_slot) => {
 
 const getAllAppointmentbyUserSessiondb = async (user_id, isAdminStaff) => {
   let queryString = `
-    SELECT appointments.*, appointment_orders.*
+    SELECT 
+      appointments.*,
+      appointment_orders.*,
+      time_slot_appointment.id AS time_slot,
+      time_slot_appointment.time,
+      time_slot_appointment.price,
+      time_slot_appointment.unit
     FROM appointments
     INNER JOIN appointment_orders ON appointments.id = appointment_orders.service_id
-  `
-  const queryParams = []
+    INNER JOIN time_slot_appointment ON appointments.time_slot = time_slot_appointment.id
+  `;
+  const queryParams = [];
 
   if (!isAdminStaff) {
-    queryString += ' WHERE appointment_orders.user_id = $1'
-    queryParams.push(user_id)
+    queryString += ' WHERE appointment_orders.user_id = $1';
+    queryParams.push(user_id);
   }
 
-  try {
-    const { rows: allAppointments } = await pool.query(queryString, queryParams)
-    return allAppointments
-  } catch (error) {
-    console.error('Error fetching appointments:', error)
-    throw error
+  const { rows: appointments } = await pool.query(queryString, queryParams);
+  
+  if (appointments.length === 0) {
+    return { message: 'No appointments found' };
   }
+  return appointments;
 }
 
-const getAllAppointmentbyPetIdDb = async (pet_id) => {
-  const { rows: appointmentByPetId } = await pool.query(
-    `SELECT appointments.*, appointment_orders.*
+
+const getAllAppointmentbyPetIdDb = async (pet_id, user_id, isAdminStaff) => {
+  let query;
+  let params;
+
+  if (isAdminStaff) {
+    query = `
+    SELECT 
+      appointments.*,
+      appointment_orders.*,
+      time_slot_appointment.id AS time_slot,
+      time_slot_appointment.time,
+      time_slot_appointment.price,
+      time_slot_appointment.unit
     FROM appointments
     INNER JOIN appointment_orders ON appointments.id = appointment_orders.service_id
-    WHERE appointment_orders.pet_id = $1`,
-    [pet_id],
-  )
-  if (appointmentByPetId.length === 0) {
-    return { message: 'No appointment found with the specified ID' }
+    INNER JOIN time_slot_appointment ON appointments.time_slot = time_slot_appointment.id
+    WHERE appointment_orders.pet_id = $1`;
+    params = [pet_id];
+  } else {
+    query = `
+    SELECT 
+      appointments.*,
+      appointment_orders.*,
+      time_slot_appointment.id AS time_slot,
+      time_slot_appointment.time,
+      time_slot_appointment.price,
+      time_slot_appointment.unit
+    FROM appointments
+    INNER JOIN appointment_orders ON appointments.id = appointment_orders.service_id
+    INNER JOIN time_slot_appointment ON appointments.time_slot = time_slot_appointment.id
+    WHERE appointment_orders.pet_id = $1 AND appointment_orders.user_id = $2`;
+    params = [pet_id, user_id];
   }
-  return appointmentByPetId
+
+  const { rows: appointmentByPetId } = await pool.query(query, params);
+
+  if (appointmentByPetId.length === 0) {
+    return { message: 'No appointment found with the specified pet_id/user_id' };
+  }
+
+  return appointmentByPetId;
+
+  return appointmentByPetId;
 }
+
 
 const getAppointmentbyIDdb = async (appointment_id) => {
   const { rows: appointmentById } = await pool.query(
-    `SELECT appointments.*, appointment_orders.*
+    `SELECT 
+      appointments.*,
+      appointment_orders.*,
+      time_slot_appointment.id AS time_slot,
+      time_slot_appointment.time,
+      time_slot_appointment.price,
+      time_slot_appointment.unit
     FROM appointments
     INNER JOIN appointment_orders ON appointments.id = appointment_orders.service_id
+    INNER JOIN time_slot_appointment ON appointments.time_slot = time_slot_appointment.id
     WHERE appointments.id = $1`,
     [appointment_id],
   )
