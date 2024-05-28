@@ -1,34 +1,41 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import pet from "api/pet";
-import useAuth from "hooks/useAuth";
-const PetContext = createContext();
+import { createContext, useContext, useEffect, useState } from 'react'
+import pet from 'api/pet'
+import useAuth from 'hooks/useAuth'
+const PetContext = createContext()
 
 export const PetProvider = ({ children }) => {
-  const [customerPets, setCustomerPets] = useState([]);
-  const [allPets, setAllPets] = useState([]);
+  const [customerPets, setCustomerPets] = useState([])
+  const [allPets, setAllPets] = useState([])
   const { userData } = useAuth()
-
-
 
   useEffect(() => {
     if (userData && userData.roles === 'customer') {
-      pet.getPetList().then((response) => {
-        setCustomerPets(response.data);
-      }).catch((error) => {
-        console.error('Error fetching customer pet list:', error);
-      });
+      pet
+        .getPetList()
+        .then((response) => {
+          setCustomerPets(response.data)
+        })
+        .catch((error) => {
+          console.error('Error fetching customer pet list:', error)
+        })
     }
-  }, [userData]);
+  }, [userData])
 
   useEffect(() => {
-    if (userData && (userData.roles === 'staff' || userData.roles === 'admin')) {
-      pet.getAllPet().then((response) => {
-        setAllPets(response.data);
-      }).catch((error) => {
-        console.error('Error fetching all pets:', error);
-      });
+    if (
+      userData &&
+      (userData.roles === 'staff' || userData.roles === 'admin')
+    ) {
+      pet
+        .getAllPet()
+        .then((response) => {
+          setAllPets(response.data)
+        })
+        .catch((error) => {
+          console.error('Error fetching all pets:', error)
+        })
     }
-  }, [userData]);
+  }, [userData])
 
   return (
     <PetContext.Provider
@@ -36,7 +43,7 @@ export const PetProvider = ({ children }) => {
     >
       {children}
     </PetContext.Provider>
-  );
-};
+  )
+}
 
-export default PetContext;
+export default PetContext

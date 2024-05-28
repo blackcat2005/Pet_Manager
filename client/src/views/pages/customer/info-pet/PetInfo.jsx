@@ -54,7 +54,7 @@ function PetInfo() {
                 activeButton={activeButton}
                 onButtonClick={handleButtonClick}
               />
-              <div className="flex flex-col ml-5 w-[74%] min-h-[70vh] max-md:ml-0 max-md:w-full">
+              <div className="flex flex-col ml-5  flex-1 min-h-[70vh] max-md:ml-0 max-md:w-full">
                 {renderContent()}
               </div>
             </div>

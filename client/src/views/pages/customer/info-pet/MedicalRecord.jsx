@@ -64,7 +64,7 @@ function PrescriptionTable({prescriptions}) {
   // ];
 
   return (
-    <div className="overflow-x-auto w-full mt-4">
+    <div className=" w-full mt-4">
       <table className="w-full bg-white border border-solid border-zinc-100">
         <thead className="bg-neutral-50">
           <tr>

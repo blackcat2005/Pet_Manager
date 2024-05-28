@@ -29,6 +29,18 @@ const service = {
   getAllServiceByUserId: () => {
     const url = '/services/detailPet'
     return API.get(url)
+  },
+  cancelAppointment: (body) => {
+    const url = '/services/appointment/updateStatus'
+    return API.put(url, body)
+  },
+  cancelBeauty: (body) => {
+    const url = '/services/updateBeautyStatus'
+    return API.put(url, body)
+  },
+  cancelStorage: (body) => {
+    const url = '/services/updateStorageServiceStatus'
+    return API.put(url, body)
   }
 }
 

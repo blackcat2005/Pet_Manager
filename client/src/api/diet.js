@@ -18,6 +18,14 @@ const diet = {
     const url = `/pets/${pet_id}/plan/food-item/${food_id}`
     return API.put(url, body)
   },
+  creatDietPlan: (pet_id, body) => {
+    const url = `/pets/${pet_id}/add-plan/`
+    return API.post(url, body)
+  },
+  creatDietFood: (pet_id, body) => {
+    const url = `/pets/${pet_id}/plan/add-food-item/`
+    return API.post(url, body)
+  }
 }
 
 export default diet

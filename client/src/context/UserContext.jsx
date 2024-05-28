@@ -11,11 +11,13 @@ export const UserProvider = ({ children }) => {
   const [collapsed, setCollapsed] = useState(
     localStorage.getItem('collapsed') === 'true',
   )
-  const [authData, setAuthData] = useState(JSON.parse(localStorage.getItem("token")))
+  const [authData, setAuthData] = useState(
+    JSON.parse(localStorage.getItem('token')),
+  )
 
   useEffect(() => {
     if (isLoggedIn) {
-      const fetchInfoUser = async() => {
+      const fetchInfoUser = async () => {
         const res = await user.getProfile()
         setUserData(res?.data)
       }
@@ -26,7 +28,7 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     if (localStorage.getItem('token')) {
       setIsLoggedIn(true)
-      setAuthData(JSON.parse(localStorage.getItem("token")));
+      setAuthData(JSON.parse(localStorage.getItem('token')))
     }
   }, [])
 
@@ -35,7 +37,7 @@ export const UserProvider = ({ children }) => {
     setIsLoggedIn(true)
     setUserData(user)
     setAuthData(token)
-    localStorage.setItem("token", JSON.stringify(token));
+    localStorage.setItem('token', JSON.stringify(token))
   }
   const updateUserData = async ({
     fullname,

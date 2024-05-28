@@ -5,8 +5,8 @@ import usePet from 'hooks/usePet'
 import { toast } from 'react-toastify'
 const UpdateModal = ({ visible, onCancel, selectedPet }) => {
   const [form] = Form.useForm()
-  const {allPets, setAllPets} = usePet()
-  
+  const { allPets, setAllPets } = usePet()
+
   useEffect(() => {
     if (selectedPet) {
       form.setFieldsValue({
@@ -22,25 +22,25 @@ const UpdateModal = ({ visible, onCancel, selectedPet }) => {
   }, [selectedPet])
 
   const handleSubmit = (values) => {
-    console.log('Received values of form: ', values);
-  
-    pet.updatePetInfo(selectedPet.pet_id, values)
+    console.log('Received values of form: ', values)
+
+    pet
+      .updatePetInfo(selectedPet.pet_id, values)
       .then(() => {
-        toast.success("Cập nhật thú cưng thành công");
-        
-        const updatedPets = allPets.map(pet => 
-          pet.pet_id === selectedPet.pet_id ? { ...pet, ...values } : pet
-        );
-  
-        setAllPets(updatedPets);
-        onCancel();
+        toast.success('Cập nhật thú cưng thành công')
+
+        const updatedPets = allPets.map((pet) =>
+          pet.pet_id === selectedPet.pet_id ? { ...pet, ...values } : pet,
+        )
+
+        setAllPets(updatedPets)
+        onCancel()
       })
-      .catch(error => {
-        console.error("Cập nhật thú cưng thất bại:", error);
-        toast.error("Cập nhật thú cưng thất bại");
-      });
-  };
-  
+      .catch((error) => {
+        console.error('Cập nhật thú cưng thất bại:', error)
+        toast.error('Cập nhật thú cưng thất bại')
+      })
+  }
 
   return (
     <Modal
@@ -130,7 +130,7 @@ const UpdateModal = ({ visible, onCancel, selectedPet }) => {
                 </Form.Item>
 
                 <Form.Item className="self-end flex flex-row">
-                  <div className='flex flex-row gap-5'>
+                  <div className="flex flex-row gap-5">
                     <Button type="primary" htmlType="submit">
                       Lưu
                     </Button>
