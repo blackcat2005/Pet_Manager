@@ -49,13 +49,11 @@ router.route('/getAllAppointmentbyPetId').get(getAllAppointmentbyPetId)
 router.route('/getAppointmentbyID').get(getAppointmentbyID)
 router.route('/deleteAppointment').delete(deleteAppointment)
 router.route('/updateAppointment').put(updateAppointment)
-router.route('/updateStatus').put(verifyStaff, updateAppointmentStatus)
+router.route('/updateStatus').put( updateAppointmentStatus)
 
 //Medical Records
 router.route('/CreateMedicalRecord').post(createMedicalRecord)
-router
-  .route('/getMedicalRecordsbyAppointmentId')
-  .get(getMedicalRecordsByAppointmentId)
+router.route('/getMedicalRecordsbyAppointmentId').get(getMedicalRecordsByAppointmentId)
 router.route('/getMedicalRecordsbyPetId').get(getMedicalRecordsbyPetId)
 router.route('/updateMedicalRecord').put(updateMedicalRecord)
 
@@ -68,7 +66,7 @@ router.route('/deleteStorageService').delete(deleteStorageService)
 router.route('/updateStorageService').put(verifyStaff, updateStorageService)
 router
   .route('/updateStorageServiceStatus')
-  .put(verifyStaff, updateStorageServiceStatus)
+  .put(updateStorageServiceStatus)
 router.route('/allRoom').get(getAllRoom)
 
 // Beauty
@@ -77,7 +75,7 @@ router.route('/getAllBeautybyUser_ID').get(getAllBeautybyUser_ID)
 router.route('/getBeautybyID').get(verifyStaff, getBeautybyID)
 router.route('/deleteBeauty').delete(verifyStaff, deleteBeauty)
 router.route('/updateBeauty').put(verifyStaff, updateBeauty)
-router.route('/updateBeautyStatus').put(verifyStaff, updateBeautyStatus)
+router.route('/updateBeautyStatus').put(updateBeautyStatus)
 
 router.route('/detailPet').get(servicePet)
 

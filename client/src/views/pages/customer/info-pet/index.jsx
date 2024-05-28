@@ -80,7 +80,7 @@ const PetList = () => {
       <div className="pet-info__card-list">
         {customerPets.length === 0 ? (
           <div className="pet-info__card-list__none">
-            Bạn dell có thú cưng!!!!
+            Bạn không có thú cưng nào!!!!
           </div>
         ) : (
           customerPets &&

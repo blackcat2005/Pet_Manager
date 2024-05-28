@@ -101,11 +101,11 @@ const MedicalRecordModal = ({ visible, onCancel, selectedPet, onSave }) => {
       >
         <Divider />
         <div className="flex flex-col justify-between min-h-[60vh]">
-          <div>
+          {/* <div>
             <Button icon={<PlusOutlined />} type="primary">
               Thêm hồ sơ{' '}
             </Button>
-          </div>
+          </div> */}
           <div className="flex justify-center items-center flex-1 text-red-500 text-xl w-full">
             Thú cưng hiện không có hồ sơ bệnh án
           </div>

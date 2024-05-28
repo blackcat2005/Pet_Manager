@@ -11,6 +11,8 @@ import {
   Select,
 } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
+import AddDietPlan from 'components/add-diet-plan'
+import { formatTimeMealToVN, formatTimeMealToE } from 'helpers/formatMeal'
 
 import pet from 'api/pet'
 import diet from 'api/diet'
@@ -55,9 +57,26 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
   const [plan, setPlan] = useState({})
   const [food, setFood] = useState([])
   const [error, setError] = useState(false)
+  const [visibleAddPlan, setVisibleAddPlan] = useState(false);
+  const [addFood, setAddFood] = useState(false)
+  const [update, setUpdate] = useState(false)
 
+  const handleAddFood = () => {
+    setVisibleAddPlan(true)
+    setAddFood(true)
+    setUpdate(false)
+  }
+  const handleCancel = () => {
+    setAddFood(false)
+    
+    setVisibleAddPlan(false)
+  }
+  const handleShowAddModal = () => {
+    setVisibleAddPlan(true)
+  }
 
   useEffect(() => {
+    setUpdate(false)
     setError(false)
     if (selectedPet && selectedPet.pet_id) {
       diet
@@ -67,6 +86,7 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
           if (res.data && res.data.length > 0) {
             const petData = res.data.map((item, index) => ({
               ...item,
+              time: formatTimeMealToVN(item.time),
               key: index + 1,
             }))
             setData(petData)
@@ -115,9 +135,9 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
           setInitialData({})
         })
     }
-  }, [selectedPet])
+  }, [selectedPet, update])
 
-  
+
   if (error) {
     return (
       <Modal
@@ -135,9 +155,16 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
         <Divider />
         <div className="flex flex-col justify-between min-h-[60vh]">
           <div>
-            <Button icon={<PlusOutlined />} type="primary">
+            <Button icon={<PlusOutlined />} onClick={handleShowAddModal} type="primary">
               Thêm kế hoạch ăn uống{' '}
             </Button>
+            <AddDietPlan
+              addFood = {addFood}
+              visible={visibleAddPlan}
+              onCancel={handleCancel}
+              selectedPet={selectedPet}
+              setUpdate={setUpdate}
+            />
           </div>
           <div className="flex justify-center items-center flex-1 text-red-500 text-xl w-full">
             Thú cưng hiện không có chế độ ăn nào
@@ -176,6 +203,7 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
 
   const columns = [
     { title: 'STT', dataIndex: 'key', key: 'key', width: '10%' },
+    { title: 'Thời gian', dataIndex: 'time', key: 'time', width: '20%' },
     { title: 'Tên thực phẩm', dataIndex: 'name', key: 'name', width: '20%' },
     { title: 'Mô tả', dataIndex: 'description', key: 'description' },
     { title: 'Số lượng', dataIndex: 'amount', key: 'amount', width: '15%' },
@@ -216,7 +244,7 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
         amount: row.amount,
         unit: row.unit,
         description: row.description,
-        time: row.time,
+        time: formatTimeMealToE(row.time),
       }
       diet
         .updateDietFood(selectedPet.pet_id, row.food_id, foodNe)
@@ -317,14 +345,16 @@ const DietPlanModal = ({ visible, onCancel, selectedPet, onSave }) => {
             </Card>
           </div>
         )}
-        <Select
-          defaultValue={food && food[0]?.time}
-          style={{ width: 200, marginBottom: 16 }}
-        >
-          <Option value="breakfast">Bữa sáng</Option>
-          <Option value="lunch">Bữa trưa</Option>
-          <Option value="dinner">Bữa tối</Option>
-        </Select>
+        <div>
+          <Button icon={<PlusOutlined />} onClick={handleAddFood} type='primary'> Thêm thực phẩm</Button>
+          <AddDietPlan
+              addFood = {addFood}
+              visible={visibleAddPlan}
+              onCancel={handleCancel}
+              selectedPet={selectedPet}
+              setUpdate={setUpdate}
+            />
+        </div>
         <Table
           columns={columns}
           dataSource={data}
