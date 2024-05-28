@@ -128,7 +128,7 @@ const deleteStorageService = async (req, res) => {
   }
   if (req.user.roles.includes('admin') || req.user.roles.includes('staff')) {
     const storage = await serviceStorage.getStorageServicebyID({ service_id })
-    const room_id = storage[0].room_id
+    const room_id = storage.room_id
     const room = await roomService.getRoombyID({ room_id })
     const { current_slot } = room
     const newRoom = await roomService.updateRoom({
@@ -151,6 +151,7 @@ const deleteStorageService = async (req, res) => {
 const updateStorageService = async (req, res) => {
   const { user_id } = req.user
   const { service_id, room_id, note, pet_id, date_start, date_end } = req.body
+  console.log("room_id", room_id);
   const user = await userService.getUserById(user_id)
   if (!user) {
     throw new ErrorHandler(404, 'User not found')
@@ -161,6 +162,7 @@ const updateStorageService = async (req, res) => {
     req.user.roles.includes('staff')
   ) {
     const storage = await serviceStorage.getStorageServicebyID({ service_id })
+    console.log(storage);
     const old_room_id = storage.room_id
     console.log(old_room_id)
     const old_room = await roomService.getRoombyID({ room_id: old_room_id })
@@ -179,6 +181,7 @@ const updateStorageService = async (req, res) => {
       date_end,
     })
     const new_room = await roomService.getRoombyID({ room_id })
+
     const { current_slot } = new_room
     console.log('Current_slot = ' + current_slot)
     console.log(new_room)
