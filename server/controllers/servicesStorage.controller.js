@@ -2,6 +2,7 @@ const userService = require('../services/users.service')
 const { ErrorHandler } = require('../helpers/error')
 const serviceStorage = require('../services/serviceStorage.service')
 const roomService = require('../services/room.service')
+const { levelValSym } = require('pino/lib/symbols')
 
 const createStorageService = async (req, res) => {
   try {
@@ -89,15 +90,12 @@ const getStorageServicebyID = async (req, res) => {
     throw new ErrorHandler(404, 'User not found')
   }
   if (req.user.roles.includes('admin') || req.user.roles.includes('staff')) {
-    const { service_id } = req.body
-    const StorageServicebyID = await serviceStorage.getStorageServicebyID({
-      service_id,
-    })
+    const { service_id } = req.query;
+    const StorageServicebyID = await serviceStorage.getStorageServicebyID(service_id)
     res.status(200).json({
       status: 'success',
       StorageServicebyID,
     })
-    console.log(user_id)
   } else {
     throw new ErrorHandler(401, 'Unauthorized')
   }
@@ -148,22 +146,24 @@ const deleteStorageService = async (req, res) => {
 
 const updateStorageService = async (req, res) => {
   const { user_id } = req.user
-  const { service_id, room_id, note, pet_id, date_start, date_end } = req.body
+  const { service_id, room_id, note, pet_id, date_start, date_end, status } = req.body
+  const validStatuses = ['complete', 'canceled', 'processing']
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Invalid status',
+    })
+  }
   const user = await userService.getUserById(user_id)
   if (!user) {
     throw new ErrorHandler(404, 'User not found')
   }
-  if (
-    +user_id === req.user.user_id ||
-    req.user.roles.includes('admin') ||
-    req.user.roles.includes('staff')
-  ) {
-    const storage = await serviceStorage.getStorageServicebyID({ service_id })
+  if (req.user.roles.includes('admin') || req.user.roles.includes('staff')) {
+    const storage = await serviceStorage.getStorageServicebyID(service_id)
+    console.log(storage);
     const old_room_id = storage.room_id
-    console.log(old_room_id)
     const old_room = await roomService.getRoombyID({ room_id: old_room_id })
     const old_slot = old_room.current_slot
-    console.log(old_slot)
     const update_Oldroom = await roomService.updateRoom({
       room_id: old_room_id,
       current_slot: old_slot + 1,
@@ -178,81 +178,75 @@ const updateStorageService = async (req, res) => {
     })
     const new_room = await roomService.getRoombyID({ room_id })
     const { current_slot } = new_room
-    console.log('Current_slot = ' + current_slot)
-    console.log(new_room)
-    console.log(old_room)
     const update_Newroom = await roomService.updateRoom({
       room_id,
       current_slot: current_slot - 1,
     })
-
+    const response = await serviceStorage.updateStorageServiceStatus({
+      id : service_id,
+      status,
+    })
+    if (response.message == 'storage not found') {
+      return res.status(404).json({
+        status: 'error',
+        message: response.message,
+      })
+    }
     res.status(200).json({
       status: 'success',
-      update_storage,
-      update_Oldroom,
-      update_Newroom,
+      // update_storage,
+      // update_Oldroom,
+      // update_Newroom,
+      response,
     })
-  } else {
-    throw new ErrorHandler(401, 'Unauthorized')
-  }
-}
-
-const updateStorageServiceStatus = async (req, res) => {
-  const { id, status } = req.body
-  const validStatuses = ['complete', 'canceled', 'processing']
-  if (!validStatuses.includes(status)) {
-    return res.status(400).json({
-      status: 'error',
-      message: 'Invalid status',
-    })
-  }
-  try {
-    if (req.user.roles.includes('admin') || req.user.roles.includes('staff')) {
+  } else if (req.user.roles.includes('customer')) {
+      if (status !== 'canceled') {
+        return res.status(401).json({
+          status: 'error',
+          message: 'Unauthorized action',
+        })
+      }
+      const storage = await serviceStorage.getStorageServicebyID(service_id)
+      const old_room_id = storage.room_id
+      const old_room = await roomService.getRoombyID({ room_id: old_room_id })
+      const old_slot = old_room.current_slot
+      const update_Oldroom = await roomService.updateRoom({
+        room_id: old_room_id,
+        current_slot: old_slot + 1,
+      })
+      const update_storage = await serviceStorage.updateStorageService({
+        id: service_id,
+        room_id,
+        note,
+        pet_id,
+        date_start,
+        date_end,
+      })
+      const new_room = await roomService.getRoombyID({ room_id })
+      const { current_slot } = new_room
+      const update_Newroom = await roomService.updateRoom({
+        room_id,
+        current_slot: current_slot - 1,
+      })  
       const response = await serviceStorage.updateStorageServiceStatus({
-        id,
+        id:service_id,
         status,
       })
-      if (response.message == 'storage not found') {
+      if (response.message === 'storage not found') {
         return res.status(404).json({
           status: 'error',
           message: response.message,
         })
       }
-      res.status(200).json({
-        status: 'success',
-        message: response.message,
-      })
-    } else {
-      if (req.user.roles.includes('customer')) {
-        if (status !== 'canceled') {
-          return res.status(401).json({
-            status: 'error',
-            message: 'Unauthorized action',
-          })
-        }
-        const response = await serviceStorage.updateStorageServiceStatus({
-          id,
-          status,
-        })
-        if (response.message === 'storage not found') {
-          return res.status(404).json({
-            status: 'error',
-            message: response.message,
-          })
-        }
         res.status(200).json({
           status: 'success',
+          // update_storage,
+          // update_Oldroom,
+          // update_Newroom,
           message: response.message,
         })
-      } else {
-        throw new ErrorHandler(401, 'Unauthorized')
-      }
-    }
-  } catch (error) {
-    res.status(500).json({
-      status: 'error',
-      message: error.message,
-    })
+  } else {
+    throw new ErrorHandler(401, 'Unauthorized')
   }
 }
 
@@ -272,6 +266,5 @@ module.exports = {
   getStorageServicebyUser_ID,
   deleteStorageService,
   updateStorageService,
-  updateStorageServiceStatus,
   getAllRoom,
 }

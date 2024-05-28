@@ -57,9 +57,10 @@ const getBeautysByDateAndTimeSlotdb = async (date, time_slot) => {
 
 const getAllBeautybyUser_IDdb = async (user_id, isAdmin) => {
   let queryString = `
-    SELECT beauty.*, beauty_orders.*
+    SELECT beauty.*, beauty_orders.*, time_slot_beauty.time
     FROM beauty
     INNER JOIN beauty_orders ON beauty.id = beauty_orders.service_id
+    INNER JOIN time_slot_beauty ON beauty.time_slot = time_slot_beauty.id
   `
   const queryParams = []
 
@@ -79,9 +80,10 @@ const getAllBeautybyUser_IDdb = async (user_id, isAdmin) => {
 
 const getBeautybyIDdb = async ({ id }) => {
   const { rows: beautyById } = await pool.query(
-    `SELECT beauty.*, beauty_orders.*
+    `SELECT beauty.*, beauty_orders.*, time_slot_beauty.time
     FROM beauty
     INNER JOIN beauty_orders ON beauty.id = beauty_orders.service_id
+    INNER JOIN time_slot_beauty ON beauty.time_slot = time_slot_beauty.id
     WHERE beauty.id = $1`,
     [id],
   )
@@ -139,7 +141,7 @@ const updateBeautydb = async ({ id, date, note, time_slot, pet_id }) => {
 
     if (existingBeauty.length === 0) {
       await pool.query('ROLLBACK')
-      return { message: 'Appointment not found' }
+      return { message: 'Beauty not found' }
     }
 
     const { rows: existingBeautyOrder } = await pool.query(

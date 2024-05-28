@@ -156,10 +156,11 @@ const getServicePetbyUser_ID = async ({ id }) => {
   const pets = petResult.rows
   const servicesQuery = `
       SELECT 
+        s.id as id,
         so.pet_id, 
         so.id AS order_id, 
         'storage' AS service_type, 
-        s."status ", 
+        s."status", 
         s.date_start AS service_date, 
         so.total
       FROM 
@@ -172,6 +173,7 @@ const getServicePetbyUser_ID = async ({ id }) => {
       UNION
 
       SELECT 
+        b.id as id,
         bo.pet_id, 
         bo.id AS order_id, 
         'beauty' AS service_type, 
@@ -188,6 +190,7 @@ const getServicePetbyUser_ID = async ({ id }) => {
       UNION
 
       SELECT 
+        a.id as id, 
         ao.pet_id, 
         ao.id AS order_id, 
         'appointment' AS service_type, 

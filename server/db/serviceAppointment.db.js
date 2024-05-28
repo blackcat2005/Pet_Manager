@@ -47,9 +47,10 @@ const getAppointmentsByDateAndTimeSlotdb = async (date, time_slot) => {
 
 const getAllAppointmentbyUserSessiondb = async (user_id, isAdminStaff) => {
   let queryString = `
-    SELECT appointments.*, appointment_orders.*
+    SELECT appointments.*, appointment_orders.*, time_slot_appointment.time
     FROM appointments
     INNER JOIN appointment_orders ON appointments.id = appointment_orders.service_id
+    INNER JOIN time_slot_appointment ON appointments.time_slot = time_slot_appointment.id
   `
   const queryParams = []
 
@@ -67,13 +68,14 @@ const getAllAppointmentbyUserSessiondb = async (user_id, isAdminStaff) => {
   }
 }
 
-const getAppointmentbyIDdb = async (appointment_id) => {
+const getAppointmentbyIDdb = async (id) => {
   const { rows: appointmentById } = await pool.query(
-    `SELECT appointments.*, appointment_orders.*
+    `SELECT appointments.*, appointment_orders.*, time_slot_appointment.time
     FROM appointments
     INNER JOIN appointment_orders ON appointments.id = appointment_orders.service_id
+    INNER JOIN time_slot_appointment ON appointments.time_slot = time_slot_appointment.id
     WHERE appointments.id = $1`,
-    [appointment_id],
+    [id],
   )
   if (appointmentById.length === 0) {
     return { message: 'No appointment found with the specified ID' }
