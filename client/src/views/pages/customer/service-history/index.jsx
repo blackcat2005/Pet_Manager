@@ -16,19 +16,21 @@ function ServiceHistory() {
   useEffect(() => {
     const fetchAllServices = async () => {
       try {
-        const storageResponse = await ServiceHistoryAPI.getStorageServicebyUser_ID();
-        const beautyResponse = await ServiceHistoryAPI.getAllBeautyService();
-        const appointmentResponse = await ServiceHistoryAPI.getAllAppointmentbyUserSession();
+        const detailPetResponse = await ServiceHistoryAPI.getDetailPet();
+        console.log("Detail Pet Services:", detailPetResponse.data);
 
-        console.log("Storage Services:", storageResponse.data.getStorageServicebyUser_ID);
-        console.log("Beauty Services:", beautyResponse.data.allBeauty);
-        console.log("Appointment Services:", appointmentResponse.data.allAppointment);
-
-        const allServices = [
-          ...storageResponse.data.getStorageServicebyUser_ID,
-          ...beautyResponse.data.allBeauty,
-          ...appointmentResponse.data.allAppointment
-        ];
+        const allServices = detailPetResponse.data.flatMap(pet => 
+          pet.services.map(service => ({
+            ...service,
+            pet_name: pet.pet_name,
+            species: pet.species,
+            age: pet.age,
+            weight: pet.weight,
+            sex: pet.sex,
+            health: pet.health,
+            describe: pet.describe
+          }))
+        );
 
         setRows(allServices);
       } catch (error) {
@@ -40,7 +42,7 @@ function ServiceHistory() {
   }, []);
 
   const canCancelService = () => {
-    const selectedRows = rows.filter(row => selected.includes(row.id));
+    const selectedRows = rows.filter(row => selected.includes(row.order_id));
     if (selectedRows.some(row => row.status === 'canceled')) {
       return false;
     }
@@ -49,9 +51,9 @@ function ServiceHistory() {
 
   const handleCancelService = () => {
     if (canCancelService()) {
-      const servicesToDelete = rows.filter(row => selected.includes(row.id));
+      const servicesToDelete = rows.filter(row => selected.includes(row.order_id));
       const deletePromises = servicesToDelete.map(service =>
-        ServiceHistoryAPI.deleteStorageService({ id: service.id })
+        ServiceHistoryAPI.deleteStorageService({ id: service.order_id })
       );
 
       Promise.all(deletePromises)
@@ -62,7 +64,7 @@ function ServiceHistory() {
             }
           });
           // Cập nhật danh sách dịch vụ sau khi xóa
-          setRows(prevRows => prevRows.filter(row => !selected.includes(row.id)));
+          setRows(prevRows => prevRows.filter(row => !selected.includes(row.order_id)));
           setSelected([]);
         })
         .catch(error => {
@@ -80,15 +82,19 @@ function ServiceHistory() {
     setSortType(value);
     const fetchFilteredServices = async () => {
       try {
-        const storageResponse = await ServiceHistoryAPI.getStorageServicebyUser_ID();
-        const beautyResponse = await ServiceHistoryAPI.getAllBeautyService();
-        const appointmentResponse = await ServiceHistoryAPI.getAllAppointmentbyUserSession();
-
-        const allServices = [
-          ...storageResponse.data.getStorageServicebyUser_ID,
-          ...beautyResponse.data.allBeauty,
-          ...appointmentResponse.data.allAppointment
-        ];
+        const detailPetResponse = await ServiceHistoryAPI.getDetailPet();
+        const allServices = detailPetResponse.data.flatMap(pet => 
+          pet.services.map(service => ({
+            ...service,
+            pet_name: pet.pet_name,
+            species: pet.species,
+            age: pet.age,
+            weight: pet.weight,
+            sex: pet.sex,
+            health: pet.health,
+            describe: pet.describe
+          }))
+        );
 
         const filteredRows = value === 'all' ? allServices : allServices.filter(row => row.status === value);
         setRows(filteredRows);
@@ -101,12 +107,12 @@ function ServiceHistory() {
   };
 
   const handleSelect = (record) => {
-    const selectedIndex = selected.indexOf(record.id);
-    let newSelected = selectedIndex === -1 ? selected.concat(record.id) : selected.filter(item => item !== record.id);
+    const selectedIndex = selected.indexOf(record.order_id);
+    let newSelected = selectedIndex === -1 ? selected.concat(record.order_id) : selected.filter(item => item !== record.order_id);
     setSelected(newSelected);
   };
 
-  const isSelected = (id) => selected.includes(id);
+  const isSelected = (order_id) => selected.includes(order_id);
 
   const getStatusIcon = (status) => {
     let icon;
@@ -167,33 +173,21 @@ function ServiceHistory() {
   const columns = [
     {
       title: '',
-      dataIndex: 'id',
+      dataIndex: 'order_id',
       key: 'checkbox',
       render: (text, record) => (
-        <Checkbox checked={isSelected(record.id)} onChange={() => handleSelect(record)} />
+        <Checkbox checked={isSelected(record.order_id)} onChange={() => handleSelect(record)} />
       )
     },
-    { title: 'Service ID', dataIndex: 'id', key: 'id' },
-    { title: 'Room ID', dataIndex: 'room_id', key: 'room_id' },
+    { title: 'ID dịch vụ', dataIndex: 'order_id', key: 'order_id' },
+    { title: 'Tên thú cưng', dataIndex: 'pet_name', key: 'pet_name' },
+    { title: 'Loại dịch vụ', dataIndex: 'service_type', key: 'service_type' },
     { 
-      title: 'Thời gian tạo', 
-      dataIndex: 'create_at', 
-      key: 'create_at',
+      title: 'Ngày đăng ký', 
+      dataIndex: 'service_date', 
+      key: 'service_date',
       render: (text) => moment(text).format('YYYY-MM-DD') 
     },
-    { 
-      title: 'Ngày bắt đầu', 
-      dataIndex: 'date_start', 
-      key: 'date_start',
-      render: (text) => moment(text).format('YYYY-MM-DD') 
-    },
-    { 
-      title: 'Ngày kết thúc', 
-      dataIndex: 'date_end', 
-      key: 'date_end',
-      render: (text) => moment(text).format('YYYY-MM-DD') 
-    },
-    { title: 'Ghi chú', dataIndex: 'note', key: 'note' },
     { title: 'Tổng cộng', dataIndex: 'total', key: 'total' },
     { title: 'Trạng thái', dataIndex: 'status', key: 'status', render: getStatusIcon },
   ];
@@ -215,7 +209,7 @@ function ServiceHistory() {
           </Button>
         </Space>
       </Space>
-      <Table dataSource={rows} columns={columns} rowKey="id" pagination={{ pageSize: 5 }} />
+      <Table dataSource={rows} columns={columns} rowKey="order_id" pagination={{ pageSize: 5 }} />
       <Modal
         title="Thông tin ngân hàng"
         visible={isBankFormVisible}

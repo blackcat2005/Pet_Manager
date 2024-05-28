@@ -5,21 +5,25 @@ const ServiceHistoryAPI = {
         const url = '/services/getStorageServicebyUser_ID'
         return API.get(url)
     },
-    deleteStorageService: (body) => {
-        const url = '/services/deleteStorageService'
-        return API.delete(url, { data: body })
+    getDetailPet: () => {
+        const url = '/services/detailPet'
+        return API.get(url)
     },
     getAllBeautyService: () => {
         const url = '/services/getAllBeautybyUser_ID'
+        return API.get(url)
+    },
+    getAllAppointmentbyUserSession: () => {
+        const url = '/services/appointment/getAllAppointmentbyUserSession'
         return API.get(url)
     },
     deleteBeautyService: (body) => {
         const url = '/services/deleteBeauty'
         return API.delete(url, { data: body })
     },
-    getAllAppointmentbyUserSession: () => {
-        const url = '/services/appointment/getAllAppointmentbyUserSession'
-        return API.get(url)
+    deleteStorageService: (body) => {
+        const url = '/services/deleteStorageService'
+        return API.delete(url, { data: body })
     },
     deleteAppointment: (body) => {
         const url = '/services/appointment/deleteAppointment'

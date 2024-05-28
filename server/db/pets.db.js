@@ -91,7 +91,7 @@ const getServicePet = async ({ id }) => {
       SELECT 
         so.id AS order_id, 
         'storage' AS service_type, 
-        s."status ", 
+        s."status", 
         s.date_start AS service_date, 
         so.total
       FROM 
@@ -159,7 +159,7 @@ const getServicePetbyUser_ID = async ({ id }) => {
         so.pet_id, 
         so.id AS order_id, 
         'storage' AS service_type, 
-        s."status ", 
+        s."status", 
         s.date_start AS service_date, 
         so.total
       FROM 

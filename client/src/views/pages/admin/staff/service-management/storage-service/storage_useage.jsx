@@ -78,12 +78,7 @@ const StorageServiceUsage = () => {
   const edit = (record) => {
     form.setFieldsValue({
       service_id: record.id, // chuyển id thành service_id để truyền đi 
-      room_id: record.room_id,
-      pet_id: record.pet_id,
-      user_id: record.user_id,
-      note: record.note,
-      total: record.total,
-      status: record.status,
+      ...record,
       date_start: record.date_start ? moment(record.date_start.toString(), 'YYYY-MM-DD') : null,
       date_end: record.date_end ? moment(record.date_end.toString(), 'YYYY-MM-DD') : null,
     });
@@ -227,7 +222,7 @@ const StorageServiceUsage = () => {
     },
     { title: 'Ghi chú', dataIndex: 'note', key: 'note', editable: true },
     { title: 'Giá dịch vụ', dataIndex: 'total', key: 'total', editable: true },
-    { title: 'Trạng thái', dataIndex: 'status ', key: 'status ', editable: true, inputType: 'select',
+    { title: 'Trạng thái', dataIndex: 'status', key: 'status', editable: true, inputType: 'select',
       render: (status) => (
         <span className={'status-tag ' + status}>
           {status}
