@@ -13,11 +13,13 @@ const {
 } = require('../controllers/servicesAppointment.controller')
 const {
   createBeauty,
+  allBeauty,
   getAllBeautybyUser_ID,
   getBeautybyID,
   deleteBeauty,
   updateBeauty,
   updateBeautyStatus,
+  getBeautybyPet_ID 
 } = require('../controllers/servicesBeauty.controller')
 const {
   createStorageService,
@@ -71,7 +73,9 @@ router.route('/allRoom').get(getAllRoom)
 
 // Beauty
 router.route('/createBeauty').post(createBeauty)
+router.route('/allBeauty').get(allBeauty)
 router.route('/getAllBeautybyUser_ID').get(getAllBeautybyUser_ID)
+router.route('/getBeautybyPet_ID').get(getBeautybyPet_ID)
 router.route('/getBeautybyID').get(verifyStaff, getBeautybyID)
 router.route('/deleteBeauty').delete(verifyStaff, deleteBeauty)
 router.route('/updateBeauty').put(verifyStaff, updateBeauty)

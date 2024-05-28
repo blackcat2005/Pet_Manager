@@ -15,11 +15,35 @@ const createBeautydb = async ({ status, date, time_slot, note }) => {
 const createBeautyOrderdb = async ({ service_id, user_id, pet_id, total }) => {
   const { rows: beauty_order } = await pool.query(
     `INSERT INTO "beauty_orders"("service_id", "user_id","pet_id","total") 
-        VALUES($1, $2, $3, $4, $5) 
+        VALUES($1, $2, $3, $4) 
         returning "id", "service_id", "user_id", "pet_id", "total", "create_at"`,
     [service_id, user_id, pet_id, total],
   )
   return beauty_order[0]
+}
+
+const getAllBeautyDB = async () => {
+  const query = `
+      SELECT 
+        s.*, 
+        t.time AS time,
+        t.price AS price,
+        t.unit AS unit,
+        bo.id AS order_id,
+        bo.service_id AS order_service_id,
+        bo.user_id AS order_user_id,
+        bo.pet_id AS order_pet_id,
+        bo.create_at AS order_created_at,
+        bo.total AS order_total
+      FROM 
+        beauty s
+      LEFT JOIN 
+        time_slot_beauty t ON s.time_slot = t.id
+      LEFT JOIN 
+        beauty_orders bo ON bo.service_id = s.id
+    `
+  const { rows: allbeauty } = await pool.query(query)
+  return allbeauty
 }
 
 const getBeautysByDateAndTimeSlotdb = async (date, time_slot) => {
@@ -65,6 +89,18 @@ const getBeautybyIDdb = async ({ id }) => {
     return { message: 'No appointment found with the specified ID' }
   }
   return beautyById[0]
+}
+
+const getBeautybyPetIDdb = async(pet_id) => {
+  const {rows: beauty} = await pool.query(
+    `SELECT beauty.*, beauty_orders.*
+    FROM beauty
+    WHERE beauty.pet_id = $1`,
+    [pet_id],
+  )
+  if (beauty.length == 0) {
+    return {message : "No beauty found with that pet"}
+  }
 }
 
 const deleteBeautydb = async (id) => {
@@ -174,8 +210,10 @@ const updateBeautyStatusdb = async ({ id, status }) => {
 module.exports = {
   createBeautydb,
   createBeautyOrderdb,
+  getAllBeautyDB,
   getBeautysByDateAndTimeSlotdb,
   getBeautybyIDdb,
+  getBeautybyPetIDdb,
   getAllBeautybyUser_IDdb,
   deleteBeautydb,
   updateBeautydb,

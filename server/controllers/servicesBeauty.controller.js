@@ -2,7 +2,7 @@ const userService = require('../services/users.service')
 const { ErrorHandler } = require('../helpers/error')
 const serviceBeauty = require('../services/serviceBeauty.service')
 const time_slotService = require('../services/time_slot.service')
-
+const PetService = require('../services/pets.service')
 const createBeauty = async (req, res) => {
   const { date, note, time_slot, pet_id, total } = req.body
   const { user_id } = req.user
@@ -63,6 +63,25 @@ const createBeauty = async (req, res) => {
   }
 }
 
+const allBeauty = async (req, res) => {
+  const { user_id } = req.user
+
+  const user = await userService.getUserById(user_id)
+  if (!user) {
+    throw new ErrorHandler(404, 'User not found')
+  }
+  if (req.user.roles.includes('admin') || req.user.roles.includes('staff')) {
+    const AllBeauty = await serviceBeauty.getAllBeauty()
+    res.status(201).json({
+      status: 'success',
+      AllBeauty,
+    })
+  } else {
+    throw new ErrorHandler(401, 'No Permission')
+  }
+}
+
+
 const getAllBeautybyUser_ID = async (req, res) => {
   const { user_id, roles } = req.user
 
@@ -80,10 +99,22 @@ const getAllBeautybyUser_ID = async (req, res) => {
       status: 'success',
       allBeauty,
     })
-    console.log(user_id)
+    // console.log(user_id)
   } else {
     throw new ErrorHandler(401, 'Unauthorized')
   }
+}
+
+const getBeautybyPet_ID = async(req, res) => {
+  const {user_id, roles} = req.user;
+  const user = await userService.getUserById(user_id);
+  const isAdmin = roles.includes('admin') || roles.includes('staff')
+  const pet = await PetService.getServicePetbyUser_ID({user_id});
+    if (!user) {
+    throw new ErrorHandler(404, 'User not found')
+  }
+  console.log(pet);
+  res.status(201).json({pet});
 }
 
 const getBeautybyID = async (req, res) => {
@@ -222,9 +253,11 @@ const updateBeautyStatus = async (req, res) => {
 
 module.exports = {
   createBeauty,
+  allBeauty,
   getAllBeautybyUser_ID,
   getBeautybyID,
   deleteBeauty,
   updateBeauty,
   updateBeautyStatus,
+  getBeautybyPet_ID,
 }
