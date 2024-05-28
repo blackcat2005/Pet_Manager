@@ -40,6 +40,7 @@ class ServiceService {
   getStorageServicebyID = async (StorageServicebyID) => {
     try {
       const e = await getStorageServicebyIDdb(StorageServicebyID)
+      console.log(e);
       return e
     } catch (error) {
       console.log(error)

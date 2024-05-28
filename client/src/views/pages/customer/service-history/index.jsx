@@ -1,27 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Table, Checkbox, Button, Typography, Space, Tag, Select, Modal, Form, Input } from 'antd';
 import { CheckCircleFilled, CloseCircleFilled, SyncOutlined, MinusCircleFilled, ExclamationCircleOutlined } from '@ant-design/icons';
+import moment from 'moment';
+import ServiceHistoryAPI from 'api/service/service-history';
 
 const { Option } = Select;
 const { confirm } = Modal;
 
-const initialRows = [
-  { id: 'AH2928', name: 'Dịch vụ lưu trú', price: 440000, status: 'Kích hoạt', date: '2021-02-05 08:28:36' },
-  { id: 'AH2929', name: 'Dịch vụ lưu trú', price: 440000, status: 'Kích hoạt', date: '2021-02-05 08:28:36' },
-  { id: 'EF8392', name: 'Dịch vụ vệ sinh', price: 320000, status: 'Đang thực hiện', date: '2020-11-17 15:42:21' },
-  { id: 'JK1038', name: 'Dịch vụ chăm sóc sức khỏe', price: 700000, status: 'Kích hoạt', date: '2023-09-28 10:15:47' },
-  { id: 'LM7162', name: 'Dịch vụ lưu trú', price: 480000, status: 'Hoàn thành', date: '2022-05-09 09:57:03' }
-];
-
 function ServiceHistory() {
-  const [rows, setRows] = useState(initialRows);
+  const [rows, setRows] = useState([]);
   const [selected, setSelected] = useState([]);
   const [sortType, setSortType] = useState(null);
   const [isBankFormVisible, setBankFormVisible] = useState(false);
 
+  useEffect(() => {
+    const fetchAllServices = async () => {
+      try {
+        const storageResponse = await ServiceHistoryAPI.getStorageServicebyUser_ID();
+        const beautyResponse = await ServiceHistoryAPI.getAllBeautyService();
+        const appointmentResponse = await ServiceHistoryAPI.getAllAppointmentbyUserSession();
+
+        console.log("Storage Services:", storageResponse.data.getStorageServicebyUser_ID);
+        console.log("Beauty Services:", beautyResponse.data.allBeauty);
+        console.log("Appointment Services:", appointmentResponse.data.allAppointment);
+
+        const allServices = [
+          ...storageResponse.data.getStorageServicebyUser_ID,
+          ...beautyResponse.data.allBeauty,
+          ...appointmentResponse.data.allAppointment
+        ];
+
+        setRows(allServices);
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+      }
+    };
+
+    fetchAllServices();
+  }, []);
+
   const canCancelService = () => {
     const selectedRows = rows.filter(row => selected.includes(row.id));
-    if (selectedRows.some(row => row.status == 'Hủy')) {
+    if (selectedRows.some(row => row.status === 'canceled')) {
       return false;
     }
     return true;
@@ -29,11 +49,25 @@ function ServiceHistory() {
 
   const handleCancelService = () => {
     if (canCancelService()) {
-      const newRows = rows.map(row => (
-        selected.includes(row.id) ? { ...row, status: 'Hủy' } : row
-      ));
-      setRows(newRows);
-      setSelected([]);
+      const servicesToDelete = rows.filter(row => selected.includes(row.id));
+      const deletePromises = servicesToDelete.map(service =>
+        ServiceHistoryAPI.deleteStorageService({ id: service.id })
+      );
+
+      Promise.all(deletePromises)
+        .then(responses => {
+          responses.forEach(response => {
+            if (response.data.status === 'success') {
+              console.log(`Service with ID ${response.data.id} deleted successfully.`);
+            }
+          });
+          // Cập nhật danh sách dịch vụ sau khi xóa
+          setRows(prevRows => prevRows.filter(row => !selected.includes(row.id)));
+          setSelected([]);
+        })
+        .catch(error => {
+          console.error("Error deleting services: ", error);
+        });
     } else {
       Modal.error({
         title: 'Không thể hủy',
@@ -43,13 +77,27 @@ function ServiceHistory() {
   };
 
   const handleStatusFilter = (value) => {
-    setSortType(value); 
-    if (value === 'all') {
-      setRows(initialRows); 
-    } else {
-      const filteredRows = initialRows.filter(row => row.status === value);
-      setRows(filteredRows);
-    }
+    setSortType(value);
+    const fetchFilteredServices = async () => {
+      try {
+        const storageResponse = await ServiceHistoryAPI.getStorageServicebyUser_ID();
+        const beautyResponse = await ServiceHistoryAPI.getAllBeautyService();
+        const appointmentResponse = await ServiceHistoryAPI.getAllAppointmentbyUserSession();
+
+        const allServices = [
+          ...storageResponse.data.getStorageServicebyUser_ID,
+          ...beautyResponse.data.allBeauty,
+          ...appointmentResponse.data.allAppointment
+        ];
+
+        const filteredRows = value === 'all' ? allServices : allServices.filter(row => row.status === value);
+        setRows(filteredRows);
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+      }
+    };
+
+    fetchFilteredServices();
   };
 
   const handleSelect = (record) => {
@@ -64,19 +112,19 @@ function ServiceHistory() {
     let icon;
     let color;
     switch (status) {
-      case 'Kích hoạt':
+      case 'created':
         icon = <CheckCircleFilled style={{ color: '#52c41a' }} />;
         color = 'green';
         break;
-      case 'Hủy':
+      case 'canceled':
         icon = <MinusCircleFilled style={{ color: 'grey' }} />;
         color = 'grey';
         break;
-      case 'Hoàn thành':
+      case 'completed':
         icon = <CheckCircleFilled style={{ color: '#1890ff' }} />;
         color = 'blue';
         break;
-      case 'Đang thực hiện':
+      case 'processing':
         icon = <SyncOutlined spin style={{ color: 'red' }} />;
         color = 'red';
         break;
@@ -105,7 +153,7 @@ function ServiceHistory() {
           setBankFormVisible(true);
         },
         onCancel() {
-          
+
         },
       });
     } else {
@@ -125,11 +173,29 @@ function ServiceHistory() {
         <Checkbox checked={isSelected(record.id)} onChange={() => handleSelect(record)} />
       )
     },
-    { title: 'Mã dịch vụ', dataIndex: 'id', key: 'id' },
-    { title: 'Tên dịch vụ', dataIndex: 'name', key: 'name' },
-    { title: 'Giá dịch vụ', dataIndex: 'price', key: 'price', render: price => `${price.toLocaleString()} VND` },
+    { title: 'Service ID', dataIndex: 'id', key: 'id' },
+    { title: 'Room ID', dataIndex: 'room_id', key: 'room_id' },
+    { 
+      title: 'Thời gian tạo', 
+      dataIndex: 'create_at', 
+      key: 'create_at',
+      render: (text) => moment(text).format('YYYY-MM-DD') 
+    },
+    { 
+      title: 'Ngày bắt đầu', 
+      dataIndex: 'date_start', 
+      key: 'date_start',
+      render: (text) => moment(text).format('YYYY-MM-DD') 
+    },
+    { 
+      title: 'Ngày kết thúc', 
+      dataIndex: 'date_end', 
+      key: 'date_end',
+      render: (text) => moment(text).format('YYYY-MM-DD') 
+    },
+    { title: 'Ghi chú', dataIndex: 'note', key: 'note' },
+    { title: 'Tổng cộng', dataIndex: 'total', key: 'total' },
     { title: 'Trạng thái', dataIndex: 'status', key: 'status', render: getStatusIcon },
-    { title: 'Thời gian đăng ký', dataIndex: 'date', key: 'date' }
   ];
 
   return (
@@ -138,11 +204,11 @@ function ServiceHistory() {
         <Typography.Title level={1}>Lịch sử đăng ký</Typography.Title>
         <Space>
           <Select value={sortType} onChange={handleStatusFilter} style={{ width: 120 }} placeholder="Lọc">
-            <Option value="all">Tất cả</Option>
-            <Option value="Kích hoạt">Kích hoạt</Option>
-            <Option value="Hủy">Hủy</Option>
-            <Option value="Hoàn thành">Hoàn thành</Option>
-            <Option value="Đang thực hiện">Đang thực hiện</Option>
+            <Option value="all">all</Option>
+            <Option value="created">created</Option>
+            <Option value="processing">processing</Option>
+            <Option value="completed">completed</Option>
+            <Option value="canceled">canceled</Option>
           </Select>
           <Button type="primary" danger onClick={showConfirm}>
             Hủy dịch vụ

@@ -8,7 +8,6 @@ const pet = {
     const url = `/pets/${pet_id}`
     return API.get(url, params)
   },
-  
 }
 
 export default pet

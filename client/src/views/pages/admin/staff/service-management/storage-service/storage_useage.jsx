@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Space, Typography, Select, message, Input, Form, Row, Popconfirm, Modal } from 'antd';
+import { Table, Button, Space, Typography, Select, message, Input, Form, Row, Popconfirm, Modal, DatePicker } from 'antd';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import '../../index.css';
+import service from 'api/service/storage-service';
+import moment from 'moment';
 
 const { Option } = Select;
 
@@ -15,15 +17,18 @@ const EditableCell = ({
   children,
   ...restProps
 }) => {
-  const inputNode = inputType === 'number' ? <Input /> : 
-    (inputType === 'select' ? (
+  const inputNode = inputType === 'number' ? <Input /> : (
+    inputType === 'select' ? (
       <Select>
-        <Option value="Created">Created</Option>
-        <Option value="Processing">Processing</Option>
-        <Option value="Completed">Completed</Option>
-        <Option value="Canceled">Canceled</Option>
+        <Option value="created">created</Option>
+        <Option value="processing">processing</Option>
+        <Option value="completed">completed</Option>
+        <Option value="canceled">canceled</Option>
       </Select>
-    ) : <Input />);
+    ) : (
+      inputType === 'date' ? <DatePicker format="YYYY-MM-DD" /> : <Input />
+    )
+  );
   return (
     <td {...restProps}>
       {editing ? (
@@ -48,82 +53,127 @@ const StorageServiceUsage = () => {
   const [form] = Form.useForm();
   const [data, setData] = useState([]);
   const [editingKey, setEditingKey] = useState('');
-
-  const [services, setServices] = useState([
-    { id: '1', petName: 'Mèo', roomType: 'VIP', startDate: '2023-05-01', endDate: '2023-05-03', registrationDate: '2023-04-01', status: 'Created' },
-    { id: '2', petName: 'Chó', roomType: 'Standard', startDate: '2023-05-02', endDate: '2023-05-04', registrationDate: '2023-04-02', status: 'Processing' },
-    { id: '3', petName: 'Bò', roomType: 'Deluxe', startDate: '2023-05-03', endDate: '2023-05-05', registrationDate: '2023-04-03', status: 'Completed' },
-    { id: '4', petName: 'Cá', roomType: 'Standard', startDate: '2023-05-04', endDate: '2023-05-06', registrationDate: '2023-04-04', status: 'Canceled' },
-    { id: '5', petName: 'Chó', roomType: 'VIP', startDate: '2023-05-05', endDate: '2023-05-07', registrationDate: '2023-04-05', status: 'Created' },
-    { id: '6', petName: 'Lợn', roomType: 'Deluxe', startDate: '2023-05-06', endDate: '2023-05-08', registrationDate: '2023-04-06', status: 'Processing' },
-  ]);
+  const [mode, setMode] = useState('create')
 
   useEffect(() => {
-    setData(services);
-  }, [services]);
+    service.getAllStorageService()
+      .then(response => {
+        const updatedData = response.data.AllStorageService.map(item => ({
+          ...item,
+          pet_id: item.order_pet_id,
+          user_id: item.order_user_id,
+          total: item.order_total
+        }));
+        setData(updatedData);
+        console.log(response.data.AllStorageService);
+      })
+      .catch(error => {
+        console.error('Failed to fetch storage services:', error);
+        message.error('Failed to fetch storage services.');
+      });
+  }, []);
 
   const isEditing = (record) => record.id === editingKey;
 
   const edit = (record) => {
     form.setFieldsValue({
-      id: '',
-      petName: '',
-      roomType: '',
-      startDate: '',
-      endDate: '',
-      registrationDate: '',
-      status: '',
-      ...record,
+      service_id: record.id, // chuyển id thành service_id để truyền đi 
+      room_id: record.room_id,
+      pet_id: record.pet_id,
+      user_id: record.user_id,
+      note: record.note,
+      total: record.total,
+      status: record.status,
+      date_start: record.date_start ? moment(record.date_start.toString(), 'YYYY-MM-DD') : null,
+      date_end: record.date_end ? moment(record.date_end.toString(), 'YYYY-MM-DD') : null,
     });
     setEditingKey(record.id);
+    setMode('update')
   };
 
   const cancel = () => {
     setEditingKey('');
+    setData(prevData => prevData.filter(item => item.id !== editingKey));
   };
 
-  const save = async (id) => {
+  const handleSave = async (id) => {
     try {
-      const row = await form.validateFields();
+      let row = await form.validateFields();
       const newData = [...data];
       const index = newData.findIndex((item) => id === item.id);
-      if (index > -1) {
+      console.log(`mode ${mode}`);
+      if (mode === 'update') {
         const item = newData[index];
-        newData.splice(index, 1, { ...item, ...row });
+        const updatedItem = { ...item, ...row, id: item.id };
+        newData.splice(index, 1, updatedItem);
         setData(newData);
         setEditingKey('');
-        setServices(newData);
+  
+        const updatePayload = {
+          service_id: updatedItem.id,
+          room_id: updatedItem.room_id,
+          date_start: moment(updatedItem.date_start.toString()).format('YYYY-MM-DD'),
+          date_end: moment(updatedItem.date_end.toString()).format('YYYY-MM-DD'),
+          note: updatedItem.note,
+          pet_id: updatedItem.pet_id,
+        };
+        await service.updateStorageService(updatePayload);
         message.success('Cập nhật dịch vụ thành công!');
-      } else {
-        newData.push(row);
-        setData(newData);
+      } else if (mode == 'create') {
+        row = {
+          ...row,
+          date_start: moment(row.date_start.toString()).format('YYYY-MM-DD'),
+          date_end: moment(row.date_end.toString()).format('YYYY-MM-DD')
+        };
+        console.log(row);
+        await service.createStorageService(row);
+        setData((prev) => [...prev, row]);
         setEditingKey('');
+        message.success('Thêm dịch vụ thành công!');
       }
     } catch (errInfo) {
       console.log('Validate Failed:', errInfo);
     }
   };
+  
 
-  const handleDelete = (id) => {
-    const newServices = services.filter(item => item.id !== id);
-    setServices(newServices);
-    setData(newServices);
-    message.success('Xóa dịch vụ thành công!');
+  const handleDelete = async (id) => {
+    try {
+      await service.deleteStorageService({ service_id: id });
+      const newServices = data.filter(item => item.id !== id);
+      setData(newServices);
+      message.success('Xóa dịch vụ thành công!');
+    } catch (error) {
+      console.error('Failed to delete service:', error);
+      message.error('Xóa dịch vụ thất bại.');
+    }
   };
 
   const handleSearchChange = (e) => {
     const value = e.target.value.toLowerCase();
-    const filteredData = services.filter(service => {
-      return service.petName.toLowerCase().includes(value);
-    });
-    setData(filteredData);
+    service.getAllStorageService()
+      .then(response => {
+        const filteredData = response.data.AllStorageService.filter(service => {
+        return service.order_pet_id && service.order_pet_id.toString().toLowerCase().includes(value);
+      }).map(item => ({
+        ...item,
+        pet_id: item.order_pet_id,
+        user_id: item.order_user_id,
+        total: item.order_total
+      }));
+      setData(filteredData);
+      })
+      .catch(error => {
+        console.error('Failed to fetch storage services:', error);
+        message.error('Failed to fetch storage services.');
+      });
   };
 
   const handleSortChange = (value) => {
     const [field, order] = value.split('-');
-    const sorted = [...services].sort((a, b) => {
-      if (a[field] < b[field]) return order === 'ascend' ? -1 : 1;
-      if (a[field] > b[field]) return order === 'ascend' ? 1 : -1;
+    const sorted = [...data].sort((a, b) => {
+      if (moment(a[field]).isBefore(moment(b[field]))) return order === 'ascend' ? -1 : 1;
+      if (moment(a[field]).isAfter(moment(b[field]))) return order === 'ascend' ? 1 : -1;
       return 0;
     });
     setData(sorted);
@@ -131,16 +181,19 @@ const StorageServiceUsage = () => {
 
   const addNewRow = () => {
     const newRow = {
-      id: `${data.length + 1}`,
-      petName: '',
-      roomType: '',
-      startDate: '',
-      endDate: '',
-      registrationDate: '',
-      status: 'Created',
+      id: '',
+      room_id: '',
+      pet_id: '',
+      user_id: '',
+      date_start: '',
+      date_end: '',
+      note: '',
+      total: '',
+      status: 'created',
     };
     setData([newRow, ...data]);
     setEditingKey(newRow.id);
+    setMode('create')
     form.setFieldsValue(newRow);
   };
 
@@ -162,15 +215,21 @@ const StorageServiceUsage = () => {
   };
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', key: 'id', editable: false },
-    { title: 'Tên thú cưng', dataIndex: 'petName', key: 'petName', editable: true },
-    { title: 'Loại phòng', dataIndex: 'roomType', key: 'roomType', editable: true },
-    { title: 'Ngày bắt đầu', dataIndex: 'startDate', key: 'startDate', editable: true },
-    { title: 'Ngày kết thúc', dataIndex: 'endDate', key: 'endDate', editable: true },
-    { title: 'Ngày đăng ký', dataIndex: 'registrationDate', key: 'registrationDate', editable: true },
-    { title: 'Trạng thái', dataIndex: 'status', key: 'status', editable: true, inputType: 'select',
+    { title: 'Service ID', dataIndex: 'id', key: 'id', editable: false },
+    { title: 'Room ID', dataIndex: 'room_id', key: 'room_id', editable: true },
+    { title: 'Pet ID', dataIndex: 'pet_id', key: 'pet_id', editable: true },
+    { title: 'User ID', dataIndex: 'user_id', key: 'user_id', editable: true },
+    { title: 'Ngày bắt đầu', dataIndex: 'date_start', key: 'date_start', editable: true, inputType: 'date', 
+      render: (text) => moment(text).format('YYYY-MM-DD') 
+    },
+    { title: 'Ngày kết thúc', dataIndex: 'date_end', key: 'date_end', editable: true, inputType: 'date', 
+      render: (text) => moment(text).format('YYYY-MM-DD') 
+    },
+    { title: 'Ghi chú', dataIndex: 'note', key: 'note', editable: true },
+    { title: 'Giá dịch vụ', dataIndex: 'total', key: 'total', editable: true },
+    { title: 'Trạng thái', dataIndex: 'status ', key: 'status ', editable: true, inputType: 'select',
       render: (status) => (
-        <span className={`status-tag ${status.toLowerCase()}`}>
+        <span className={'status-tag ' + status}>
           {status}
         </span>
       ),
@@ -183,7 +242,7 @@ const StorageServiceUsage = () => {
         return editable ? (
           <span>
             <a
-              onClick={() => save(record.id)}
+              onClick={async () => {await handleSave(record.id)}}
               style={{
                 marginRight: 8,
               }}
@@ -227,8 +286,8 @@ const StorageServiceUsage = () => {
       <Typography.Title level={2} style={{ textAlign: 'center' }}>Sử dụng dịch vụ</Typography.Title>
       <Space style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, marginLeft: 50, width: '100%' }}>
         <Form layout="inline" style={{ border: '1px solid #d9d9d9', padding: '10px', borderRadius: '4px' }}>
-          <Form.Item label="Tên thú cưng">
-            <Input placeholder="Nhập tên" style={{ width: 200 }}
+          <Form.Item label="ID thú cưng">
+            <Input placeholder="Nhập id" style={{ width: 200 }}
               onChange={handleSearchChange}
               onPressEnter={handleSearchChange}
             />
@@ -239,12 +298,10 @@ const StorageServiceUsage = () => {
       <Row style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography.Title level={3} style={{ marginBottom: 0 }}>Search Table</Typography.Title>
         <Space>
-          <Select placeholder="Sắp xếp theo" style={{ width: 200 }} onChange={handleSortChange}>
-            <Option value="petName-ascend">Tên thú cưng (A-Z)</Option>
-            <Option value="petName-descend">Tên thú cưng (Z-A)</Option>
-            <Option value="registrationDate-ascend">Ngày đăng ký (Tăng dần)</Option>
-            <Option value="registrationDate-descend">Ngày đăng ký (Giảm dần)</Option>
-          </Select>
+        <Select placeholder="Sắp xếp theo" style={{ width: 200 }} onChange={handleSortChange}>
+          <Option value="date_start-ascend">Ngày bắt đầu (Tăng dần)</Option>
+          <Option value="date_start-descend">Ngày bắt đầu (Giảm dần)</Option>
+        </Select>
           <Button type="primary" icon={<PlusOutlined />} onClick={addNewRow}>Thêm mới</Button>
         </Space>
       </Row>
@@ -259,7 +316,7 @@ const StorageServiceUsage = () => {
           dataSource={data}
           columns={mergedColumns}
           rowClassName="editable-row"
-          pagination={{ pageSize: 5 }}
+          pagination={{ pageSize: 10 }}
         />
       </Form>
     </div>

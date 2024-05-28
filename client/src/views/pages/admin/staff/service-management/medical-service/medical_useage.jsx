@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Table, Button, Space, Typography, Select, message, Input, Form, Row, Popconfirm, Modal, DatePicker } from 'antd';
 import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import '../../index.css';
+import pet from 'api/pet';  
+import moment from 'moment';
 
 const { Option } = Select;
 
@@ -15,14 +17,18 @@ const EditableCell = ({
   children,
   ...restProps
 }) => {
-  const inputNode = inputType === 'number' ? <Input /> : (inputType === 'select' ? (
-    <Select>
-      <Option value="Created">Created</Option>
-      <Option value="Processing">Processing</Option>
-      <Option value="Completed">Completed</Option>
-      <Option value="Canceled">Canceled</Option>
-    </Select>
-  ) : <Input />);
+  const inputNode = inputType === 'number' ? <Input /> : (
+    inputType === 'select' ? (
+      <Select>
+        <Option value="Created">Created</Option>
+        <Option value="Processing">Processing</Option>
+        <Option value="Completed">Completed</Option>
+        <Option value="Canceled">Canceled</Option>
+      </Select>
+    ) : (
+      inputType === 'date' ? <DatePicker format="YYYY-MM-DD" /> : <Input />
+    )
+  );
   return (
     <td {...restProps}>
       {editing ? (
@@ -48,18 +54,18 @@ const MedicalServiceUsage = () => {
   const [data, setData] = useState([]);
   const [editingKey, setEditingKey] = useState('');
 
-  const [services, setServices] = useState([
-    { id: 'TradeCode 99', petName: 'Mèo', examination: 'Ca khám 1', description: 'Triệu chứng A', registrationDate: '2023-05-01', status: 'Created' },
-    { id: 'TradeCode 98', petName: 'Chó', examination: 'Ca khám 2', description: 'Triệu chứng B', registrationDate: '2023-05-02', status: 'Processing' },
-    { id: 'TradeCode 97', petName: 'Bò', examination: 'Ca khám 3', description: 'Triệu chứng C', registrationDate: '2023-05-03', status: 'Completed' },
-    { id: 'TradeCode 96', petName: 'Cá', examination: 'Ca khám 4', description: 'Triệu chứng D', registrationDate: '2023-05-04', status: 'Canceled' },
-    { id: 'TradeCode 95', petName: 'Chó', examination: 'Ca khám 5', description: 'Triệu chứng E', registrationDate: '2023-05-05', status: 'Created' },
-    { id: 'TradeCode 94', petName: 'Lợn', examination: 'Ca khám 6', description: 'Triệu chứng F', registrationDate: '2023-05-06', status: 'Processing' },
-  ]);
-
   useEffect(() => {
-    setData(services);
-  }, [services]);
+    const fetchData = async () => {
+      try {
+        const response = await pet.getPetList();
+        setData(response.data);
+      } catch (error) {
+        message.error('Lỗi khi tải danh sách dịch vụ');
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const isEditing = (record) => record.id === editingKey;
 
@@ -77,6 +83,7 @@ const MedicalServiceUsage = () => {
   };
 
   const cancel = () => {
+    setData(prevData => prevData.filter(item => item.id !== editingKey));
     setEditingKey('');
   };
 
@@ -90,7 +97,8 @@ const MedicalServiceUsage = () => {
         newData.splice(index, 1, { ...item, ...row });
         setData(newData);
         setEditingKey('');
-        setServices(newData);
+        // Cập nhật dịch vụ thông qua API
+        await pet.updatePetInfo(id, row);
         message.success('Cập nhật dịch vụ thành công!');
       } else {
         newData.push(row);
@@ -102,16 +110,20 @@ const MedicalServiceUsage = () => {
     }
   };
 
-  const handleDelete = (id) => {
-    const newServices = services.filter(item => item.id !== id);
-    setServices(newServices);
-    setData(newServices);
-    message.success('Xóa dịch vụ thành công!');
+  const handleDelete = async (id) => {
+    try {
+      await pet.deletePet(id); // Xóa dịch vụ thông qua API
+      const newServices = data.filter(item => item.id !== id);
+      setData(newServices);
+      message.success('Xóa dịch vụ thành công!');
+    } catch (error) {
+      message.error('Lỗi khi xóa dịch vụ');
+    }
   };
 
   const handleSearchChange = (e) => {
     const value = e.target.value.toLowerCase();
-    const filteredData = services.filter(service => {
+    const filteredData = data.filter(service => {
       return service.petName.toLowerCase().includes(value);
     });
     setData(filteredData);
@@ -119,7 +131,7 @@ const MedicalServiceUsage = () => {
 
   const handleSortChange = (value) => {
     const [field, order] = value.split('-');
-    const sorted = [...services].sort((a, b) => {
+    const sorted = [...data].sort((a, b) => {
       if (a[field] < b[field]) return order === 'ascend' ? -1 : 1;
       if (a[field] > b[field]) return order === 'ascend' ? 1 : -1;
       return 0;
@@ -129,7 +141,7 @@ const MedicalServiceUsage = () => {
 
   const addNewRow = () => {
     const newRow = {
-      id: `TradeCode ${data.length + 1}`,
+      id: `${data.length + 1}`,
       petName: '',
       examination: '',
       description: '',
@@ -163,7 +175,9 @@ const MedicalServiceUsage = () => {
     { title: 'Tên thú cưng', dataIndex: 'petName', key: 'petName', editable: true },
     { title: 'Ca khám', dataIndex: 'examination', key: 'examination', editable: true },
     { title: 'Mô tả triệu chứng', dataIndex: 'description', key: 'description', editable: true },
-    { title: 'Ngày đăng ký', dataIndex: 'registrationDate', key: 'registrationDate', editable: true },
+    { title: 'Ngày đăng ký', dataIndex: 'registrationDate', key: 'registrationDate', editable: true, inputType: 'date', 
+      render: (text) => moment(text).format('YYYY-MM-DD') 
+    },
     { 
       title: 'Trạng thái', 
       dataIndex: 'status', 

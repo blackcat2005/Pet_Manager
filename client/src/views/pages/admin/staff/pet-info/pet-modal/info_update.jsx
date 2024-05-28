@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Modal, Form, Input, Radio, Button, Divider } from 'antd';
 
-const UpdateModal = ({ visible, onCancel, selectedPet }) => {
+const UpdateModal = ({ visible, onCancel, selectedPet, onSave }) => {
     const [form] = Form.useForm();
 
     useEffect(() => {
@@ -19,7 +19,9 @@ const UpdateModal = ({ visible, onCancel, selectedPet }) => {
     }, [selectedPet]);
 
     const onFinish = (values) => {
-        console.log('Received values of form: ', values);
+        onSave({ ...selectedPet, ...values });
+        form.resetFields();
+        onCancel();
     };
 
     return (
@@ -48,9 +50,9 @@ const UpdateModal = ({ visible, onCancel, selectedPet }) => {
                                 <Form.Item
                                     label="Tên thú cưng"
                                     name="name"
-                                    rules={[{ required: true, message: 'Give the target a name!' }]}
+                                    rules={[{ required: true, message: 'Hãy nhập tên thú cưng!' }]}
                                 >
-                                    <Input placeholder="Give the target a name" />
+                                    <Input placeholder="Hãy nhập tên thú cưng" />
                                 </Form.Item>
 
                                 <Form.Item
@@ -63,21 +65,21 @@ const UpdateModal = ({ visible, onCancel, selectedPet }) => {
                                 <Form.Item
                                     label="Giới tính"
                                     name="gender"
-                                    rules={[{ required: true, message: 'Please select the gender!' }]}
+                                    rules={[{ required: true, message: 'Hãy chọn giới tính!' }]}
                                 >
                                     <Radio.Group>
-                                        <Radio value="male">Đực</Radio>
-                                        <Radio value="female">Cái</Radio>
-                                        <Radio value="other">Không xác định</Radio>
+                                        <Radio value="Đực">Đực</Radio>
+                                        <Radio value="Cái">Cái</Radio>
+                                        <Radio value="Không xác định">Không xác định</Radio>
                                     </Radio.Group>
                                 </Form.Item>
 
                                 <Form.Item
                                     label="Sức khỏe"
                                     name="health"
-                                    rules={[{ required: true, message: 'Please input status of pet\'s health!' }]}
+                                    rules={[{ required: true, message: 'Hãy nhập tình trạng sức khỏe!' }]}
                                 >
-                                    <Input placeholder="example" />
+                                    <Input placeholder="Nhập tình trạng sức khỏe" />
                                 </Form.Item>
 
                                 <Form.Item

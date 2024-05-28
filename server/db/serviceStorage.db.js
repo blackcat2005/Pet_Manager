@@ -62,6 +62,7 @@ const getAllStorageServiceDB = async () => {
 }
 
 const getStorageServicebyIDdb = async ({ service_id }) => {
+  console.log(service_id)
   const { rows: StorageServicebyID } = await pool.query(
     `SELECT ss.*, so.user_id, so.pet_id, so.total, so.create_at
        FROM "storage" ss
@@ -70,6 +71,7 @@ const getStorageServicebyIDdb = async ({ service_id }) => {
        WHERE ss.id = $1`,
     [service_id],
   )
+  console.log(StorageServicebyID)
   return StorageServicebyID[0]
 }
 

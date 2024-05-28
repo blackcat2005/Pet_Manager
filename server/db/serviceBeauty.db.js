@@ -15,7 +15,7 @@ const createBeautydb = async ({ status, date, time_slot, note }) => {
 const createBeautyOrderdb = async ({ service_id, user_id, pet_id, total }) => {
   const { rows: beauty_order } = await pool.query(
     `INSERT INTO "beauty_orders"("service_id", "user_id","pet_id","total") 
-        VALUES($1, $2, $3, $4, $5) 
+        VALUES($1, $2, $3, $4) 
         returning "id", "service_id", "user_id", "pet_id", "total", "create_at"`,
     [service_id, user_id, pet_id, total],
   )
@@ -35,7 +35,7 @@ const getAllBeautybyUser_IDdb = async (user_id, isAdmin) => {
   let queryString = `
     SELECT beauty.*, beauty_orders.*
     FROM beauty
-    INNER JOIN beauty_orders ON beauty.id = beauty_orders.service_id
+    JOIN beauty_orders ON beauty.id = beauty_orders.service_id
   `
   const queryParams = []
 
@@ -46,6 +46,7 @@ const getAllBeautybyUser_IDdb = async (user_id, isAdmin) => {
 
   try {
     const { rows: allAppointments } = await pool.query(queryString, queryParams)
+    console.log(allAppointments);
     return allAppointments
   } catch (error) {
     console.error('Error fetching beautys:', error)
@@ -83,7 +84,7 @@ const deleteBeautydb = async (id) => {
     }
 
     await pool.query('COMMIT')
-
+    console.log("Xóa thành công");
     return { message: 'beauty successfully deleted' }
   } catch (error) {
     await pool.query('ROLLBACK')

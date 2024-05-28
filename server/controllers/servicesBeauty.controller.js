@@ -16,7 +16,10 @@ const createBeauty = async (req, res) => {
     req.user.roles.include('staff')
   ) {
     const currentDate = new Date()
+    console.log("curr: ", currentDate);
     const beautyDate = new Date(date)
+    console.log("beautyDate: ", beautyDate);
+    console.log("date: ", date);
     // Kiểm tra nếu date nhỏ hơn hôm nay
     if (beautyDate < currentDate.setHours(0, 0, 0, 0)) {
       throw new ErrorHandler(400, 'The beauty date cannot be in the past.')
@@ -46,9 +49,10 @@ const createBeauty = async (req, res) => {
       time_slot,
     })
     let service_id = beauty.id
+    let {user_id} = req.body;
     const beauty_order = await serviceBeauty.createBeautyOrder({
       service_id,
-      user_id,
+      user_id ,
       pet_id,
       total,
     })
@@ -110,6 +114,7 @@ const getBeautybyID = async (req, res) => {
 }
 
 const deleteBeauty = async (req, res) => {
+  console.log("đã xóa");
   const { user_id } = req.user
   const { id } = req.body
   const user = await userService.getUserById(user_id)
