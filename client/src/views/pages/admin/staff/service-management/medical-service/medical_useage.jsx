@@ -222,8 +222,8 @@ const MedicalServiceUsage = () => {
       <Space style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, marginLeft: 50, width: '100%' }}>
         <Form layout="inline" style={{ border: '1px solid #d9d9d9', padding: '10px', borderRadius: '4px' }}>
           <Form.Item label="Tên thú cưng">
-            <Input placeholder="Nhập tên" style={{ width: 200 }} 
-              onChange={handleSearchChange} 
+            <Input placeholder="Nhập tên" style={{ width: 200 }}
+              onChange={handleSearchChange}
               onPressEnter={handleSearchChange}
             />
           </Form.Item>
