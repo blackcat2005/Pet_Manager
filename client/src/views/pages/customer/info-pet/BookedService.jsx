@@ -80,7 +80,11 @@ export function ServiceTable() {
           service.cancelAppointment(cancelState)
         }
         if (serviceCancel.service_type === 'storage') {
-          service.cancelStorage(cancelState)
+          const cancelStateStorage = {
+            service_id: cancelState.id,
+            status: cancelState.status
+          }
+          service.cancelStorage(cancelStateStorage)
         }
 
         toast.success("Cập nhật thành công")
