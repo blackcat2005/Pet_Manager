@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Table, Space, Typography, Tabs } from 'antd';
-import useService from 'hooks/useService';
+import React, { useState } from 'react'
+import { Table, Space, Typography, Tabs } from 'antd'
+import useService from 'hooks/useService'
 
 const items = [
   {
@@ -18,13 +18,13 @@ const items = [
     label: 'Dịch vụ vệ sinh làm đẹp',
     children: <></>,
   },
-];
+]
 
 const columnsAppoint = [
   {
     title: 'ID',
     dataIndex: 'id',
-    defaultSortOrder: 'descend',
+    defaultSortOrder: 'ascend',
     sorter: (a, b) => a.id - b.id,
     fixed: 'left',
     width: '70px',
@@ -41,13 +41,13 @@ const columnsAppoint = [
     title: 'Đơn vị',
     dataIndex: 'unit',
   },
-];
+]
 
 const columnsStorage = [
   {
     title: 'ID',
     dataIndex: 'id',
-    defaultSortOrder: 'descend',
+    defaultSortOrder: 'ascend',
     sorter: (a, b) => a.id - b.id,
     fixed: 'left',
     width: '70px',
@@ -64,48 +64,54 @@ const columnsStorage = [
     title: 'Đơn vị',
     dataIndex: 'unit',
   },
-];
+]
 
 const ServiceCost = () => {
-  const { serviceAppointment, serviceBeauty, serviceStorage, } = useService()
-  const [listData, setListData] = useState(serviceAppointment);
-  const [col, setCol] = useState(columnsAppoint);
+  const { serviceAppointment, serviceBeauty, serviceStorage } = useService()
+  const [listData, setListData] = useState(serviceAppointment)
+  const [col, setCol] = useState(columnsAppoint)
 
   const onChangeTabs = (key) => {
     switch (key) {
       case '1':
         setListData(serviceAppointment)
         setCol(columnsAppoint)
-        break;
+        break
       case '2':
         setListData(serviceStorage)
         setCol(columnsStorage)
-        break;
+        break
       case '3':
         setListData(serviceBeauty)
         setCol(columnsAppoint)
-        break;
+        break
       default:
         setListData(serviceAppointment)
         setCol(columnsAppoint)
-        break;
+        break
     }
-  };
+  }
 
   return (
-    <div className='service-cost'>
+    <div className="service-cost">
       <Space style={{ width: '100%', justifyContent: 'center' }}>
         <Typography.Title level={2}>Bảng giá dịch vụ</Typography.Title>
-        <br /><br />
+        <br />
+        <br />
       </Space>
       <Tabs defaultActiveKey="1" items={items} onChange={onChangeTabs} />
       <Table
         dataSource={listData}
         columns={col}
-        pagination={{ defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['10', '20', '30'] }}
-      />;
+        pagination={{
+          defaultPageSize: 10,
+          showSizeChanger: true,
+          pageSizeOptions: ['10', '20', '30'],
+        }}
+      />
+      ;
     </div>
   )
-};
+}
 
-export default ServiceCost;
+export default ServiceCost
