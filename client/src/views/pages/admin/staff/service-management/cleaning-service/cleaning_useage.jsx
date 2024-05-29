@@ -78,7 +78,9 @@ const BeautyServiceUsage = () => {
 
   const cancel = () => {
     setEditingKey('');
-    setData(prevData => prevData.filter(item => item.id !== editingKey));
+    if(mode === 'created'){
+      setData(prevData => prevData.filter(item => item.id !== editingKey));
+    }
   };
 
   const handleSave = async (id) => {
@@ -123,8 +125,7 @@ const BeautyServiceUsage = () => {
 
   const handleDelete = async (id) => {
     try {
-      console.log('Deleting record with ID:', id);
-      await beautyService.deleteBeautyService({ id });
+      await beautyService.deleteBeautyService({ service_id : id});
       const newServices = data.filter(item => item.id !== id);
       setData(newServices);
       message.success('Xóa dịch vụ thành công!');
@@ -190,7 +191,7 @@ const BeautyServiceUsage = () => {
   };
 
   const columns = [
-    { title: 'ID', dataIndex: 'service_id', key: 'id', editable: false },
+    { title: 'ID', dataIndex: 'id', key: 'id', editable: false },
     { title: 'Pet ID', dataIndex: 'pet_id', key: 'pet_id', editable: true },
     { title: 'User ID', dataIndex: 'user_id', key: 'user_id', editable: true },
     { title: 'Ngày dịch vụ', dataIndex: 'date', key: 'date', editable: true, inputType: 'date', 

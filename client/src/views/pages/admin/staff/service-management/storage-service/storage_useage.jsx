@@ -81,6 +81,7 @@ const StorageServiceUsage = () => {
       ...record,
       date_start: record.date_start ? moment(record.date_start.toString(), 'YYYY-MM-DD') : null,
       date_end: record.date_end ? moment(record.date_end.toString(), 'YYYY-MM-DD') : null,
+      status: record.status,
     });
     setEditingKey(record.id);
     setMode('update')
@@ -88,7 +89,9 @@ const StorageServiceUsage = () => {
 
   const cancel = () => {
     setEditingKey('');
-    setData(prevData => prevData.filter(item => item.id !== editingKey));
+    if (mode === 'created') {
+      setData(prevData => prevData.filter(item => item.id !== editingKey));
+    }
   };
 
   const handleSave = async (id) => {
@@ -96,7 +99,7 @@ const StorageServiceUsage = () => {
       let row = await form.validateFields();
       const newData = [...data];
       const index = newData.findIndex((item) => id === item.id);
-      console.log(`mode ${mode}`);
+  
       if (mode === 'update') {
         const item = newData[index];
         const updatedItem = { ...item, ...row, id: item.id };
@@ -111,16 +114,19 @@ const StorageServiceUsage = () => {
           date_end: moment(updatedItem.date_end.toString()).format('YYYY-MM-DD'),
           note: updatedItem.note,
           pet_id: updatedItem.pet_id,
+          status: updatedItem.status,
         };
+  
         await service.updateStorageService(updatePayload);
+        await service.updateStorageServiceStatus({ id: updatedItem.id, status: updatedItem.status }); 
+  
         message.success('Cập nhật dịch vụ thành công!');
-      } else if (mode == 'create') {
+      } else if (mode === 'create') {
         row = {
           ...row,
           date_start: moment(row.date_start.toString()).format('YYYY-MM-DD'),
           date_end: moment(row.date_end.toString()).format('YYYY-MM-DD')
         };
-        console.log(row);
         await service.createStorageService(row);
         setData((prev) => [...prev, row]);
         setEditingKey('');
@@ -131,7 +137,6 @@ const StorageServiceUsage = () => {
     }
   };
 
-
   const handleDelete = async (id) => {
     try {
       await service.deleteStorageService({ service_id: id });
@@ -139,7 +144,6 @@ const StorageServiceUsage = () => {
       setData(newServices);
       message.success('Xóa dịch vụ thành công!');
     } catch (error) {
-      console.error('Failed to delete service:', error);
       message.error('Xóa dịch vụ thất bại.');
     }
   };

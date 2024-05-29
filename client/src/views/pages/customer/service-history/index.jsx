@@ -209,7 +209,7 @@ function ServiceHistory() {
           </Button>
         </Space>
       </Space>
-      <Table dataSource={rows} columns={columns} rowKey="order_id" pagination={{ pageSize: 5 }} />
+      <Table dataSource={rows} columns={columns} rowKey="order_id" pagination={{ pageSize: 10 }} />
       <Modal
         title="Thông tin ngân hàng"
         visible={isBankFormVisible}

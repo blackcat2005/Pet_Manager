@@ -1,5 +1,10 @@
 import API from '../axios.config'
 const service = {
+  getAllPrice: () => {
+    const url = '/services/allPrice'
+    return API.get(url)
+  },
+
   getAllStorageService: () => {
     const url = '/services/getAllStorageService'
     return API.get(url)
@@ -12,6 +17,11 @@ const service = {
 
   updateStorageService: (body) => {
     const url = '/services/updateStorageService'
+    return API.put(url, body)
+  },
+
+  updateStorageServiceStatus: (body) => {
+    const url = '/services/updateStorageServiceStatus'
     return API.put(url, body)
   },
 

@@ -17,6 +17,7 @@ const beautyService = {
     },
     
     deleteBeautyService: (body) => {
+      console.log(body);
       const url = '/services/deleteBeauty'
       return API.delete(url, { data: body })
     },

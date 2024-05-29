@@ -1,6 +1,10 @@
 import API from "api/axios.config";
 
 const ServiceHistoryAPI = {
+    getAllPrice: () => {
+        const url = '/services/allPrice'
+        return API.get(url)
+    },
     getStorageServicebyUser_ID: () => {
         const url = '/services/getStorageServicebyUser_ID'
         return API.get(url)
