@@ -5,34 +5,23 @@ const ServiceHistoryAPI = {
         const url = '/services/allPrice'
         return API.get(url)
     },
-    getStorageServicebyUser_ID: () => {
-        const url = '/services/getStorageServicebyUser_ID'
-        return API.get(url)
-    },
     getDetailPet: () => {
         const url = '/services/detailPet'
         return API.get(url)
     },
-    getAllBeautyService: () => {
-        const url = '/services/getAllBeautybyUser_ID'
-        return API.get(url)
+    cancelAppointment: (body) => {
+        const url = '/services/appointment/updateAppointment'
+        return API.put(url, body)
     },
-    getAllAppointmentbyUserSession: () => {
-        const url = '/services/appointment/getAllAppointmentbyUserSession'
-        return API.get(url)
+    cancelBeauty: (body) => {
+        const url = '/services/updateBeauty'
+        return API.put(url, body)
     },
-    deleteBeautyService: (body) => {
-        const url = '/services/deleteBeauty'
-        return API.delete(url, { data: body })
+    cancelStorageService: (body) => {
+        const url = '/services/updateStorageService'
+        return API.put(url, body)
     },
-    deleteStorageService: (body) => {
-        const url = '/services/deleteStorageService'
-        return API.delete(url, { data: body })
-    },
-    deleteAppointment: (body) => {
-        const url = '/services/appointment/deleteAppointment'
-        return API.delete(url, { data: body })
-    },
+  
 }
 
 export default ServiceHistoryAPI

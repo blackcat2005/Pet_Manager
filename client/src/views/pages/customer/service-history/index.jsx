@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Checkbox, Button, Typography, Space, Tag, Select, Modal, Form, Input } from 'antd';
-import { CheckCircleFilled, CloseCircleFilled, SyncOutlined, MinusCircleFilled, ExclamationCircleOutlined } from '@ant-design/icons';
+import { Table, Checkbox, Button, Typography, Space, Select, Modal, Form, Input } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import ServiceHistoryAPI from 'api/service/service-history';
+import { toast } from 'react-toastify';
+import '../../admin/staff/index.css';
 
 const { Option } = Select;
 const { confirm } = Modal;
@@ -17,8 +19,6 @@ function ServiceHistory() {
     const fetchAllServices = async () => {
       try {
         const detailPetResponse = await ServiceHistoryAPI.getDetailPet();
-        console.log("Detail Pet Services:", detailPetResponse.data);
-
         const allServices = detailPetResponse.data.flatMap(pet =>
           pet.services.map(service => ({
             ...service,
@@ -31,7 +31,6 @@ function ServiceHistory() {
             describe: pet.describe
           }))
         );
-
         setRows(allServices);
       } catch (error) {
         console.error("Error fetching data: ", error);
@@ -43,33 +42,46 @@ function ServiceHistory() {
 
   const canCancelService = () => {
     const selectedRows = rows.filter(row => selected.includes(row.order_id));
-    if (selectedRows.some(row => row.status === 'canceled')) {
-      return false;
-    }
-    return true;
+    return !selectedRows.some(row => row.status === 'canceled');
   };
 
-  const handleCancelService = () => {
+  const handleCancelService = async () => {
     if (canCancelService()) {
-      const servicesToDelete = rows.filter(row => selected.includes(row.order_id));
-      const deletePromises = servicesToDelete.map(service =>
-        ServiceHistoryAPI.deleteStorageService({ id: service.order_id })
-      );
-
-      Promise.all(deletePromises)
-        .then(responses => {
-          responses.forEach(response => {
-            if (response.data.status === 'success') {
-              console.log(`Service with ID ${response.data.id} deleted successfully.`);
-            }
-          });
-          // Cập nhật danh sách dịch vụ sau khi xóa
-          setRows(prevRows => prevRows.filter(row => !selected.includes(row.order_id)));
-          setSelected([]);
-        })
-        .catch(error => {
-          console.error("Error deleting services: ", error);
-        });
+      const servicesToUpdate = rows.filter(row => selected.includes(row.order_id));
+      try {
+        for (const service of servicesToUpdate) {
+          const body = { id: service.id, status: 'canceled' };
+          let response;
+          switch (service.service_type) {
+            case 'beauty':
+              response = await ServiceHistoryAPI.cancelBeauty(body);
+              break;
+            case 'storage':
+              response = await ServiceHistoryAPI.cancelStorageService(body);
+              break;
+            case 'appointment':
+              response = await ServiceHistoryAPI.cancelAppointment(body);
+              break;
+            default:
+              throw new Error('Unknown service type');
+          }
+          if (response.data.status === 'success') {
+            console.log(`Service with ID ${response.data.id} updated successfully.`);
+            toast.success("Cập nhật thành công");
+          } else {
+            throw new Error('Failed to update service');
+          }
+        }
+        setRows(prevRows =>
+          prevRows.map(row =>
+            selected.includes(row.order_id) ? { ...row, status: 'canceled' } : row
+          )
+        );
+        setSelected([]);
+      } catch (error) {
+        console.error("Error updating services: ", error);
+        toast.error("Cập nhật thất bại");
+      }
     } else {
       Modal.error({
         title: 'Không thể hủy',
@@ -108,41 +120,34 @@ function ServiceHistory() {
 
   const handleSelect = (record) => {
     const selectedIndex = selected.indexOf(record.order_id);
-    let newSelected = selectedIndex === -1 ? selected.concat(record.order_id) : selected.filter(item => item !== record.order_id);
+    const newSelected = selectedIndex === -1 ? [...selected, record.order_id] : selected.filter(item => item !== record.order_id);
     setSelected(newSelected);
   };
 
   const isSelected = (order_id) => selected.includes(order_id);
 
   const getStatusIcon = (status) => {
-    let icon;
-    let color;
+    let className = '';
     switch (status) {
       case 'created':
-        icon = <CheckCircleFilled style={{ color: '#52c41a' }} />;
-        color = 'green';
+        className = 'status-tag created';
         break;
       case 'canceled':
-        icon = <MinusCircleFilled style={{ color: 'grey' }} />;
-        color = 'grey';
+        className = 'status-tag canceled';
         break;
-      case 'completed':
-        icon = <CheckCircleFilled style={{ color: '#1890ff' }} />;
-        color = 'blue';
+      case 'complete':
+        className = 'status-tag complete';
         break;
       case 'processing':
-        icon = <SyncOutlined spin style={{ color: 'red' }} />;
-        color = 'red';
+        className = 'status-tag processing';
         break;
       default:
-        icon = <CloseCircleFilled style={{ color: 'pink' }} />;
-        color = 'pink';
+        className = 'status-tag';
     }
     return (
-      <Space>
-        {icon}
-        <Tag color={color}>{status}</Tag>
-      </Space>
+      <div className={className}>
+        {status}
+      </div>
     );
   };
 
@@ -166,19 +171,19 @@ function ServiceHistory() {
       Modal.error({
         title: 'Không thể hủy',
         content: 'Dịch vụ đã được hủy.'
-      })
+      });
     }
   };
 
   const columns = [
     {
       title: '',
-      dataIndex: 'order_id',
+      dataIndex: '',
       key: 'checkbox',
       render: (text, record) => (
         <Checkbox checked={isSelected(record.order_id)} onChange={() => handleSelect(record)} />
       )
-    },
+    },    
     { title: 'ID dịch vụ', dataIndex: 'order_id', key: 'order_id' },
     { title: 'Tên thú cưng', dataIndex: 'pet_name', key: 'pet_name' },
     { title: 'Loại dịch vụ', dataIndex: 'service_type', key: 'service_type' },

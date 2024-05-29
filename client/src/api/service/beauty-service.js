@@ -1,7 +1,7 @@
 import API from "api/axios.config";
 const beautyService = {
     getAllBeautyService: () => {
-      const url = '/services/getAllBeautybyUser_ID'
+      const url = '/services/allBeauty'
       return API.get(url)
     },
     
@@ -22,9 +22,5 @@ const beautyService = {
       return API.delete(url, { data: body })
     },
 
-    updateBeautyStatus: (status) => {
-      const url = '/services/updateBeautyStatus'
-      return API.put(url, status)
-    }
 }
 export default beautyService

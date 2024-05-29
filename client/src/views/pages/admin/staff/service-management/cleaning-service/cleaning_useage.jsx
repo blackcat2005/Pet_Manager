@@ -22,7 +22,7 @@ const EditableCell = ({
       <Select>
         <Option value="created">created</Option>
         <Option value="processing">processing</Option>
-        <Option value="completed">completed</Option>
+        <Option value="complete">completed</Option>
         <Option value="canceled">canceled</Option>
       </Select>
     ) : (
@@ -58,7 +58,8 @@ const BeautyServiceUsage = () => {
   useEffect(() => {
     beautyService.getAllBeautyService()
       .then(response => {
-        setData(response.data.allBeauty);
+        setData(response.data.AllBeauty);
+        console.log(response);
       })
       .catch(error => {
         message.error('Lỗi khi tải danh sách dịch vụ');
@@ -68,9 +69,16 @@ const BeautyServiceUsage = () => {
   const isEditing = (record) => record.id === editingKey;
 
   const edit = (record) => {
+    console.log(record);
     form.setFieldsValue({
-      ...record,
-      date: moment(record.date),
+      user_id: record.user_id,
+      date: moment(record.date).format('YYYY-MM-DD'),
+      service_id: record.service_id,
+      pet_id: record.pet_id,
+      note: record.note,
+      time_slot: record.time_slot,
+      total: record.total,
+      status: record.status,
     });
     setEditingKey(record.id);
     setMode('update');
@@ -78,54 +86,63 @@ const BeautyServiceUsage = () => {
 
   const cancel = () => {
     setEditingKey('');
-    if(mode === 'created'){
+    if(mode === 'create'){
       setData(prevData => prevData.filter(item => item.id !== editingKey));
     }
   };
 
   const handleSave = async (id) => {
-  try {
-    const row = await form.validateFields();
-    const newData = [...data];
-
-    if (mode === 'update') {
+    try {
+      const row = await form.validateFields();
+      const newData = [...data];
       const index = newData.findIndex((item) => id === item.id);
-      const item = newData[index];
-      const updatedItem = { ...item, ...row, id: item.id };
-      newData.splice(index, 1, updatedItem);
-      setData(newData);
-      setEditingKey('');
-
-      console.log('Updating record:', updatedItem); 
-      await beautyService.updateBeautyService(updatedItem);
-      console.log(updatedItem.service_id);
-      await beautyService.updateBeautyStatus({ id: updatedItem.service_id, status: updatedItem.status });
-      message.success('Cập nhật dịch vụ thành công!');
-    } else if (mode === 'create') {
-      const payload = {
-        ...row,
-        date: moment(row.date.toString()).format('YYYY-MM-DD'),
-      };
-      console.log("rowww: ", row);
-      const response = await beautyService.createBeautyService(payload);
-      const newItem = {
-        user_id: row.user_id,
-        ...response.data,
-        status: 'created',
-        id: response.data.id,
-      };
-      setData((prev) => [...prev, newItem]);
-      setEditingKey('');
-      message.success('Thêm dịch vụ thành công!');
+  
+      if (mode === 'update') {
+        const item = newData[index];
+        const updatedItem = { ...item, ...row, id: item.id };
+        newData.splice(index, 1, updatedItem);
+        setData(newData);
+        setEditingKey('');
+        
+        console.log(updatedItem);
+        const updatePayload = {
+          id : updatedItem.id,
+          note: updatedItem.note,
+          time_slot: updatedItem.time_slot,
+          pet_id: updatedItem.pet_id,
+          date: moment(updatedItem.date).format('YYYY-MM-DD'),
+          status: updatedItem.status,
+        };
+        console.log(updatePayload);
+        await beautyService.updateBeautyService(updatePayload);
+        message.success('Cập nhật dịch vụ thành công!');
+      } else if (mode === 'create') {
+        const payload = {
+          ...row,
+          date: moment(row.date).format('YYYY-MM-DD'),
+        };
+        console.log(row);
+        const response = await beautyService.createBeautyService(payload);
+        const newItem = {
+          ...payload,
+          id: response.data.id,
+          status: 'created',
+        };
+  
+        newData[index] = newItem; 
+        setData(newData);
+        setEditingKey('');
+        message.success('Thêm dịch vụ thành công!');
+      }
+    } catch (errInfo) {
+      console.log('Validate Failed:', errInfo);
     }
-  } catch (errInfo) {
-    console.log('Validate Failed:', errInfo); 
-  }
-};
+  };
+  
 
   const handleDelete = async (id) => {
     try {
-      await beautyService.deleteBeautyService({ service_id : id});
+      await beautyService.deleteBeautyService({id});
       const newServices = data.filter(item => item.id !== id);
       setData(newServices);
       message.success('Xóa dịch vụ thành công!');
@@ -139,7 +156,7 @@ const BeautyServiceUsage = () => {
     const value = e.target.value.toLowerCase();
     console.log('Search value:', value);
     const filteredData = data.filter(service => {
-      return service.pet_id && service.pet_id.toString().toLowerCase().includes(value);
+      return service.order_pet_id && service.order_pet_id.toString().toLowerCase().includes(value);
     });
     setData(filteredData);
   };
@@ -158,13 +175,13 @@ const BeautyServiceUsage = () => {
   const addNewRow = () => {
     const newRow = {
       id: '',
-      pet_id: '',
-      user_id: '',
+      order_pet_id: '',
+      order_user_id: '',
       date: '',
       note: '',
       status: 'created',
       time_slot: 1,
-      total: 100,
+      order_total: 100,
     };
     console.log('Adding new row:', newRow);
     setData([newRow, ...data]);
@@ -191,15 +208,15 @@ const BeautyServiceUsage = () => {
   };
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', key: 'id', editable: false },
-    { title: 'Pet ID', dataIndex: 'pet_id', key: 'pet_id', editable: true },
-    { title: 'User ID', dataIndex: 'user_id', key: 'user_id', editable: true },
+    { title: 'Service ID', dataIndex: 'id', key: 'id', editable: false },
+    { title: 'Pet ID', dataIndex: 'order_pet_id', key: 'order_pet_id', editable: true },
+    { title: 'User ID', dataIndex: 'order_user_id', key: 'order_user_id', editable: true },
     { title: 'Ngày dịch vụ', dataIndex: 'date', key: 'date', editable: true, inputType: 'date', 
       render: (text) => moment(text.toString()).format('YYYY-MM-DD') 
     },
     { title: 'Ghi chú', dataIndex: 'note', key: 'note', editable: true },
     { title: 'Thời gian', dataIndex: 'time_slot', key: 'time_slot', editable: true },
-    { title: 'Giá dịch vụ', dataIndex: 'total', key: 'total', editable: true },
+    { title: 'Giá dịch vụ', dataIndex: 'order_total', key: 'order_total', editable: true },
     { 
       title: 'Trạng thái', 
       dataIndex: 'status', 
@@ -294,6 +311,7 @@ const BeautyServiceUsage = () => {
           dataSource={data}
           columns={mergedColumns}
           rowClassName="editable-row"
+          rowKey="id" 
           pagination={{ pageSize: 10 }}
         />
       </Form>

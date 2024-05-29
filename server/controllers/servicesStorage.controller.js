@@ -129,7 +129,8 @@ const deleteStorageService = async (req, res) => {
   if (req.user.roles.includes('admin') || req.user.roles.includes('staff')) {
     const storage = await serviceStorage.getStorageServicebyID(service_id)
     const room_id = storage.room_id
-    const room = await roomService.getRoombyID({ room_id })
+    console.log(room_id);
+    const room = await roomService.getRoombyID({room_id} )
     const { current_slot } = room
     const newRoom = await roomService.updateRoom({
       room_id,

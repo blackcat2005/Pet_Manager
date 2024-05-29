@@ -22,7 +22,7 @@ const EditableCell = ({
       <Select>
         <Option value="created">created</Option>
         <Option value="processing">processing</Option>
-        <Option value="completed">completed</Option>
+        <Option value="complete">completed</Option>
         <Option value="canceled">canceled</Option>
       </Select>
     ) : (
@@ -77,7 +77,7 @@ const StorageServiceUsage = () => {
 
   const edit = (record) => {
     form.setFieldsValue({
-      service_id: record.id, // chuyển id thành service_id để truyền đi 
+      service_id: record.id, 
       ...record,
       date_start: record.date_start ? moment(record.date_start.toString(), 'YYYY-MM-DD') : null,
       date_end: record.date_end ? moment(record.date_end.toString(), 'YYYY-MM-DD') : null,
@@ -89,7 +89,7 @@ const StorageServiceUsage = () => {
 
   const cancel = () => {
     setEditingKey('');
-    if (mode === 'created') {
+    if (mode === 'create') {
       setData(prevData => prevData.filter(item => item.id !== editingKey));
     }
   };
@@ -118,8 +118,6 @@ const StorageServiceUsage = () => {
         };
   
         await service.updateStorageService(updatePayload);
-        await service.updateStorageServiceStatus({ id: updatedItem.id, status: updatedItem.status }); 
-  
         message.success('Cập nhật dịch vụ thành công!');
       } else if (mode === 'create') {
         row = {

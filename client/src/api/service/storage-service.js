@@ -20,11 +20,6 @@ const service = {
     return API.put(url, body)
   },
 
-  updateStorageServiceStatus: (body) => {
-    const url = '/services/updateStorageServiceStatus'
-    return API.put(url, body)
-  },
-
   deleteStorageService: (body) => {
     const url = '/services/deleteStorageService'
     return API.delete(url, { data: body })

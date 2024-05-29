@@ -12,22 +12,17 @@ const MedicalService = {
 
     createAppointment: (body) => {
       const url = '/services/appointment/CreateAppointment'
-      return API.get(url)
+      return API.post(url, body)
     },
 
     updateAppointment: (body) => {
       const url = '/services/appointment/updateAppointment'
-      return API.get(url)
-    },
-
-    updateAppointmentStatus: (body) => {
-      const url = '/services/appointment/updateStatus'
-      return API.get(url)
+      return API.put(url, body)
     },
 
     deleteAppointment: (body) => {
       const url = '/services/appointment/deleteAppointment'
-      return API.get(url)
+      return API.delete(url, {data: body})
     },
 }
 export default MedicalService

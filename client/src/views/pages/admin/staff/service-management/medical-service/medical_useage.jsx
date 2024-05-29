@@ -22,7 +22,7 @@ const EditableCell = ({
       <Select>
         <Option value="created">created</Option>
         <Option value="processing">processing</Option>
-        <Option value="completed">completed</Option>
+        <Option value="complete">completed</Option>
         <Option value="canceled">canceled</Option>
       </Select>
     ) : (
@@ -49,11 +49,11 @@ const EditableCell = ({
   );
 };
 
-const StorageServiceUsage = () => {
+const MedicalServiceUsage = () => {
   const [form] = Form.useForm();
   const [data, setData] = useState([]);
   const [editingKey, setEditingKey] = useState('');
-  const [mode, setMode] = useState('create')
+  const [mode, setMode] = useState('create');
 
   useEffect(() => {
     MedicalService.getAllAppointmentbyUserSession()
@@ -64,8 +64,8 @@ const StorageServiceUsage = () => {
         setData(updatedData);
       })
       .catch(error => {
-        console.error('Failed to fetch storage services:', error);
-        message.error('Failed to fetch storage services.');
+        console.error('Failed to fetch medical services:', error);
+        message.error('Failed to fetch medical services.');
       });
   }, []);
 
@@ -74,17 +74,16 @@ const StorageServiceUsage = () => {
   const edit = (record) => {
     form.setFieldsValue({
       ...record,
-      date_start: record.date_start ? moment(record.date_start.toString(), 'YYYY-MM-DD') : null,
-      date_end: record.date_end ? moment(record.date_end.toString(), 'YYYY-MM-DD') : null,
+      date:moment(record.date.toString(), 'YYYY-MM-DD'),
       status: record.status,
     });
     setEditingKey(record.id);
-    setMode('update')
+    setMode('update');
   };
 
   const cancel = () => {
     setEditingKey('');
-    if (mode === 'created') {
+    if (mode === 'create') {
       setData(prevData => prevData.filter(item => item.id !== editingKey));
     }
   };
@@ -94,14 +93,14 @@ const StorageServiceUsage = () => {
       let row = await form.validateFields();
       const newData = [...data];
       const index = newData.findIndex((item) => id === item.id);
-  
+
       if (mode === 'update') {
         const item = newData[index];
         const updatedItem = { ...item, ...row, id: item.id };
         newData.splice(index, 1, updatedItem);
         setData(newData);
         setEditingKey('');
-  
+
         const updatePayload = {
           id: updatedItem.id,
           date: moment(updatedItem.date.toString()).format('YYYY-MM-DD'),
@@ -110,18 +109,17 @@ const StorageServiceUsage = () => {
           status: updatedItem.status,
           time_slot: updatedItem.time_slot,
         };
-  
-        await service.updateAppointment(updatePayload);
-        await service.updateAppointmentStatus({ id: updatedItem.id, status: updatedItem.status }); 
-  
+
+        await MedicalService.updateAppointment(updatePayload);
+
         message.success('Cập nhật dịch vụ thành công!');
       } else if (mode === 'create') {
+        console.log("rowww: ", row);
         row = {
           ...row,
-          date_start: moment(row.date_start.toString()).format('YYYY-MM-DD'),
-          date_end: moment(row.date_end.toString()).format('YYYY-MM-DD')
+          date: moment(row.date.toString()).format('YYYY-MM-DD'),
         };
-        await service.createAppointment(row);
+        await MedicalService.createAppointment(row);
         setData((prev) => [...prev, row]);
         setEditingKey('');
         message.success('Thêm dịch vụ thành công!');
@@ -133,29 +131,30 @@ const StorageServiceUsage = () => {
 
   const handleDelete = async (id) => {
     try {
-      await service.deleteAppointment(service_id);
-      const newServices = data.filter(item => item.service_id0 !== service_id);
+      await MedicalService.deleteAppointment({ id });
+      const newServices = data.filter(item => item.id !== id);
       setData(newServices);
       message.success('Xóa dịch vụ thành công!');
     } catch (error) {
       message.error('Xóa dịch vụ thất bại.');
     }
   };
+  
 
   const handleSearchChange = (e) => {
     const value = e.target.value.toLowerCase();
-    service.getAllStorageService()
+    MedicalService.getAllAppointmentbyUserSession()
       .then(response => {
         const filteredData = response.data.allAppointment.filter(service => {
-        return service.pet_id && service.pet_id.toString().toLowerCase().includes(value);
-      }).map(item => ({
-        ...item,
-      }));
-      setData(filteredData);
+          return service.pet_id && service.pet_id.toString().toLowerCase().includes(value);
+        }).map(item => ({
+          ...item,
+        }));
+        setData(filteredData);
       })
       .catch(error => {
-        console.error('Failed to fetch storage services:', error);
-        message.error('Failed to fetch storage services.');
+        console.error('Failed to fetch medical services:', error);
+        message.error('Failed to fetch medical services.');
       });
   };
 
@@ -205,15 +204,18 @@ const StorageServiceUsage = () => {
   };
 
   const columns = [
-    { title: 'ID Dịch vụ', dataIndex: 'service_id', key: 'service_id', editable: false },
-    { title: 'ID Thú cưng', dataIndex: 'pet_id', key: 'pet_id', editable: true },
-    { title: 'ID Người dùng', dataIndex: 'user_id', key: 'user_id', editable: true },
-    { title: 'Ngày tạo', dataIndex: 'created_at', key: 'created_at', editable: false, render: (text) => moment(text).format('YYYY-MM-DD') },
-    { title: 'Ngày khám', dataIndex: 'date', key: 'date', editable: true, inputType: 'date', render: (text) => moment(text).format('YYYY-MM-DD') },
+    { title: 'Service ID', dataIndex: 'id', key: 'id', editable: false },
+    { title: 'Pet ID', dataIndex: 'pet_id', key: 'pet_id', editable: true },
+    { title: 'User ID', dataIndex: 'user_id', key: 'user_id', editable: true },
+    {
+      title: 'Ngày khám', dataIndex: 'date', key: 'date', editable: true, inputType: 'date',
+      render: (text) => moment(text).format('YYYY-MM-DD')
+    },
     { title: 'Ghi chú', dataIndex: 'note', key: 'note', editable: true },
     { title: 'Thời gian khám', dataIndex: 'time_slot', key: 'time_slot', editable: true },
     { title: 'Tổng cộng', dataIndex: 'total', key: 'total', editable: true },
-    { title: 'Trạng thái', dataIndex: 'status', key: 'status', editable: true, inputType: 'select',
+    {
+      title: 'Trạng thái', dataIndex: 'status', key: 'status', editable: true, inputType: 'select',
       render: (status) => (
         <span className={'status-tag ' + status}>
           {status}
@@ -228,7 +230,7 @@ const StorageServiceUsage = () => {
         return editable ? (
           <span>
             <a
-              onClick={async () => { await handleSave(record.id); }}
+              onClick={async () => { await handleSave(record.id) }}
               style={{
                 marginRight: 8,
               }}
@@ -244,7 +246,7 @@ const StorageServiceUsage = () => {
             <a className="action-link" disabled={editingKey !== ''} onClick={() => edit(record)}>
               Cập nhật
             </a>
-            <a className="action-link" onClick={() => showConfirm(record.id)}>Xóa</a>
+            <a className="action-link" onClick={() => showConfirm(record.service_id)}>Xóa</a>
           </Space>
         );
       },
@@ -269,7 +271,7 @@ const StorageServiceUsage = () => {
 
   return (
     <div>
-      <Typography.Title level={2} style={{ textAlign: 'center' }}>Sử dụng dịch vụ</Typography.Title>
+      <Typography.Title level={2} style={{ textAlign: 'center' }}>Sử dụng dịch vụ y tế</Typography.Title>
       <Space style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, marginLeft: 50, width: '100%' }}>
         <Form layout="inline" style={{ border: '1px solid #d9d9d9', padding: '10px', borderRadius: '4px' }}>
           <Form.Item label="ID thú cưng">
@@ -284,10 +286,10 @@ const StorageServiceUsage = () => {
       <Row style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography.Title level={3} style={{ marginBottom: 0 }}>Search Table</Typography.Title>
         <Space>
-        <Select placeholder="Sắp xếp theo" style={{ width: 200 }} onChange={handleSortChange}>
-          <Option value="date_start-ascend">Ngày bắt đầu (Tăng dần)</Option>
-          <Option value="date_start-descend">Ngày bắt đầu (Giảm dần)</Option>
-        </Select>
+          <Select placeholder="Sắp xếp theo" style={{ width: 200 }} onChange={handleSortChange}>
+            <Option value="date-ascend">Ngày khám (Tăng dần)</Option>
+            <Option value="date-descend">Ngày khám (Giảm dần)</Option>
+          </Select>
           <Button type="primary" icon={<PlusOutlined />} onClick={addNewRow}>Thêm mới</Button>
         </Space>
       </Row>
@@ -309,4 +311,4 @@ const StorageServiceUsage = () => {
   );
 };
 
-export default StorageServiceUsage;
+export default MedicalServiceUsage;
