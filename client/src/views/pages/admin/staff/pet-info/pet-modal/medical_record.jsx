@@ -234,9 +234,9 @@ const MedicalRecordModal = ({ visible, onCancel, selectedPet, onSave }) => {
             <Card style={{ flex: 1 }}>
               <Meta
                 title={
-                  <div className="flex flex-row items-center gap-2">
-                    <p className="text-xl font-bold">HỒ SƠ BỆNH ÁN</p>{' '}
-                    <p className="flex flex-row items-center text-xs font-thin">
+                  <div className="flex flex-row items-center gap-2  justify-between">
+                    <div className="text-xl font-bold">HỒ SƠ BỆNH ÁN</div>
+                    <div className="flex flex-row items-center text-xs font-large">
                       NGÀY KHÁM:
                       <EditableField
                         value={editableFields['date']}
@@ -246,7 +246,7 @@ const MedicalRecordModal = ({ visible, onCancel, selectedPet, onSave }) => {
                         onBlur={() => handleBlur('date')}
                         onKeyDown={(e) => handleKeyDown('date', e)}
                       />
-                    </p>
+                    </div>
                   </div>
                 }
                 description={

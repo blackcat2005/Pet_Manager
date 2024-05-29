@@ -8,6 +8,7 @@ import ResetPassword from 'views/pages/forgot-password/reset-password'
 import Homepage from 'views/pages/homePage'
 import { RoleProtectedRoute } from './role.protected.route'
 import GuestRoute from './guest-route'
+import ManageMedicalRecord from 'views/pages/admin/staff/manage-medical-record'
 
 const PetList = loadableComponent(() => import('views/pages/customer/info-pet'))
 const PetInfo = loadableComponent(
@@ -100,7 +101,7 @@ function AllRoutes() {
             path="/pet/basic-info/:slug"
             element={<MainLayout component={PetInfo} />}
           />
-          
+
           <Route
             path="/service-register"
             element={<MainLayout component={ServiceRegisterPet} />}
@@ -124,7 +125,10 @@ function AllRoutes() {
             path="/staff/customer-manage"
             element={<MainLayout component={ManageCustomer} />}
           />
-          
+          <Route
+            path="/staff/medical-record-manage"
+            element={<MainLayout component={ManageMedicalRecord} />}
+          />
         </Route>
 
         <Route element={<RoleProtectedRoute roles={['admin']} />}>
@@ -152,22 +156,13 @@ function AllRoutes() {
             path="/admin/staff-manage/update"
             element={<MainLayout component={UpdateStaffForm} />}
           />
+          <Route
+            path="/admin/medical-record-manage"
+            element={<MainLayout component={ManageMedicalRecord} />}
+          />
         </Route>
 
         <Route element={<RoleProtectedRoute roles={['staff', 'admin']} />}>
-          
-          
-        </Route>
-
-        <Route
-          element={
-            <RoleProtectedRoute roles={['staff', 'customer', 'admin']} />
-          }
-        >
-          <Route
-            path="/personal-info"
-            element={<MainLayout component={PersonalInfo} />}
-          />
           <Route
             path="/cleaning-info"
             element={<MainLayout component={CleaningInfo} />}
@@ -191,6 +186,17 @@ function AllRoutes() {
           <Route
             path="/storage-used"
             element={<MainLayout component={StorageServiceUsage} />}
+          />
+        </Route>
+
+        <Route
+          element={
+            <RoleProtectedRoute roles={['staff', 'customer', 'admin']} />
+          }
+        >
+          <Route
+            path="/personal-info"
+            element={<MainLayout component={PersonalInfo} />}
           />
         </Route>
 

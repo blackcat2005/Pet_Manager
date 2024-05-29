@@ -27,6 +27,7 @@ const customerMenu = [
 const staffMenu = [
   getItem('Quản lí thú cưng', '/staff/pet-manage', <TableOutlined />),
   getItem('Quản lí khách hàng', '/staff/customer-manage', <TableOutlined />),
+  getItem('Hồ sơ khám bệnh', '/staff/medical-record-manage', <FormOutlined />),
   getItem('Khám bệnh', 'medical-service', <FormOutlined />, [
     getItem('Sử dụng dịch vụ', '/medical-used'),
     getItem('Thông tin dịch vụ', '/medical-info'),
@@ -46,6 +47,7 @@ const adminMenu = [
   getItem('Quản lý khách hàng', '/admin/customer-manage', <FormOutlined />),
   getItem('Quản lý nhân viên', '/admin/staff-manage', <FormOutlined />),
   getItem('Quản lý thú cưng', '/admin/pet-manage', <FormOutlined />),
+  getItem('Hồ sơ khám bệnh', '/admin/medical-record-manage', <FormOutlined />),
   getItem('Khám bệnh', 'medical-service', <FormOutlined />, [
     getItem('Sử dụng dịch vụ', '/medical-used'),
     getItem('Thông tin dịch vụ', '/medical-info'),

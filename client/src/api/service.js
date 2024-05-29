@@ -41,7 +41,15 @@ const service = {
   cancelStorage: (body) => {
     const url = '/services/updateStorageService'
     return API.put(url, body)
-  }
+  },
+  getAllAppointment: () => {
+    const url = '/services/getAllAppointmentbyUserSession'
+    return API.get(url)
+  },
+  createMedicalRecord: (body) => {
+    const url = `/services/appointment/CreateMedicalRecord`
+    return API.post(url, body)
+  },
 }
 
 export default service
