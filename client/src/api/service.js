@@ -31,15 +31,15 @@ const service = {
     return API.get(url)
   },
   cancelAppointment: (body) => {
-    const url = '/services/appointment/updateStatus'
+    const url = '/services/updateAppointment'
     return API.put(url, body)
   },
   cancelBeauty: (body) => {
-    const url = '/services/updateBeautyStatus'
+    const url = '/services/updateBeauty'
     return API.put(url, body)
   },
   cancelStorage: (body) => {
-    const url = '/services/updateStorageServiceStatus'
+    const url = '/services/updateStorageService'
     return API.put(url, body)
   }
 }
