@@ -70,6 +70,8 @@ const getStorageServicebyIDdb = async (service_id) => {
        WHERE ss.id = $1`,
     [service_id],
   )
+  console.log(service_id);
+  console.log(StorageServicebyID);
   return StorageServicebyID[0]
 }
 

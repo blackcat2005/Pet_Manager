@@ -164,20 +164,21 @@ const deleteBeauty = async (req, res) => {
 
 const updateBeauty = async (req, res) => {
   const { user_id } = req.user
-  const { id, date, note, time_slot, pet_id, status } = req.body
   const validStatuses = ['complete', 'canceled', 'processing']
   const user = await userService.getUserById(user_id)
   if (!user) {
     throw new ErrorHandler(404, 'User not found')
   }
-  if (!validStatuses.includes(status)) {
-    return res.status(400).json({
-      status: 'error',
-      message: 'Invalid status',
-    })
-  }
+
   try {
       if (req.user.roles.includes('admin') || req.user.roles.includes('staff')) {
+        const { id, date, note, time_slot, pet_id, status } = req.body
+        if (!validStatuses.includes(status)) {
+          return res.status(400).json({
+            status: 'error',
+            message: 'Invalid status',
+          })
+        }
         const response = await serviceBeauty.updateBeautyStatus({ id, status })
         const update_beauty = await serviceBeauty.updateBeauty({
           id,
@@ -198,19 +199,36 @@ const updateBeauty = async (req, res) => {
           update_beauty,
         })
       } else if (req.user.roles.includes('customer')) {
+        const { id, date, note, time_slot, pet_id, status } = req.body
+        if (!status) {
+        const response = await serviceBeauty.updateBeauty({
+          id,
+          date,
+          note,
+          time_slot,
+          pet_id,
+        })
+          return res.status(200).json({
+            status: 'success',
+            message: response.message,
+          })          
+        }
         if (status != 'canceled') {
           return res.status(401).json({
             status: 'error',
             message: 'Unauthorized action',
           })
         }
-        const response = await serviceBeauty.updateBeautyStatus({ id, status })
-        const update_beauty = await serviceBeauty.updateBeauty({
+        if (!date || !note || !time_slot || !pet_id || status) {
+          const response = await serviceBeauty.updateBeautyStatus({ id, status })
+          return res.status(200).json({
+            status: 'success',
+            message: response.message,
+          })  
+        }
+        const response = await serviceBeauty.updateBeautyStatus({
           id,
-          date,
-          note,
-          time_slot,
-          pet_id,
+          status,
         })
         if (response.message === 'Beauty not found') {
           return res.status(404).json({
@@ -218,6 +236,13 @@ const updateBeauty = async (req, res) => {
             message: response.message,
           })
         }
+        const update_beauty = await serviceBeauty.updateBeauty({
+          id,
+          date,
+          note,
+          time_slot,
+          pet_id,
+        })
         res.status(200).json({
           status: 'success',
           update_beauty,

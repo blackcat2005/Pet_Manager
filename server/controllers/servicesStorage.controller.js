@@ -123,8 +123,8 @@ const deleteStorageService = async (req, res) => {
     throw new ErrorHandler(404, 'User not found')
   }
   if (req.user.roles.includes('admin') || req.user.roles.includes('staff')) {
-    const storage = await serviceStorage.getStorageServicebyID({ service_id })
-    const room_id = storage[0].room_id
+    const storage = await serviceStorage.getStorageServicebyID(service_id)
+    const room_id = storage.room_id
     const room = await roomService.getRoombyID({ room_id })
     const { current_slot } = room
     const newRoom = await roomService.updateRoom({
@@ -159,6 +159,7 @@ const updateStorageService = async (req, res) => {
     throw new ErrorHandler(404, 'User not found')
   }
   if (req.user.roles.includes('admin') || req.user.roles.includes('staff')) {
+    console.log(service_id);
     const storage = await serviceStorage.getStorageServicebyID(service_id)
     console.log(storage);
     const old_room_id = storage.room_id
@@ -194,17 +195,52 @@ const updateStorageService = async (req, res) => {
     }
     res.status(200).json({
       status: 'success',
-      // update_storage,
-      // update_Oldroom,
-      // update_Newroom,
       response,
     })
   } else if (req.user.roles.includes('customer')) {
+      if (!status) {
+        const storage = await serviceStorage.getStorageServicebyID(service_id)
+        const old_room_id = storage.room_id
+        const old_room = await roomService.getRoombyID({ room_id: old_room_id })
+        const old_slot = old_room.current_slot
+        const update_Oldroom = await roomService.updateRoom({
+          room_id: old_room_id,
+          current_slot: old_slot + 1,
+        })
+        const response = await serviceStorage.updateStorageService({
+          id: service_id,
+          room_id,
+          note,
+          pet_id,
+          date_start,
+          date_end,
+        })
+        const new_room = await roomService.getRoombyID({ room_id })
+        const { current_slot } = new_room
+        const update_Newroom = await roomService.updateRoom({
+          room_id,
+          current_slot: current_slot - 1,
+        })  
+        return res.status(200).json({
+          status: 'success',
+          message: response.message,
+        })
+      }
       if (status !== 'canceled') {
         return res.status(401).json({
           status: 'error',
           message: 'Unauthorized action',
         })
+      }
+      if (!room_id || !note || !pet_id || !date_start || !date_end) {
+        const response = serviceStorage.updateStorageServiceStatus({
+          id: service_id,
+          status,
+        })
+        return res.status(200).json({
+          status: 'success',
+          message: response.message,
+        })     
       }
       const storage = await serviceStorage.getStorageServicebyID(service_id)
       const old_room_id = storage.room_id
