@@ -129,7 +129,7 @@ const getAppointmentbyIDdb = async (appointment_id) => {
     INNER JOIN appointment_orders ON appointments.id = appointment_orders.service_id
     INNER JOIN time_slot_appointment ON appointments.time_slot = time_slot_appointment.id
     WHERE appointments.id = $1`,
-    [id],
+    [appointment_id],
   )
   if (appointmentById.length === 0) {
     return { message: 'No appointment found with the specified ID' }

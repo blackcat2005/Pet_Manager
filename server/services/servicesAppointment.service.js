@@ -82,7 +82,7 @@ class ServiceAppointment {
   getAppointmentbyID = async (appointment_id) => {
     try {
       // console.log(user_id)
-      return await getAppointmentbyIDdb(id)
+      return await getAppointmentbyIDdb(appointment_id)
     } catch (error) {
       console.log(error)
       throw new ErrorHandler(error.statusCode, 'getAppointmentbyID False')

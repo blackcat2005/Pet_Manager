@@ -94,14 +94,14 @@ const StorageServiceUsage = () => {
       let row = await form.validateFields();
       const newData = [...data];
       const index = newData.findIndex((item) => id === item.id);
-  
+
       if (mode === 'update') {
         const item = newData[index];
         const updatedItem = { ...item, ...row, id: item.id };
         newData.splice(index, 1, updatedItem);
         setData(newData);
         setEditingKey('');
-  
+
         const updatePayload = {
           id: updatedItem.id,
           date: moment(updatedItem.date.toString()).format('YYYY-MM-DD'),
@@ -110,10 +110,10 @@ const StorageServiceUsage = () => {
           status: updatedItem.status,
           time_slot: updatedItem.time_slot,
         };
-  
+
         await service.updateAppointment(updatePayload);
-        await service.updateAppointmentStatus({ id: updatedItem.id, status: updatedItem.status }); 
-  
+        await service.updateAppointmentStatus({ id: updatedItem.id, status: updatedItem.status });
+
         message.success('Cập nhật dịch vụ thành công!');
       } else if (mode === 'create') {
         row = {
@@ -147,11 +147,11 @@ const StorageServiceUsage = () => {
     service.getAllStorageService()
       .then(response => {
         const filteredData = response.data.allAppointment.filter(service => {
-        return service.pet_id && service.pet_id.toString().toLowerCase().includes(value);
-      }).map(item => ({
-        ...item,
-      }));
-      setData(filteredData);
+          return service.pet_id && service.pet_id.toString().toLowerCase().includes(value);
+        }).map(item => ({
+          ...item,
+        }));
+        setData(filteredData);
       })
       .catch(error => {
         console.error('Failed to fetch storage services:', error);
@@ -213,7 +213,8 @@ const StorageServiceUsage = () => {
     { title: 'Ghi chú', dataIndex: 'note', key: 'note', editable: true },
     { title: 'Thời gian khám', dataIndex: 'time_slot', key: 'time_slot', editable: true },
     { title: 'Tổng cộng', dataIndex: 'total', key: 'total', editable: true },
-    { title: 'Trạng thái', dataIndex: 'status', key: 'status', editable: true, inputType: 'select',
+    {
+      title: 'Trạng thái', dataIndex: 'status', key: 'status', editable: true, inputType: 'select',
       render: (status) => (
         <span className={'status-tag ' + status}>
           {status}
@@ -284,10 +285,10 @@ const StorageServiceUsage = () => {
       <Row style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography.Title level={3} style={{ marginBottom: 0 }}>Search Table</Typography.Title>
         <Space>
-        <Select placeholder="Sắp xếp theo" style={{ width: 200 }} onChange={handleSortChange}>
-          <Option value="date_start-ascend">Ngày bắt đầu (Tăng dần)</Option>
-          <Option value="date_start-descend">Ngày bắt đầu (Giảm dần)</Option>
-        </Select>
+          <Select placeholder="Sắp xếp theo" style={{ width: 200 }} onChange={handleSortChange}>
+            <Option value="date_start-ascend">Ngày bắt đầu (Tăng dần)</Option>
+            <Option value="date_start-descend">Ngày bắt đầu (Giảm dần)</Option>
+          </Select>
           <Button type="primary" icon={<PlusOutlined />} onClick={addNewRow}>Thêm mới</Button>
         </Space>
       </Row>
