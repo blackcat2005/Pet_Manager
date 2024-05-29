@@ -152,19 +152,19 @@ const deleteAppointment = async (req, res) => {
 
 const updateAppointment = async (req, res) => {
   const { user_id } = req.user
-  const { id, date, note, time_slot, pet_id, status } = req.body
-  const validStatuses = ['complete', 'canceled', 'processing']
-  if (!validStatuses.includes(status)) {
-    return res.status(400).json({
-      status: 'error',
-      message: 'Invalid status',
-    })
-  }
   const user = await userService.getUserById(user_id)
   if (!user) {
     throw new ErrorHandler(404, 'User not found')
   }
   if (req.user.roles.includes('admin') || req.user.roles.includes('staff')) {
+    const { id, date, note, time_slot, pet_id, status } = req.body
+    const validStatuses = ['complete', 'canceled', 'processing']
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Invalid status',
+      })
+    }
     const update_appointment = await serviceAppointment.updateAppointment({id,date,note,time_slot,pet_id})
     const response = await serviceAppointment.updateAppointmentStatus({id,status})
     if (response.message === 'Appointment not found') {
@@ -179,11 +179,29 @@ const updateAppointment = async (req, res) => {
     })
     
   }else if(req.user.roles.includes('customer')) {
+    const { id, date, note, time_slot, pet_id, status } = req.body;
+    if (!status){ 
+      const response = await serviceAppointment.updateAppointment({id,date,note,time_slot,pet_id})
+      return res.status(200).json({
+        status: 'success',
+        message: response.message
+      })
+    }
     if (status !== 'canceled') {
       return res.status(401).json({
         status: 'error',
         message: 'Unauthorized action',
       })
+    }
+    if (!date || !note || !time_slot || !pet_id) {
+    const response = await serviceAppointment.updateAppointmentStatus({
+      id,
+      status,
+    })
+      return res.status(200).json({
+        status: 'success',
+        message: response.message,
+      })          
     }
     const response = await serviceAppointment.updateAppointmentStatus({id,status})
     if (response.message === 'Appointment not found') {
