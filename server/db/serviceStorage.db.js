@@ -61,10 +61,9 @@ const getAllStorageServiceDB = async () => {
   return allStorageService
 }
 
-const getStorageServicebyIDdb = async ({ service_id }) => {
-  console.log(service_id)
+const getStorageServicebyIDdb = async (service_id) => {
   const { rows: StorageServicebyID } = await pool.query(
-    `SELECT ss.*, so.user_id, so.pet_id, so.total, so.create_at
+    `SELECT ss.*, so.user_id, so.pet_id, so.total, so.create_at, ro.*
        FROM "storage" ss
        JOIN "storage_orders" so ON ss.id = so.service_id
        JOIN "room" ro ON ss.room_id = ro.id
@@ -77,13 +76,14 @@ const getStorageServicebyIDdb = async ({ service_id }) => {
 
 const getStorageServicebyUser_IDdb = async ({ user_id }) => {
   const { rows: StorageServicebyUser_ID } = await pool.query(
-    `SELECT ss.*, so.user_id, so.pet_id, so.total, so.create_at
+    `SELECT ss.*, so.user_id, so.pet_id, so.total, so.create_at, ro.*
        FROM "storage" ss
        JOIN "storage_orders" so ON ss.id = so.service_id
        JOIN "room" ro ON ss.room_id = ro.id
        WHERE so.user_id = $1`,
     [user_id],
   )
+  console.log(StorageServicebyUser_ID)
   return StorageServicebyUser_ID
 }
 

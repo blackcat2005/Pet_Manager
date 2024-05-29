@@ -37,10 +37,9 @@ class ServiceService {
       throw new ErrorHandler(error.statusCode, 'getAllStorageServicedb False')
     }
   }
-  getStorageServicebyID = async (StorageServicebyID) => {
+  getStorageServicebyID = async (service_id) => {
     try {
-      const e = await getStorageServicebyIDdb(StorageServicebyID)
-      console.log(e);
+      const e = await getStorageServicebyIDdb(service_id)
       return e
     } catch (error) {
       console.log(error)

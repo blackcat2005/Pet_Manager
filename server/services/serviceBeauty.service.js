@@ -2,12 +2,14 @@ const { ErrorHandler } = require('../helpers/error')
 const {
   createBeautydb,
   createBeautyOrderdb,
+  getAllBeautyDB,
   getBeautysByDateAndTimeSlotdb,
   getBeautybyIDdb,
   getAllBeautybyUser_IDdb,
   deleteBeautydb,
   updateBeautydb,
   updateBeautyStatusdb,
+  getBeautybyPetIDdb,
 } = require('../db/serviceBeauty.db')
 
 class ServiceService {
@@ -29,9 +31,27 @@ class ServiceService {
     }
   }
 
+  getAllBeauty = async () => {
+    try {
+      return await getAllBeautyDB()
+    } catch (error) {
+      console.log(error)
+      throw new ErrorHandler(error.statusCode, 'getAllBeauty False')
+    }
+  }
+
   getBeautysByDateAndTimeSlot = async (date, time_slot) => {
     try {
       return await getBeautysByDateAndTimeSlotdb(date, time_slot)
+    } catch (error) {
+      console.log(error)
+      throw new ErrorHandler(error.statusCode, error.message)
+    }
+  }
+
+  getBeautybyPetID = async (pet_id) => {
+    try {
+      return await getBeautybyPetIDdb(pet_id)
     } catch (error) {
       console.log(error)
       throw new ErrorHandler(error.statusCode, error.message)

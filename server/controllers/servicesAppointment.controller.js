@@ -175,36 +175,57 @@ const deleteAppointment = async (req, res) => {
 
 const updateAppointment = async (req, res) => {
   const { user_id } = req.user
-  const { id, date, note, time_slot, pet_id } = req.body
+  const { id, date, note, time_slot, pet_id, status } = req.body
+  const validStatuses = ['complete', 'canceled', 'processing']
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Invalid status',
+    })
+  }
   const user = await userService.getUserById(user_id)
   if (!user) {
     throw new ErrorHandler(404, 'User not found')
   }
-  if (+user_id === req.user.user_id || req.user.roles.includes('admin') || req.user.roles.include('staff')) {
-    const update_appointment = await serviceAppointment.updateAppointment({
-      id,
-      date,
-      note,
-      time_slot,
-      pet_id,
-    })
+  if (req.user.roles.includes('admin') || req.user.roles.includes('staff')) {
+    const update_appointment = await serviceAppointment.updateAppointment({id,date,note,time_slot,pet_id})
+    const response = await serviceAppointment.updateAppointmentStatus({id,status})
+    if (response.message === 'Appointment not found') {
+      return res.status(404).json({
+        status: 'error',
+        message: response.message,
+      })
+    }    
     res.status(200).json({
       status: 'success',
-      update_appointment,
+      message: response.message,
     })
-  } else {
+    
+  }else if(req.user.roles.includes('customer')) {
+    if (status !== 'canceled') {
+      return res.status(401).json({
+        status: 'error',
+        message: 'Unauthorized action',
+      })
+    }
+    const response = await serviceAppointment.updateAppointmentStatus({id,status})
+    if (response.message === 'Appointment not found') {
+      return res.status(404).json({
+        status: 'error',
+        message: response.message,
+      })
+    }
+    await serviceAppointment.updateAppointment({id,date,note,time_slot,pet_id});
+    res.status(200).json({      
+      status: 'success',
+      message: response.message})
+  }else {
     throw new ErrorHandler(401, 'Unauthorized')
   }
 }
 
 const updateAppointmentStatus = async (req, res) => {
-  // const { user_id } = req.user
   const { id, status } = req.body
-  // const user = await userService.getUserById(user_id)
-  // if (!user) {
-  //   throw new ErrorHandler(404, 'User not found')
-  // }
-  // Kiểm tra xem trạng thái có hợp lệ không
   const validStatuses = ['complete', 'canceled', 'processing']
   if (!validStatuses.includes(status)) {
     return res.status(400).json({

@@ -30,9 +30,7 @@ const getPetListByUser_idDb = async (user_id) => {
 }
 
 const getAllPetdb = async () => {
-  const { rows: pets } = await pool.query(
-    'SELECT * FROM pets',
-  )
+  const { rows: pets } = await pool.query('SELECT * FROM pets')
   return pets
 }
 
@@ -156,7 +154,7 @@ const getServicePetbyUser_ID = async ({ id }) => {
   const pets = petResult.rows
   const servicesQuery = `
       SELECT 
-        s.id,
+        s.id as id,
         so.pet_id, 
         so.id AS order_id, 
         'storage' AS service_type, 
@@ -173,7 +171,7 @@ const getServicePetbyUser_ID = async ({ id }) => {
       UNION
 
       SELECT 
-        b.id,
+        b.id as id,
         bo.pet_id, 
         bo.id AS order_id, 
         'beauty' AS service_type, 
@@ -190,7 +188,7 @@ const getServicePetbyUser_ID = async ({ id }) => {
       UNION
 
       SELECT 
-        a.id,
+        a.id as id, 
         ao.pet_id, 
         ao.id AS order_id, 
         'appointment' AS service_type, 

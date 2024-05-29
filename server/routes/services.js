@@ -14,11 +14,12 @@ const {
 } = require('../controllers/servicesAppointment.controller')
 const {
   createBeauty,
+  allBeauty,
   getAllBeautybyUser_ID,
   getBeautybyID,
   deleteBeauty,
   updateBeauty,
-  updateBeautyStatus,
+  getBeautybyPet_ID,
 } = require('../controllers/servicesBeauty.controller')
 const {
   createStorageService,
@@ -49,11 +50,13 @@ router.route('/getAllAppointmentbyPetId').get(getAllAppointmentbyPetId)
 router.route('/getAppointmentbyID').get(getAppointmentbyID)
 router.route('/deleteAppointment').delete(deleteAppointment)
 router.route('/updateAppointment').put(updateAppointment)
-router.route('/updateStatus').put( updateAppointmentStatus)
+router.route('/updateStatus').put(updateAppointmentStatus)
 
 //Medical Records
 router.route('/CreateMedicalRecord').post(createMedicalRecord)
-router.route('/getMedicalRecordsbyAppointmentId').get(getMedicalRecordsByAppointmentId)
+router
+  .route('/getMedicalRecordsbyAppointmentId')
+  .get(getMedicalRecordsByAppointmentId)
 router.route('/getMedicalRecordsbyPetId').get(getMedicalRecordsbyPetId)
 router.route('/updateMedicalRecord').put(updateMedicalRecord)
 
@@ -63,19 +66,17 @@ router.route('/getAllStorageService').get(verifyStaff, getAllStorageService)
 router.route('/getStorageServicebyID').get(verifyStaff, getStorageServicebyID)
 router.route('/getStorageServicebyUser_ID').get(getStorageServicebyUser_ID)
 router.route('/deleteStorageService').delete(deleteStorageService)
-router.route('/updateStorageService').put(verifyStaff, updateStorageService)
-router
-  .route('/updateStorageServiceStatus')
-  .put(updateStorageServiceStatus)
+router.route('/updateStorageService').put(updateStorageService)
 router.route('/allRoom').get(getAllRoom)
 
 // Beauty
 router.route('/createBeauty').post(createBeauty)
+router.route('/allBeauty').get(allBeauty)
 router.route('/getAllBeautybyUser_ID').get(getAllBeautybyUser_ID)
+router.route('/getBeautybyPet_ID').get(getBeautybyPet_ID)
 router.route('/getBeautybyID').get(verifyStaff, getBeautybyID)
 router.route('/deleteBeauty').delete(verifyStaff, deleteBeauty)
-router.route('/updateBeauty').put(verifyStaff, updateBeauty)
-router.route('/updateBeautyStatus').put(updateBeautyStatus)
+router.route('/updateBeauty').put(updateBeauty)
 
 router.route('/detailPet').get(servicePet)
 
