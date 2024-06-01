@@ -2,7 +2,7 @@ import axios from 'axios'
 import queryString from 'query-string'
 
 const API = axios.create({
-  baseURL: 'http://localhost:9000/v1/api',
+  baseURL: 'https://pet-manager.onrender.com/v1/api',
   withCredentials: true,
   headers: {
     'content-type': 'application/json',

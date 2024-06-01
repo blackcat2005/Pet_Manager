@@ -8,11 +8,23 @@ const helmet = require('helmet')
 const compression = require('compression')
 const unknownEndpoint = require('./middleware/unKnownEndpoint')
 const { handleError } = require('./helpers/error')
+const { WHITELIST } = require('./config/whitelist')
 
 const app = express()
 
 app.set('trust proxy', 1)
-app.use(cors({ credentials: true, origin: true }))
+app.use(
+  cors({
+    credentials: true,
+    origin: function (origin, callback) {
+      if (WHITELIST.includes(origin)) {
+        return callback(null, true)
+      }
+
+      return callback(new Error('Not allowed by CORS'))
+    },
+  }),
+)
 app.use(express.json())
 app.use(morgan('dev'))
 app.use(compression())
