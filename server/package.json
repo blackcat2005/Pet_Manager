@@ -18,6 +18,10 @@
       "/node_modules/"
     ]
   },
+  "engines": {
+    "node": "20.x",
+    "npm": "10.2.4"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
